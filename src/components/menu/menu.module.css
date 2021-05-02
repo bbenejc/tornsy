@@ -1,0 +1,55 @@
+.Menu {
+  background-color: var(--color-paper);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  padding: 0 8px;
+}
+
+.Stock {
+  padding: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.Intervals {
+  display: flex;
+  padding: 0 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.Intervals a {
+  padding: 8px;
+  color: inherit;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.Intervals a:hover,
+.Stock:hover {
+  background-color: var(--color-highlight);
+  border-radius: 4px;
+}
+
+.Intervals a.Active {
+  color: var(--color-highlight-text);
+}
+
+.Theme {
+  width: 16px;
+  height: 16px;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.Theme use {
+  fill: var(--color-font);
+}
+
+.List {
+  position: fixed;
+  z-index: 9;
+  top: 40px;
+  left: 0;
+}

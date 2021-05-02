@@ -1,0 +1,12 @@
+Allow from All
+RewriteEngine On
+Options -Indexes
+
+AddType text/cache-manifest .manifest
+
+RewriteRule ^api($|/) - [L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !^api\. [NC]
+RewriteRule ^(.*)$ /index.html

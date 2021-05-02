@@ -1,0 +1,45 @@
+/* theme colors */
+.App.light {
+  --color-bg: #e0e3eb;
+  --color-paper: #fff;
+  --color-font: rgba(0, 0, 0, 0.87);
+  --color-font-sec: rgba(0, 0, 0, 0.54);
+  --color-border: #f0f3fa;
+  --color-highlight: #d7ecff;
+  --color-highlight-text: #1e88e5;
+  --color-red: #f44336;
+  --color-green: #26a69a;
+}
+.App.dark {
+  --color-bg: #2a2e38;
+  --color-paper: #161a24;
+  --color-font: rgba(255, 255, 255, 0.87);
+  --color-font-sec: rgba(255, 255, 255, 0.54);
+  --color-border: #2a2e38;
+  --color-highlight: #212c38;
+  --color-highlight-text: #1e88e5;
+  --color-red: #ef5350;
+  --color-green: #26a69a;
+}
+
+.App {
+  display: grid;
+  grid-template-rows: 39px 1fr;
+  grid-gap: 1px;
+  overflow: hidden;
+  height: 100%;
+  background-color: var(--color-bg);
+  color: var(--color-font);
+}
+
+.Content {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 295px;
+  grid-gap: 5px;
+  overflow: hidden;
+}
+
+.Content > div {
+  background-color: var(--color-paper);
+}
