@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { API, worker } from "config";
+import { worker } from "config";
 
 let cache: { [marketInterval: string]: TStockData } = {};
 let historyReached: { [marketInterval: string]: boolean } = {};
@@ -109,7 +109,7 @@ async function fetchStock(
   to = 0
 ): Promise<TStockData | null> {
   if (stock === "") return Promise.resolve(null);
-  let url = API + "/" + stock;
+  let url = process.env.REACT_APP_API + "/" + stock;
   const params = [];
 
   if (interval !== "m1") params.push("interval=" + interval);

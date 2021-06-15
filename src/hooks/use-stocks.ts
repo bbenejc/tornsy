@@ -1,8 +1,9 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { API, worker } from "config";
+import { worker } from "config";
 import { setStocksList } from "app/store";
 
+console.log(process.env);
 export function useStocks(): void {
   const dispatch = useDispatch();
 
@@ -49,6 +50,8 @@ export function useStocks(): void {
 }
 
 async function fetchStocks(): Promise<TStockList[]> {
-  const res = await fetch(API + "/stocks").then((response) => response.json());
+  const res = await fetch(process.env.REACT_APP_API + "/stocks").then(
+    (response) => response.json()
+  );
   return res && res.data ? res.data : [];
 }
