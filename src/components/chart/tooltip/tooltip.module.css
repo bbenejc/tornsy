@@ -10,6 +10,7 @@
 
 .Title {
   display: flex;
+  align-items: center;
   padding-left: 32px;
 }
 
