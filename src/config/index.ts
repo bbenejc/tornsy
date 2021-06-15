@@ -1,4 +1,5 @@
-export const API = "http://torn-stocks.jurcec.si/api";
+export const API = "http://tornsy.com/api";
+// export const API = "http://localhost:3001/api";
 export const worker = new Worker("/worker.js");
 
 export const INTERVALS: { [key in TInterval]: string } = {
