@@ -10,7 +10,9 @@ type TInterval =
   | "h4"
   | "h6"
   | "h12"
-  | "d1";
+  | "d1"
+  | "w1"
+  | "n1";
 
 type TStockList = {
   stock: string;
@@ -37,7 +39,18 @@ type TStockData =
     }
   | {
       stock: string;
-      interval: "m5" | "m15" | "m30" | "h1" | "h2" | "h4" | "h6" | "h12" | "d1";
+      interval:
+        | "m5"
+        | "m15"
+        | "m30"
+        | "h1"
+        | "h2"
+        | "h4"
+        | "h6"
+        | "h12"
+        | "d1"
+        | "w1"
+        | "n1";
       data: [
         timestamp: UTCTimestamp,
         open: string,

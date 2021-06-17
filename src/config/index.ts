@@ -11,4 +11,6 @@ export const INTERVALS: { [key in TInterval]: string } = {
   h6: "6h",
   h12: "12h",
   d1: "1D",
+  w1: "1W",
+  n1: "1M",
 };
