@@ -3,7 +3,6 @@ import { useDispatch } from "react-redux";
 import { worker } from "config";
 import { setStocksList } from "app/store";
 
-console.log(process.env);
 export function useStocks(): void {
   const dispatch = useDispatch();
 
