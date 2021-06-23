@@ -4,6 +4,8 @@ import { useParams, Redirect } from "react-router-dom";
 import { use100vh } from "react-div-100vh";
 import { useStocks } from "hooks";
 import { selectOrderedStocksList, selectTheme } from "app/store";
+import { getInterval, getStock, setStock, setInterval } from "tools";
+import { INTERVALS } from "config";
 import { Chart, Menu, Watchlist } from "components";
 import "./app.css";
 
@@ -11,11 +13,12 @@ const SMALL = 860;
 
 export function App(): ReactElement {
   useStocks();
+  const { stock, interval, redirect } = useQueryParams();
   const [width, setWidth] = useState(window.innerWidth);
-  const { stock = "", interval = "m1" } = useParams<TParams>();
   const theme = useSelector(selectTheme);
   const height = use100vh() || 0;
 
+  // window resize handler
   useEffect(() => {
     const onResize = () => {
       setWidth(window.innerWidth);
@@ -31,44 +34,91 @@ export function App(): ReactElement {
   if (width < SMALL) appCss.push("small");
 
   return (
-    <div className={appCss.join(" ")} style={{ height }}>
-      <VerifyStock stock={stock} />
-      <Menu stock={stock} interval={interval} width={width} height={height} />
-      {height > 0 && (
-        <div className="Content">
-          <Chart
-            key={stock + interval}
+    <>
+      {redirect && <Redirect to={redirect} />}
+      {!redirect && stock !== "" && (
+        <div className={appCss.join(" ")} style={{ height }}>
+          <Menu
             stock={stock}
             interval={interval}
-            height={height - 40}
-            width={width < SMALL ? width : width - 300}
+            width={width}
+            height={height}
           />
-          {width >= SMALL && <Watchlist interval={interval} />}
+          {height > 0 && (
+            <div className="Content">
+              <Chart
+                key={stock + interval}
+                stock={stock}
+                interval={interval}
+                height={height - 40}
+                width={width < SMALL ? width : width - 300}
+              />
+              {width >= SMALL && <Watchlist interval={interval} />}
+            </div>
+          )}
         </div>
       )}
-    </div>
+    </>
   );
 }
 
-function VerifyStock({ stock }: TVerifyProps): ReactElement | null {
+function useQueryParams(): TQueryParams {
   const stocks = useSelector(selectOrderedStocksList);
-  const match = stocks.find(
-    (s) => s.stock.toUpperCase() === stock.toUpperCase()
-  );
+  const { stock = "", interval = "m1" } = useParams<TParams>();
 
-  if (stocks.length && (!match || match.stock.toLowerCase() !== stock)) {
-    const redirect = match ? match.stock : stocks[0].stock;
-    return <Redirect to={"/" + redirect.toLowerCase()} />;
+  if (stocks.length) {
+    const verifiedStock = verifyStock(stocks, [stock, getStock()]);
+    const verifiedInterval = verifyInterval(
+      stock === "" ? getInterval() : interval
+    );
+
+    if (verifiedStock === stock) setStock(stock);
+    if (verifiedInterval === interval) setInterval(interval);
+
+    return {
+      stock: verifiedStock,
+      interval: verifiedInterval,
+      redirect:
+        verifiedStock === stock && verifiedInterval === interval
+          ? ""
+          : `/${verifiedStock}${
+              verifiedInterval !== "m1" ? `/${verifiedInterval}` : ""
+            }`,
+    };
+  } else
+    return {
+      stock: "",
+      interval,
+      redirect: "",
+    };
+}
+
+function verifyStock(stocks: TStockInfo[], options: string[]): string {
+  let stock = "";
+
+  const findStock = (stock: string) =>
+    stocks.find((s) => s.stock.toUpperCase() === stock.toUpperCase());
+
+  for (let i = 0; i < options.length; i += 1) {
+    const match = findStock(options[i]);
+    if (match) {
+      stock = match.stock.toLowerCase();
+      break;
+    }
   }
 
-  return null;
+  return stock;
+}
+
+function verifyInterval(option: string): TInterval {
+  if (option.toLowerCase() in INTERVALS)
+    return option.toLowerCase() as TInterval;
+  return "m1";
 }
 
 type TParams = {
   stock: string;
-  interval?: TInterval;
+  interval: TInterval;
 };
 
-type TVerifyProps = {
-  stock: string;
-};
+type TQueryParams = TParams & { redirect: string };
