@@ -17,3 +17,9 @@ export function findDataIndex(data: any[], time: number): number {
 
   return index;
 }
+
+export function sumArray(data: number[]): number {
+  return data.reduce(function (pv, cv) {
+    return pv + cv;
+  }, 0);
+}
