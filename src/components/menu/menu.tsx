@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectTheme, setTheme } from "app/store";
 import { Link } from "react-router-dom";
 import { Watchlist } from "components";
-import { INTERVALS } from "config";
+import { INTERVALS, SMALL } from "config";
 import css from "./menu.module.css";
 
 function Menu({ stock, interval, width, height }: TProps): ReactElement {
@@ -14,7 +14,7 @@ function Menu({ stock, interval, width, height }: TProps): ReactElement {
     dispatch(setTheme(theme === "light" ? "dark" : "light"));
   }, [dispatch, theme]);
 
-  const isSmall = width < 860;
+  const isSmall = width < SMALL;
 
   const toggleList = useCallback(() => {
     if (isSmall) setList((l) => !l);

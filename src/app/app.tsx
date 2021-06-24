@@ -5,11 +5,9 @@ import { use100vh } from "react-div-100vh";
 import { useStocks } from "hooks";
 import { selectOrderedStocksList, selectTheme } from "app/store";
 import { getInterval, getStock, setStock, setInterval } from "tools";
-import { INTERVALS } from "config";
+import { INTERVALS, SMALL } from "config";
 import { Chart, Menu, Watchlist } from "components";
 import "./app.css";
-
-const SMALL = 860;
 
 export function App(): ReactElement {
   useStocks();

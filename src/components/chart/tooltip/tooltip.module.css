@@ -54,12 +54,27 @@
   color: var(--color-red);
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 680px) {
+  .Title {
+    padding-left: 24px;
+  }
+  .Title img {
+    width: 20px;
+    height: 20px;
+  }
   .Tooltip {
     flex-direction: column;
+    font-size: 14px;
+  }
+  .Interval {
+    font-size: 12px;
   }
   .Info {
     align-self: flex-start;
+    font-size: 12px;
     margin-top: 8px;
+  }
+  .Ohlc {
+    flex: 0 0 50px;
   }
 }
