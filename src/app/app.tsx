@@ -67,7 +67,11 @@ function useQueryParams(): TQueryParams {
   const { stock = "", interval = "m1" } = useParams<TParams>();
 
   if (stocks.length) {
-    const verifiedStock = verifyStock(stocks, [stock, getStock()]);
+    const verifiedStock = verifyStock(stocks, [
+      stock,
+      getStock(),
+      stocks[0].stock,
+    ]);
     const verifiedInterval = verifyInterval(
       stock === "" ? getInterval() : interval
     );
