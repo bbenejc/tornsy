@@ -32,14 +32,18 @@
   font-size: 14px;
 }
 
-.Info > div {
+.Ohlc {
   flex: 0 0 60px;
 }
 
-.Info span:first-child:not(:last-child) {
+.Ohlc span:first-child:not(:last-child) {
   font-size: 8px;
   color: var(--color-font-sec);
   margin-right: 2px;
+}
+
+.OhlcGrowth span:last-child {
+  margin-left: 8px;
 }
 
 .Green {

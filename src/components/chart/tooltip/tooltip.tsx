@@ -5,19 +5,26 @@ import { getStockLogoUrl, findDataIndex } from "tools";
 import { INTERVALS } from "config";
 import css from "./tooltip.module.css";
 
-function Tooltip({ data, hover }: TProps): ReactElement {
+function Tooltip({ data, series }: TProps): ReactElement {
   const stockInfo = useSelector(selectStockInfo(data.stock));
   const theme = useSelector(selectTheme);
+
+  /*
   const index =
     hover > 0 ? findDataIndex(data.data, hover) : data.data.length - 1;
 
-  if (stockInfo && index >= 0) {
+  
+*/
+
+  if (stockInfo && series && series.length > 0) {
     const info: ReactElement[] = [];
     const infoCss = [css.Info];
-    if (data.interval === "m1") {
+
+    if (series[0].type === "line") {
+      const index = findDataIndex(data.data, series[0].time);
       info.push(
-        <div key="p">
-          <span>{data.data[index][1]}</span>
+        <div className={css.Ohlc} key="p">
+          <span>{series[0].value}</span>
         </div>
       );
       if (index > 0) {
@@ -29,41 +36,54 @@ function Tooltip({ data, hover }: TProps): ReactElement {
         else infoCss.push(css.Red);
 
         info.push(
-          <div key="d">{(diff >= 0 ? "+" : "") + diff.toFixed(2)}</div>
-        );
-        info.push(
-          <div key="d%">
-            {(diff >= 0 ? "+" : "") + ((diff / prev) * 100).toFixed(2) + "%"}
+          <div className={css.OhlcGrowth} key="d">
+            <span>{(diff >= 0 ? "+" : "") + diff.toFixed(2)}</span>
+            <span>
+              ({(diff >= 0 ? "+" : "") + ((diff / prev) * 100).toFixed(2) + "%"}
+              )
+            </span>
           </div>
         );
       } else infoCss.push(css.Red);
     } else {
-      infoCss.push(
-        data.data[index][4] >= data.data[index][1] ? css.Green : css.Red
+      const diff = series[0].close - series[0].open;
+      infoCss.push(diff >= 0 ? css.Green : css.Red);
+
+      info.push(
+        <div className={css.Ohlc} key="o">
+          <span>O</span>
+          <span>{series[0].open}</span>
+        </div>
+      );
+      info.push(
+        <div className={css.Ohlc} key="h">
+          <span>H</span>
+          <span>{series[0].high}</span>
+        </div>
+      );
+      info.push(
+        <div className={css.Ohlc} key="l">
+          <span>L</span>
+          <span>{series[0].low}</span>
+        </div>
+      );
+      info.push(
+        <div className={css.Ohlc} key="c">
+          <span>C</span>
+          <span>{series[0].close}</span>
+        </div>
       );
 
       info.push(
-        <div key="o">
-          <span>O</span>
-          <span>{data.data[index][1]}</span>
-        </div>
-      );
-      info.push(
-        <div key="h">
-          <span>H</span>
-          <span>{data.data[index][2]}</span>
-        </div>
-      );
-      info.push(
-        <div key="l">
-          <span>L</span>
-          <span>{data.data[index][3]}</span>
-        </div>
-      );
-      info.push(
-        <div key="c">
-          <span>C</span>
-          <span>{data.data[index][4]}</span>
+        <div className={css.OhlcGrowth} key="d">
+          <span>{(diff >= 0 ? "+" : "") + diff.toFixed(2)}</span>
+          <span>
+            (
+            {(diff >= 0 ? "+" : "") +
+              ((diff / series[0].open) * 100).toFixed(2) +
+              "%"}
+            )
+          </span>
         </div>
       );
     }
@@ -93,5 +113,19 @@ export default memo(Tooltip);
 
 type TProps = {
   data: TStockData;
-  hover: number;
+  series?: TTooltip[];
 };
+
+export type TTooltip =
+  | {
+      type: "ohlc";
+      open: number;
+      high: number;
+      low: number;
+      close: number;
+    }
+  | {
+      type: "line";
+      time?: any;
+      value?: number;
+    };
