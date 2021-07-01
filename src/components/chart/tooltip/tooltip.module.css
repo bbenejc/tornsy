@@ -90,9 +90,14 @@
   color: var(--color-font-sec);
   margin-left: 4px;
 }
+.Indicators .Name {
+  width: 40px;
+}
+.Indicators .Value {
+  width: 60px;
+}
 .Indicator .Controls {
   display: flex;
-  margin-left: 16px;
   visibility: hidden;
 }
 .Indicator .Controls > div {
