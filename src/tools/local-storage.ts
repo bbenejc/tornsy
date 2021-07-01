@@ -4,6 +4,7 @@ const THEME = "theme";
 const ORDER = "list-order";
 const STOCK = "stock";
 const INTERVAL = "interval";
+const INDICATORS = "indicators";
 
 export function getTheme(): string | null {
   return localStorage.getItem(THEME);
@@ -36,4 +37,33 @@ export function getInterval(): TInterval {
 
 export function setInterval(interval: string): void {
   localStorage.setItem(INTERVAL, interval);
+}
+
+export function getIndicators(): TIndicator[] {
+  try {
+    const lsIndicators = JSON.parse(localStorage.getItem(INDICATORS) || "");
+    if (Array.isArray(lsIndicators)) {
+      const indicators = [];
+      let updateLs = false;
+      for (let i = 0; i < lsIndicators.length; i += 1) {
+        const indicator = lsIndicators[i];
+        if (
+          typeof indicator === "object" &&
+          ["sma", "ema"].includes(indicator.type) &&
+          typeof indicator.length === "number"
+        ) {
+          indicators.push(indicator);
+        } else updateLs = true;
+      }
+      if (updateLs) setIndicators(indicators);
+
+      return indicators;
+    }
+  } catch {}
+
+  return [];
+}
+
+export function setIndicators(indicators: TIndicator[]): void {
+  localStorage.setItem(INDICATORS, JSON.stringify(indicators));
 }

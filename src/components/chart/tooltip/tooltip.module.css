@@ -53,6 +53,116 @@
 .Red {
   color: var(--color-red);
 }
+.Volume {
+  position: absolute;
+  top: 32px;
+  left: 8px;
+  z-index: 8;
+  pointer-events: none;
+}
+.Indicators {
+  position: absolute;
+  top: 52px;
+  left: 8px;
+  z-index: 8;
+}
+.Indicator {
+  display: flex;
+  align-items: center;
+  line-height: 20px;
+  cursor: pointer;
+}
+.Add {
+  font-size: 10px;
+}
+.Add:hover {
+  text-decoration: underline;
+}
+.Indicator .Name {
+  color: var(--color-font-sec);
+  margin-right: 8px;
+  font-size: 10px;
+}
+.Indicator .Value {
+  font-size: 14px;
+}
+.Indicator .Value span {
+  color: var(--color-font-sec);
+  margin-left: 4px;
+}
+.Indicator .Controls {
+  display: flex;
+  margin-left: 16px;
+  visibility: hidden;
+}
+.Indicator .Controls > div {
+  display: inline-flex;
+}
+.Indicator:hover .Controls {
+  visibility: visible;
+}
+.Indicator .Controls svg {
+  fill: var(--color-font-sec);
+  width: 14px;
+  padding: 4px;
+}
+.Indicator .Controls svg:hover {
+  fill: var(--color-font);
+}
+
+.Settings {
+  position: absolute;
+  top: 75px;
+  left: 8px;
+  z-index: 9;
+  background-color: var(--color-paper);
+  border: 1px solid var(--color-bg);
+  padding: 8px;
+  font-size: 14px;
+  border-radius: 4px;
+}
+.Settings > div {
+  display: flex;
+  align-items: center;
+}
+.Settings > div + div {
+  margin-top: 8px;
+}
+.Settings .Label {
+  width: 90px;
+}
+.Settings .Label span {
+  font-size: 10px;
+  margin-left: 4px;
+  color: var(--color-font-sec);
+}
+.Settings button {
+  border: none;
+  outline: none;
+  background-color: transparent;
+  color: var(--color-font-sec);
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.Settings button:hover {
+  background-color: var(--color-highlight);
+}
+.Settings button + button {
+  margin-left: 8px;
+}
+.Settings button.Active {
+  color: var(--color-highlight-text);
+}
+.Settings input {
+  width: 40px;
+  background-color: var(--color-bg);
+  color: var(--color-font);
+  border: 0;
+  padding: 8px;
+  border-radius: 4px;
+  margin-left: auto;
+}
 
 @media screen and (max-width: 680px) {
   .Title {
@@ -76,5 +186,17 @@
   }
   .Ohlc {
     flex: 0 0 50px;
+  }
+  .Volume {
+    top: 52px;
+  }
+  .Indicators {
+    top: 72px;
+  }
+  .Indicator .Value {
+    font-size: 12px;
+  }
+  .Settings {
+    top: 95px;
   }
 }

@@ -36,6 +36,10 @@
   color: var(--color-highlight-text);
 }
 
+.Buttons {
+  display: flex;
+}
+
 .Theme {
   width: 16px;
   height: 16px;
@@ -52,4 +56,8 @@
   z-index: 9;
   top: 40px;
   left: 0;
+}
+
+.Indicators {
+  position: fixed;
 }

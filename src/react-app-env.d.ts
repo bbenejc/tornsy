@@ -59,3 +59,8 @@ type TStockData =
         close: string
       ][];
     };
+
+type TIndicator = {
+  type: string;
+  length: number;
+};

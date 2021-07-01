@@ -10,20 +10,26 @@ import {
   MouseEventParams,
   CrosshairMode,
   TimeRange,
+  LineStyle,
+  SeriesOptions,
 } from "lightweight-charts";
-import { Tooltip } from "./tooltip";
-import { selectTheme } from "app/store";
+import { Tooltip, TTooltip } from "./tooltip";
+import { selectTheme, selectIndicators } from "app/store";
 import { getTheme } from "themes";
+import { calculateEMA, calculateSMA } from "tools";
 
 function Chart({ stock, interval, height, width }: TProps): ReactElement {
   const [data, loadHistory] = useStockData(stock, interval);
+  const indicators = useSelector(selectIndicators);
+  const [hover, setHover] = useState<TTooltip[]>();
+  const hoverPrev = useRef<string>();
+  const [lastData, setLastData] = useState<TTooltip[]>();
   const theme = getTheme(useSelector(selectTheme));
-  const [hover, setHover] = useState(0);
   const divRef = useRef<HTMLDivElement>(null);
   const chart = useRef<IChartApi>();
-  const lineSeries = useRef<ISeriesApi<"Line">>();
-  const ohlcSeries = useRef<ISeriesApi<"Candlestick">>();
+  const mainSeries = useRef<ISeriesApi<"Line" | "Candlestick">>();
   const volumeSeries = useRef<ISeriesApi<"Area">>();
+  const indicatorSerieses = useRef<ISeriesApi<"Line">[]>([]);
   const historyDebounce = useRef<NodeJS.Timeout | null>(null);
 
   // init chart
@@ -33,14 +39,8 @@ function Chart({ stock, interval, height, width }: TProps): ReactElement {
         chart.current = createChart(divRef.current, {
           width,
           height,
-          leftPriceScale: {
-            scaleMargins: {
-              top: 0.75,
-            },
-          },
-          rightPriceScale: {
-            scaleMargins: { bottom: 0.2 },
-          },
+          leftPriceScale: { scaleMargins: { top: 0.75 } },
+          rightPriceScale: { scaleMargins: { bottom: 0.2 } },
           watermark: {
             text: "Loading",
             fontSize: 20,
@@ -61,7 +61,37 @@ function Chart({ stock, interval, height, width }: TProps): ReactElement {
             }, 50);
           });
         chart.current.subscribeCrosshairMove((param: MouseEventParams) => {
-          setHover(param.time ? (param.time as number) : 0);
+          if (param.seriesPrices.size && mainSeries.current) {
+            const tooltip: TTooltip[] = [];
+            const main = param.seriesPrices.get(mainSeries.current);
+            const vol = volumeSeries.current
+              ? param.seriesPrices.get(volumeSeries.current)
+              : undefined;
+
+            if (main === Object(main))
+              tooltip.push({ type: "ohlc", ...Object(main) });
+            else
+              tooltip.push({
+                type: "line",
+                time: param.time,
+                value: main as number,
+              });
+            tooltip.push({ type: "line", value: vol as number | undefined });
+
+            for (let i = 0; i < indicatorSerieses.current.length; i += 1) {
+              const val = param.seriesPrices.get(indicatorSerieses.current[i]);
+              tooltip.push({ type: "line", value: val as number | undefined });
+            }
+
+            const id = JSON.stringify(tooltip);
+            if (hoverPrev.current !== id) {
+              setHover(tooltip);
+              hoverPrev.current = id;
+            }
+          } else if (hoverPrev.current) {
+            hoverPrev.current = undefined;
+            setHover(undefined);
+          }
         });
       } else chart.current.resize(width, height);
 
@@ -94,51 +124,53 @@ function Chart({ stock, interval, height, width }: TProps): ReactElement {
   useEffect(() => {
     if (chart.current) {
       if (data.data.length) {
+        const tooltip: TTooltip[] = [];
+
         // line series
         if (data.interval === "m1") {
-          if (!lineSeries.current)
-            lineSeries.current = chart.current.addLineSeries();
+          if (
+            mainSeries.current &&
+            mainSeries.current.seriesType() !== "Line"
+          ) {
+            chart.current.removeSeries(mainSeries.current);
+            mainSeries.current = undefined;
+          }
+          if (!mainSeries.current)
+            mainSeries.current = chart.current.addLineSeries();
 
-          const lineData: LineData[] = [];
-          for (let i = 0; i < data.data.length; i += 1) {
-            lineData.push({
-              time: data.data[i][0],
-              value: parseFloat(data.data[i][1]),
-            });
-          }
-          lineSeries.current.setData(lineData);
-          if (ohlcSeries.current) {
-            chart.current.removeSeries(ohlcSeries.current);
-            ohlcSeries.current = undefined;
-          }
+          const lineData: LineData[] = getLineData(data);
+          mainSeries.current.setData(lineData);
+          const { time, value } = lineData[lineData.length - 1];
+          tooltip.push({
+            type: "line",
+            value,
+            time,
+          });
         }
         // candle series
         else {
-          if (!ohlcSeries.current)
-            ohlcSeries.current = chart.current.addCandlestickSeries();
-          ohlcSeries.current.applyOptions({
+          const ohlcData = getOhlcData(data);
+
+          if (
+            mainSeries.current &&
+            mainSeries.current.seriesType() !== "Candlestick"
+          ) {
+            chart.current.removeSeries(mainSeries.current);
+            mainSeries.current = undefined;
+          }
+
+          if (!mainSeries.current)
+            mainSeries.current = chart.current.addCandlestickSeries();
+          mainSeries.current.applyOptions({
             upColor: theme.green,
             wickUpColor: theme.green,
             downColor: theme.red,
             wickDownColor: theme.red,
             borderVisible: false,
           });
-          const ohlcData: BarData[] = [];
-          for (let i = 0; i < data.data.length; i += 1) {
-            const row = data.data[i];
-            ohlcData.push({
-              time: row[0],
-              open: parseFloat(row[1]),
-              high: parseFloat(row[2]),
-              low: parseFloat(row[3]),
-              close: parseFloat(row[4]),
-            });
-          }
-          ohlcSeries.current.setData(ohlcData);
-          if (lineSeries.current) {
-            chart.current.removeSeries(lineSeries.current);
-            lineSeries.current = undefined;
-          }
+
+          mainSeries.current.setData(ohlcData);
+          tooltip.push({ type: "ohlc", ...ohlcData[ohlcData.length - 1] });
         }
         // volume series
         if (!volumeSeries.current)
@@ -164,26 +196,69 @@ function Chart({ stock, interval, height, width }: TProps): ReactElement {
           });
         }
         volumeSeries.current.setData(volumeData);
+        tooltip.push({
+          type: "line",
+          value: volumeData[volumeData.length - 1].value,
+        });
 
         chart.current.applyOptions({
           watermark: { visible: false },
-          timeScale: { timeVisible: data.interval !== "d1" },
+          timeScale: {
+            timeVisible: !["d1", "w1", "n1"].includes(data.interval),
+          },
           crosshair: {
             horzLine: { visible: true },
             vertLine: { visible: true },
           },
         });
+
+        for (let i = 0; i < indicatorSerieses.current.length; i += 1) {
+          chart.current.removeSeries(indicatorSerieses.current[i]);
+        }
+        indicatorSerieses.current = [];
+        if (indicators.length > 0) {
+          const indicatorsData = getLineData(data);
+          for (let i = 0; i < indicators.length; i += 1) {
+            const indicatorSeries: SeriesOptions<any> = {
+              priceLineVisible: false,
+              lastValueVisible: false,
+              crosshairMarkerVisible: false,
+              color: theme.indicators[i],
+              lineStyle: LineStyle.Solid,
+              lineWidth: 2,
+            };
+            indicatorSerieses.current.push(
+              chart.current.addLineSeries(indicatorSeries)
+            );
+            const indicatorData =
+              indicators[i].type === "ema"
+                ? calculateEMA(indicatorsData, indicators[i].length)
+                : calculateSMA(indicatorsData, indicators[i].length);
+
+            indicatorSerieses.current[i].setData(indicatorData);
+
+            tooltip.push({
+              type: "line",
+              value:
+                indicatorData.length > 0
+                  ? indicatorData[indicatorData.length - 1].value
+                  : undefined,
+            });
+          }
+        }
+
+        setLastData(tooltip);
       } else {
-        if (lineSeries.current) chart.current.removeSeries(lineSeries.current);
-        if (ohlcSeries.current) chart.current.removeSeries(ohlcSeries.current);
+        if (mainSeries.current) chart.current.removeSeries(mainSeries.current);
         if (volumeSeries.current)
           chart.current.removeSeries(volumeSeries.current);
+
         chart.current.applyOptions({
           watermark: { visible: true },
         });
       }
     }
-  }, [data, theme]);
+  }, [data, theme, indicators]);
 
   // handle title change
   useEffect(() => {
@@ -194,19 +269,59 @@ function Chart({ stock, interval, height, width }: TProps): ReactElement {
     }
 
     if (title !== "") title += " | ";
-    title += "Torn City Stocks";
+    title += "Tornsy";
 
     if (document.title !== title) document.title = title;
   }, [stock, data]);
 
   return (
     <div ref={divRef}>
-      <Tooltip data={data} hover={hover} />
+      <Tooltip
+        data={data}
+        series={hover || lastData || []}
+        indicators={indicators}
+      />
     </div>
   );
 }
 
 export default memo(Chart);
+
+function getLineData(data: TStockData): LineData[] {
+  const cIndex = data.interval === "m1" ? 1 : 4;
+  const lineData: LineData[] = [];
+
+  for (let i = 0, num = data.data.length; i < num; i += 1) {
+    const row = data.data[i];
+    lineData.push({
+      time: row[0],
+      value: parseFloat(row[cIndex] as string),
+    });
+  }
+
+  return lineData;
+}
+
+function getOhlcData(data: TStockData): BarData[] {
+  const oIndex = 1;
+  const hIndex = data.interval === "m1" ? 1 : 2;
+  const lIndex = data.interval === "m1" ? 1 : 3;
+  const cIndex = data.interval === "m1" ? 1 : 4;
+  const ohlcData: BarData[] = [];
+
+  for (let i = 0; i < data.data.length; i += 1) {
+    const row = data.data[i];
+    ohlcData.push({
+      time: row[0],
+      open: parseFloat(row[oIndex]),
+      high: parseFloat(row[hIndex] as string),
+      low: parseFloat(row[lIndex] as string),
+      close: parseFloat(row[cIndex] as string),
+    });
+  }
+
+  return ohlcData;
+}
 
 type TProps = {
   stock: string;

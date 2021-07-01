@@ -51,7 +51,7 @@ function Menu({ stock, interval, width, height }: TProps): ReactElement {
           {stock.toUpperCase()}
         </div>
         <div className={css.Intervals}>{intervals}</div>
-        <div className={css.Theme} onClick={toggleTheme}>
+        <div className={css.Theme} onClick={toggleTheme} title="Toggle theme">
           <svg viewBox="0 0 100 100">
             <use xlinkHref={`#icon-theme`} />
           </svg>
