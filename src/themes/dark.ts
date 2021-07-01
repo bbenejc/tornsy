@@ -10,6 +10,6 @@ const darkTheme = {
   red: "#e16052",
   // volume: "0,0,15",
   volume: "30,136,229", // rgb(30, 136, 229)
-  indicators: ["#008000", "#483D8B"],
+  indicators: ["#7CFC00", "#EE82EE"],
 };
 export default darkTheme;
