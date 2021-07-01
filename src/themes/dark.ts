@@ -1,4 +1,5 @@
 const darkTheme = {
+  dark: true,
   paper: "#161a24",
   grid: "#242732",
   axis: "#31363e",
@@ -9,5 +10,6 @@ const darkTheme = {
   red: "#e16052",
   // volume: "0,0,15",
   volume: "30,136,229", // rgb(30, 136, 229)
+  indicators: ["#008000", "#483D8B"],
 };
 export default darkTheme;

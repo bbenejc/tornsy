@@ -1,4 +1,5 @@
 const lightTheme = {
+  dark: false,
   paper: "#fff",
   grid: "#f2f3f3",
   axis: "#e1e1e3",
@@ -9,6 +10,7 @@ const lightTheme = {
   red: "#e16052",
   //volume: "180,180,200",
   volume: "30,136,229", // rgb(30, 136, 229)
+  indicators: ["#008000", "#483D8B"],
 };
 
 export default lightTheme;

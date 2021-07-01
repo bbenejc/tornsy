@@ -7,6 +7,7 @@ export function getTheme(theme: string): TTheme {
 }
 
 type TTheme = {
+  dark: boolean;
   paper: string;
   grid: string;
   axis: string;
@@ -16,4 +17,5 @@ type TTheme = {
   red: string;
   green: string;
   volume: string;
+  indicators: string[];
 };
