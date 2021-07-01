@@ -150,13 +150,14 @@ function Tooltip({ data, series, indicators }: TProps): ReactElement {
     for (let i = 0; i < indicators.length; i += 1) {
       if (series.length < i + 3) break;
       const s = series[i + 2];
+      const val = s.type === "line" ? s.value : s.close;
       extra.push(
         <div className={css.Indicator} key={"i" + i}>
           <div className={css.Name} style={{ color: theme.indicators[i] }}>
             {indicators[i].type.toUpperCase() + " " + indicators[i].length}
           </div>
           <div className={css.Value}>
-            {formatNumber(s.type === "line" ? s.value : s.close)}
+            {!!val ? val.toFixed(2) : <span>-</span>}
           </div>
           <div className={css.Controls}>
             <div title="Edit indicator" data-index={i} onClick={editIndicator}>
@@ -215,7 +216,7 @@ function Tooltip({ data, series, indicators }: TProps): ReactElement {
             className={css.Name}
             style={{ color: "rgb(" + theme.volume + ")" }}
           >
-            Total stocks
+            # Shares
           </div>
           <div className={css.Value}>
             {formatNumber(totalStocks)}{" "}
