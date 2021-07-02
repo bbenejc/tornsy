@@ -73,14 +73,22 @@ function Chart({ stock, interval, height, width }: TProps): ReactElement {
             else
               tooltip.push({
                 type: "line",
-                time: param.time,
-                value: main as number,
+                time: param.time as number,
+                value: main ? (main as number) : 0,
               });
-            tooltip.push({ type: "line", value: vol as number | undefined });
+            tooltip.push({
+              type: "line",
+              time: param.time as number,
+              value: vol ? (vol as number) : 0,
+            });
 
             for (let i = 0; i < indicatorSerieses.current.length; i += 1) {
               const val = param.seriesPrices.get(indicatorSerieses.current[i]);
-              tooltip.push({ type: "line", value: val as number | undefined });
+              tooltip.push({
+                type: "line",
+                time: param.time as number,
+                value: val ? (val as number) : 0,
+              });
             }
 
             const id = JSON.stringify(tooltip);
@@ -144,7 +152,7 @@ function Chart({ stock, interval, height, width }: TProps): ReactElement {
           tooltip.push({
             type: "line",
             value,
-            time,
+            time: time as number,
           });
         }
         // candle series
@@ -198,6 +206,7 @@ function Chart({ stock, interval, height, width }: TProps): ReactElement {
         volumeSeries.current.setData(volumeData);
         tooltip.push({
           type: "line",
+          time: volumeData[volumeData.length - 1].time as number,
           value: volumeData[volumeData.length - 1].value,
         });
 
@@ -239,10 +248,14 @@ function Chart({ stock, interval, height, width }: TProps): ReactElement {
 
             tooltip.push({
               type: "line",
+              time:
+                indicatorData.length > 0
+                  ? (indicatorData[indicatorData.length - 1].time as number)
+                  : 0,
               value:
                 indicatorData.length > 0
                   ? indicatorData[indicatorData.length - 1].value
-                  : undefined,
+                  : 0,
             });
           }
         }

@@ -83,7 +83,7 @@ function Tooltip({ data, series, indicators }: TProps): ReactElement {
       const index = findDataIndex(data.data, series[0].time);
       info.push(
         <div className={css.Ohlc} key="p">
-          <span>{series[0].value}</span>
+          <span>{series[0].value ? series[0].value.toFixed(2) : ""}</span>
         </div>
       );
       if (index > 0) {
@@ -111,25 +111,25 @@ function Tooltip({ data, series, indicators }: TProps): ReactElement {
       info.push(
         <div className={css.Ohlc} key="o">
           <span>O</span>
-          <span>{series[0].open}</span>
+          <span>{series[0].open.toFixed(2)}</span>
         </div>
       );
       info.push(
         <div className={css.Ohlc} key="h">
           <span>H</span>
-          <span>{series[0].high}</span>
+          <span>{series[0].high.toFixed(2)}</span>
         </div>
       );
       info.push(
         <div className={css.Ohlc} key="l">
           <span>L</span>
-          <span>{series[0].low}</span>
+          <span>{series[0].low.toFixed(2)}</span>
         </div>
       );
       info.push(
         <div className={css.Ohlc} key="c">
           <span>C</span>
-          <span>{series[0].close}</span>
+          <span>{series[0].close.toFixed(2)}</span>
         </div>
       );
 
@@ -340,6 +340,6 @@ export type TTooltip =
     }
   | {
       type: "line";
-      time?: any;
-      value?: number;
+      time: number;
+      value: number;
     };
