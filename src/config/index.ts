@@ -15,3 +15,22 @@ export const INTERVALS: { [key in TInterval]: string } = {
   w1: "1W",
   n1: "1M",
 };
+
+export const INDICATORS_ADVANCED = [
+  { type: "rsi", params: [{ key: "length", value: 14, title: "Length" }] },
+  {
+    type: "stoch",
+    params: [
+      { key: "k", value: 12, title: "K Length" },
+      { key: "d", value: 3, title: "D Smoothing" },
+    ],
+  },
+  {
+    type: "macd",
+    params: [
+      { key: "fast", value: 12, title: "Fast Length" },
+      { key: "slow", value: 26, title: "Slow Length" },
+      { key: "smoothing", value: 9, title: "Smoothing" },
+    ],
+  },
+];
