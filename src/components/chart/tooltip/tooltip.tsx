@@ -10,25 +10,33 @@ import React, {
 } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  createIndicator,
   selectIndicators,
+  selectAdvanced,
   selectStockInfo,
   selectTheme,
+  createIndicator,
   removeIndicator as removeIndicatorAction,
   setIndicator,
+  createAdvanced,
+  removeAdvanced as removeAdvancedAction,
+  setAdvanced,
+  updateAdvanced,
 } from "app/store";
 import { getStockLogoUrl, findDataIndex } from "tools";
 import { getTheme } from "themes";
-import { INTERVALS } from "config";
+import { INTERVALS, INDICATORS_ADVANCED } from "config";
 import css from "./tooltip.module.css";
 import { formatNumber } from "tools/format";
 import classes from "./tooltip.module.css";
 
-function Tooltip({ data, series, indicators }: TProps): ReactElement {
+function Tooltip({ data, series }: TProps): ReactElement {
   const dispatch = useDispatch();
   const stockInfo = useSelector(selectStockInfo(data.stock));
-  const theme = getTheme(useSelector(selectTheme));
+  const indicators = useSelector(selectIndicators);
+  const advanced = useSelector(selectAdvanced);
   const [indicatorSettings, setIndicatorSettings] = useState(-1);
+  const [advancedSettings, setAdvancedSettings] = useState(false);
+  const theme = getTheme(useSelector(selectTheme));
   const wrapperRef = useRef<any>();
 
   const addIndicator = useCallback(() => {
@@ -43,41 +51,63 @@ function Tooltip({ data, series, indicators }: TProps): ReactElement {
     [dispatch]
   );
 
-  const editIndicator = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      const i = parseInt(e.currentTarget.getAttribute("data-index") || "");
-      setIndicatorSettings(i);
-    },
-    [setIndicatorSettings]
-  );
+  const editIndicator = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const i = parseInt(e.currentTarget.getAttribute("data-index") || "");
+    setIndicatorSettings(i);
+  }, []);
+
+  const addAdvanced = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    dispatch(createAdvanced());
+  }, []);
+
+  const editAdvanced = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    setAdvancedSettings(true);
+  }, []);
+
+  const removeAdvanced = useCallback(() => {
+    dispatch(removeAdvancedAction());
+  }, []);
 
   useEffect(() => {
-    if (indicatorSettings >= 0) {
-      const clickAway = (e: MouseEvent) => {
-        if (wrapperRef.current && !wrapperRef.current.contains(e.target))
+    if (indicatorSettings >= 0 || advancedSettings) {
+      const clickAway = (e: MouseEvent | TouchEvent) => {
+        if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
           setIndicatorSettings(-1);
-      };
-      const escKey = (e: KeyboardEvent) => {
-        if (e.key === "Escape") setIndicatorSettings(-1);
+          setAdvancedSettings(false);
+        }
       };
 
-      document.addEventListener("click", clickAway);
+      const escKey = (e: KeyboardEvent) => {
+        if (e.key === "Escape") {
+          setIndicatorSettings(-1);
+          setAdvancedSettings(false);
+        }
+      };
+
+      document.addEventListener("mousedown", clickAway);
+      document.addEventListener("touchstart", clickAway);
       document.addEventListener("keydown", escKey);
       return () => {
-        document.removeEventListener("click", clickAway);
+        document.removeEventListener("mousedown", clickAway);
+        document.removeEventListener("touchstart", clickAway);
         document.removeEventListener("keydown", escKey);
       };
     }
-  }, [indicatorSettings, setIndicatorSettings]);
+  }, [indicatorSettings, advancedSettings]);
 
   const closeIndicatorSettings = useCallback(() => {
     setIndicatorSettings(-1);
-  }, [setIndicatorSettings]);
+    setAdvancedSettings(false);
+  }, [setIndicatorSettings, setAdvancedSettings]);
 
   if (stockInfo && series && series.length > 0) {
     const info: ReactElement[] = [];
     const extra: ReactElement[] = [];
+    const advancedExtra: ReactElement[] = [];
     const infoCss = [css.Info];
+
+    let diff;
+    let prev;
 
     if (series[0].type === "line") {
       const index = findDataIndex(data.data, series[0].time);
@@ -88,24 +118,15 @@ function Tooltip({ data, series, indicators }: TProps): ReactElement {
       );
       if (index > 0) {
         const cur = parseFloat(data.data[index][1]);
-        const prev = parseFloat(data.data[index - 1][1]);
-        const diff = cur - prev;
+        prev = parseFloat(data.data[index - 1][1]);
+        diff = cur - prev;
 
         if (diff >= 0) infoCss.push(css.Green);
         else infoCss.push(css.Red);
-
-        info.push(
-          <div className={css.OhlcGrowth} key="d">
-            <span>{(diff >= 0 ? "+" : "") + diff.toFixed(2)}</span>
-            <span>
-              ({(diff >= 0 ? "+" : "") + ((diff / prev) * 100).toFixed(2) + "%"}
-              )
-            </span>
-          </div>
-        );
       } else infoCss.push(css.Red);
     } else {
-      const diff = series[0].close - series[0].open;
+      prev = series[0].open;
+      diff = series[0].close - prev;
       infoCss.push(diff >= 0 ? css.Green : css.Red);
 
       info.push(
@@ -132,16 +153,14 @@ function Tooltip({ data, series, indicators }: TProps): ReactElement {
           <span>{series[0].close.toFixed(2)}</span>
         </div>
       );
+    }
 
+    if (diff !== undefined && prev !== undefined) {
       info.push(
         <div className={css.OhlcGrowth} key="d">
           <span>{(diff >= 0 ? "+" : "") + diff.toFixed(2)}</span>
           <span>
-            (
-            {(diff >= 0 ? "+" : "") +
-              ((diff / series[0].open) * 100).toFixed(2) +
-              "%"}
-            )
+            ({(diff >= 0 ? "+" : "") + ((diff / prev) * 100).toFixed(2) + "%"})
           </span>
         </div>
       );
@@ -178,17 +197,96 @@ function Tooltip({ data, series, indicators }: TProps): ReactElement {
         </div>
       );
     }
-    if (series.length < 4)
+    if (indicators.length < 2) {
       extra.push(
         <div
           key="add-indicator"
           className={[css.Indicator, css.Add].join(" ")}
           onClick={addIndicator}
-          style={{ color: theme.indicators[series.length - 2] }}
+          style={{ color: theme.indicators[indicators.length] }}
         >
           + Indicator
         </div>
       );
+    }
+
+    if (advanced) {
+      const advancedSeries = [];
+
+      for (
+        let a = 0, i = 2 + indicators.length;
+        i < series.length;
+        i += 1, a += 1
+      ) {
+        const s = series[i];
+        const val = s.type === "line" ? s.value : s.close;
+
+        advancedSeries.push(
+          <div
+            className={[
+              css.Value,
+              advanced.type === "macd" ? css.BigValue : "",
+            ].join(" ")}
+            style={{
+              color:
+                a === 2
+                  ? val > 0
+                    ? theme.green[0]
+                    : theme.red[0]
+                  : theme.advanced[advanced.type === "rsi" ? 2 : a],
+            }}
+            key={i}
+          >
+            {val.toFixed(advanced.type === "macd" ? 4 : 2)}
+          </div>
+        );
+      }
+      const nameInfo = [];
+      for (let i = 0; i < INDICATORS_ADVANCED.length; i += 1) {
+        if (INDICATORS_ADVANCED[i].type === advanced.type) {
+          for (let j = 0; j < INDICATORS_ADVANCED[i].params.length; j += 1) {
+            const { key, value } = INDICATORS_ADVANCED[i].params[j];
+            nameInfo.push(
+              key in advanced ? advanced[key as keyof TAdvanced] : value
+            );
+          }
+          break;
+        }
+      }
+
+      advancedExtra.push(
+        <div className={css.Indicator} key={advanced.type}>
+          <div
+            className={[
+              css.Name,
+              advanced.type === "macd" ? css.BigName : "",
+            ].join(" ")}
+          >
+            {advanced.type.toUpperCase()}{" "}
+            <span className={css.NameInfo}>{nameInfo.join(" ")}</span>
+          </div>
+          {advancedSeries}
+          <div className={css.Controls}>
+            <div title="Edit indicator" onClick={editAdvanced}>
+              <svg viewBox="0 0 100 100">
+                <use xlinkHref={`#icon-settings`} />
+              </svg>
+            </div>
+            <div title="Remove indicator" onClick={removeAdvanced}>
+              <svg viewBox="0 0 100 100">
+                <use xlinkHref={`#icon-trash`} />
+              </svg>
+            </div>
+          </div>
+        </div>
+      );
+    } else {
+      advancedExtra.push(
+        <div key="add-advanced" onClick={addAdvanced} className={css.Add}>
+          + Advanced
+        </div>
+      );
+    }
 
     const totalStocks =
       (series[1].type === "line" ? series[1].value : series[1].close) || 0;
@@ -234,6 +332,16 @@ function Tooltip({ data, series, indicators }: TProps): ReactElement {
             onClose={closeIndicatorSettings}
           />
         )}
+        <div
+          className={[css.AdvancedIndicator, !advanced ? css.None : ""].join(
+            " "
+          )}
+        >
+          {advancedExtra}
+        </div>
+        {advancedSettings && (
+          <AdvancedSettings ref={wrapperRef} onClose={closeIndicatorSettings} />
+        )}
       </>
     );
   }
@@ -265,7 +373,7 @@ const IndicatorSettingsC = React.forwardRef(
         const { type } = indicators[index];
         let length = parseInt(e.currentTarget.value);
         if (!isNaN(length)) {
-          if (length > 99) length = 99;
+          if (length > 250) length = 250;
           else if (length < 2) length = 2;
           dispatch(setIndicator(index, { type, length }));
         }
@@ -305,12 +413,12 @@ const IndicatorSettingsC = React.forwardRef(
         </div>
         <div>
           <div className={css.Label}>
-            Length <span>(2-99)</span>
+            Length <span>(2-250)</span>
           </div>
           <input
             type="number"
             min={2}
-            max={99}
+            max={250}
             defaultValue={length}
             onChange={changeLength}
             onKeyDown={inputKeyDown}
@@ -322,12 +430,108 @@ const IndicatorSettingsC = React.forwardRef(
 );
 const IndicatorSettings = memo(IndicatorSettingsC);
 
+const AdvancedSettingsC = React.forwardRef(
+  (
+    { onClose }: { onClose: () => void },
+    ref: Ref<HTMLDivElement>
+  ): ReactElement => {
+    const dispatch = useDispatch();
+    const advanced = useSelector(selectAdvanced);
+
+    const changeType = useCallback(
+      (e: React.MouseEvent<HTMLButtonElement>) => {
+        const clickedType = e.currentTarget.value;
+        const newAdvanced: any = { type: clickedType };
+
+        for (let i = 0; i < INDICATORS_ADVANCED.length; i += 1) {
+          if (INDICATORS_ADVANCED[i].type === clickedType) {
+            for (let j = 0; j < INDICATORS_ADVANCED[i].params.length; j += 1) {
+              const { key, value } = INDICATORS_ADVANCED[i].params[j];
+              newAdvanced[key] = value;
+            }
+            break;
+          }
+        }
+
+        dispatch(setAdvanced(newAdvanced as TAdvanced));
+      },
+      [dispatch]
+    );
+
+    const changeLength = useCallback(
+      (e: ChangeEvent<HTMLInputElement>) => {
+        const field = e.currentTarget.getAttribute("data-field");
+        let length = parseInt(e.currentTarget.value);
+        if (field && !isNaN(length)) {
+          if (length > 250) length = 250;
+          else if (length < 2) length = 2;
+          dispatch(updateAdvanced(field, length));
+        }
+      },
+      [dispatch]
+    );
+
+    const inputKeyDown = useCallback(
+      (e: React.KeyboardEvent) => {
+        if (e.key === "Enter") onClose();
+      },
+      [onClose]
+    );
+
+    const { params } = advanced
+      ? (INDICATORS_ADVANCED.find(
+          (e) => e.type === advanced.type
+        ) as typeof INDICATORS_ADVANCED[number])
+      : INDICATORS_ADVANCED[0];
+
+    return (
+      <div ref={ref} className={[css.Settings, css.Advanced].join(" ")}>
+        <div>
+          <div className={css.Label}>Indicator</div>
+          <div>
+            {INDICATORS_ADVANCED.map(({ type }) => (
+              <button
+                key={type}
+                className={advanced && advanced.type === type ? css.Active : ""}
+                value={type}
+                onClick={changeType}
+              >
+                {type.toUpperCase()}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div>
+          {params.map(({ key, value, title }) => (
+            <label key={key}>
+              {title}
+              <input
+                type="number"
+                min={2}
+                max={250}
+                defaultValue={
+                  advanced && key in advanced
+                    ? advanced[key as keyof TAdvanced]
+                    : value
+                }
+                onKeyDown={inputKeyDown}
+                onChange={changeLength}
+                data-field={key}
+              />
+            </label>
+          ))}
+        </div>
+      </div>
+    );
+  }
+);
+const AdvancedSettings = memo(AdvancedSettingsC);
+
 export default memo(Tooltip);
 
 type TProps = {
   data: TStockData;
   series: TTooltip[];
-  indicators: TIndicator[];
 };
 
 export type TTooltip =

@@ -70,11 +70,11 @@
   display: flex;
   align-items: center;
   line-height: 20px;
-  cursor: pointer;
   white-space: nowrap;
 }
 .Add {
   font-size: 10px;
+  cursor: pointer;
 }
 .Add:hover {
   text-decoration: underline;
@@ -92,7 +92,7 @@
   margin-left: 4px;
 }
 .Name {
-  flex: 0 0 40px;
+  width: 50px;
 }
 .Indicators .Value {
   width: 60px;
@@ -103,9 +103,11 @@
 }
 .Indicator .Controls > div {
   display: inline-flex;
+  cursor: pointer;
 }
 .Indicator:hover .Controls {
   visibility: visible;
+  pointer-events: all;
 }
 .Indicator .Controls svg {
   fill: var(--color-font-sec);
@@ -114,6 +116,34 @@
 }
 .Indicator .Controls svg:hover {
   fill: var(--color-font);
+}
+
+.AdvancedIndicator {
+  position: absolute;
+  z-index: 8;
+  bottom: 25%;
+  left: 8px;
+  color: var(--color-font);
+  font-size: 10px;
+  line-height: 20px;
+}
+.AdvancedIndicator.None {
+  bottom: 30px;
+}
+.AdvancedIndicator .Name {
+  color: var(--color-font);
+}
+.AdvancedIndicator .BigName {
+  width: 75px;
+}
+.AdvancedIndicator .NameInfo {
+  color: var(--color-font-sec);
+}
+.AdvancedIndicator .Value {
+  width: 50px;
+}
+.AdvancedIndicator .BigValue {
+  width: 65px;
 }
 
 .Settings {
@@ -127,15 +157,19 @@
   font-size: 14px;
   border-radius: 4px;
 }
+.Settings.Advanced {
+  top: 75%;
+}
 .Settings > div {
   display: flex;
   align-items: center;
 }
 .Settings > div + div {
   margin-top: 8px;
+  grid-gap: 8px;
 }
 .Settings .Label {
-  width: 90px;
+  margin-right: 24px;
 }
 .Settings .Label span {
   font-size: 10px;
@@ -154,9 +188,6 @@
 .Settings button:hover {
   background-color: var(--color-highlight);
 }
-.Settings button + button {
-  margin-left: 8px;
-}
 .Settings button.Active {
   color: var(--color-highlight-text);
 }
@@ -168,6 +199,13 @@
   padding: 8px;
   border-radius: 4px;
   margin-left: auto;
+}
+.Settings label {
+  display: flex;
+  flex-direction: column;
+  grid-gap: 3px;
+  font-size: 10px;
+  color: var(--color-font-sec);
 }
 
 @media screen and (max-width: 680px) {
@@ -204,5 +242,8 @@
   }
   .Settings {
     top: 95px;
+  }
+  .AdvancedIndicator .BigValue {
+    width: 55px;
   }
 }

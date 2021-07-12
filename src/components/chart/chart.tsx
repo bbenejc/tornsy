@@ -14,13 +14,20 @@ import {
   SeriesOptions,
 } from "lightweight-charts";
 import { Tooltip, TTooltip } from "./tooltip";
-import { selectTheme, selectIndicators } from "app/store";
+import { selectTheme, selectIndicators, selectAdvanced } from "app/store";
 import { getTheme } from "themes";
-import { calculateEMA, calculateSMA } from "tools";
+import {
+  calculateSMA,
+  calculateEMA,
+  calculateRSI,
+  calculateStochastics,
+  calculateMACD,
+} from "tools";
 
 function Chart({ stock, interval, height, width }: TProps): ReactElement {
   const [data, loadHistory] = useStockData(stock, interval);
   const indicators = useSelector(selectIndicators);
+  const advanced = useSelector(selectAdvanced);
   const [hover, setHover] = useState<TTooltip[]>();
   const hoverPrev = useRef<string>();
   const [lastData, setLastData] = useState<TTooltip[]>();
@@ -30,6 +37,7 @@ function Chart({ stock, interval, height, width }: TProps): ReactElement {
   const mainSeries = useRef<ISeriesApi<"Line" | "Candlestick">>();
   const volumeSeries = useRef<ISeriesApi<"Area">>();
   const indicatorSerieses = useRef<ISeriesApi<"Line">[]>([]);
+  const advancedSerieses = useRef<ISeriesApi<"Line" | "Histogram">[]>([]);
   const historyDebounce = useRef<NodeJS.Timeout | null>(null);
 
   // init chart
@@ -40,7 +48,7 @@ function Chart({ stock, interval, height, width }: TProps): ReactElement {
           width,
           height,
           leftPriceScale: { scaleMargins: { top: 0.75 } },
-          rightPriceScale: { scaleMargins: { bottom: 0.2 } },
+          rightPriceScale: { scaleMargins: { bottom: 0.3 } },
           watermark: {
             text: "Loading",
             fontSize: 20,
@@ -84,6 +92,15 @@ function Chart({ stock, interval, height, width }: TProps): ReactElement {
 
             for (let i = 0; i < indicatorSerieses.current.length; i += 1) {
               const val = param.seriesPrices.get(indicatorSerieses.current[i]);
+              tooltip.push({
+                type: "line",
+                time: param.time as number,
+                value: val ? (val as number) : 0,
+              });
+            }
+
+            for (let i = 0; i < advancedSerieses.current.length; i += 1) {
+              const val = param.seriesPrices.get(advancedSerieses.current[i]);
               tooltip.push({
                 type: "line",
                 time: param.time as number,
@@ -170,10 +187,10 @@ function Chart({ stock, interval, height, width }: TProps): ReactElement {
           if (!mainSeries.current)
             mainSeries.current = chart.current.addCandlestickSeries();
           mainSeries.current.applyOptions({
-            upColor: theme.green,
-            wickUpColor: theme.green,
-            downColor: theme.red,
-            wickDownColor: theme.red,
+            upColor: theme.green[0],
+            wickUpColor: theme.green[0],
+            downColor: theme.red[0],
+            wickDownColor: theme.red[0],
             borderVisible: false,
           });
 
@@ -224,9 +241,13 @@ function Chart({ stock, interval, height, width }: TProps): ReactElement {
         for (let i = 0; i < indicatorSerieses.current.length; i += 1) {
           chart.current.removeSeries(indicatorSerieses.current[i]);
         }
+        for (let i = 0; i < advancedSerieses.current.length; i += 1) {
+          chart.current.removeSeries(advancedSerieses.current[i]);
+        }
         indicatorSerieses.current = [];
+        advancedSerieses.current = [];
+
         if (indicators.length > 0) {
-          const indicatorsData = getLineData(data);
           for (let i = 0; i < indicators.length; i += 1) {
             const indicatorSeries: SeriesOptions<any> = {
               priceLineVisible: false,
@@ -241,8 +262,8 @@ function Chart({ stock, interval, height, width }: TProps): ReactElement {
             );
             const indicatorData =
               indicators[i].type === "ema"
-                ? calculateEMA(indicatorsData, indicators[i].length)
-                : calculateSMA(indicatorsData, indicators[i].length);
+                ? calculateEMA(data, indicators[i].length)
+                : calculateSMA(data, indicators[i].length);
 
             indicatorSerieses.current[i].setData(indicatorData);
 
@@ -260,6 +281,88 @@ function Chart({ stock, interval, height, width }: TProps): ReactElement {
           }
         }
 
+        if (advanced) {
+          const advancedSeries: SeriesOptions<any> = {
+            priceLineVisible: false,
+            lastValueVisible: false,
+            crosshairMarkerVisible: false,
+            lineStyle: LineStyle.Solid,
+            lineWidth: 1,
+            priceScaleId: "advanced",
+            scaleMargins: { bottom: 0, top: 0.8 },
+          };
+          let advancedData = [];
+          const priceLines: number[] = [];
+          switch (advanced.type) {
+            case "rsi":
+              priceLines.push(70, 30);
+              const rsiData = calculateRSI(data, advanced.length);
+              if (rsiData.length) advancedData.push(rsiData);
+              break;
+            case "stoch":
+              priceLines.push(80, 20);
+              advancedData = calculateStochastics(data, advanced.k, advanced.d);
+              break;
+            case "macd":
+              priceLines.push(0);
+              advancedData = calculateMACD(
+                data,
+                advanced.fast,
+                advanced.slow,
+                advanced.smoothing,
+                theme
+              );
+              break;
+          }
+
+          for (let i = 0; i < advancedData.length; i += 1) {
+            advancedSeries.color =
+              theme.advanced[advanced.type === "rsi" ? 2 : i];
+            advancedSerieses.current.push(
+              i === 2
+                ? chart.current.addHistogramSeries(advancedSeries)
+                : chart.current.addLineSeries(advancedSeries)
+            );
+            advancedSerieses.current[i].setData(advancedData[i]);
+
+            tooltip.push({
+              type: "line",
+              time:
+                advancedData[i].length > 0
+                  ? (advancedData[i][advancedData[i].length - 1].time as number)
+                  : 0,
+              value:
+                advancedData[i].length > 0
+                  ? advancedData[i][advancedData[i].length - 1].value
+                  : 0,
+            });
+          }
+          if (
+            advancedSerieses.current.length &&
+            ["rsi", "stoch"].includes(advanced.type)
+          ) {
+            advancedSerieses.current[0].applyOptions({
+              autoscaleInfoProvider: () => ({
+                priceRange: {
+                  minValue: 0,
+                  maxValue: 100,
+                },
+              }),
+            });
+          }
+
+          priceLines.forEach((price) =>
+            advancedSerieses.current[0].createPriceLine({
+              color: theme.crosshair,
+              price,
+              lineStyle: LineStyle.Dotted,
+              lineWidth: 1,
+              axisLabelVisible: true,
+              title: "",
+            })
+          );
+        }
+
         setLastData(tooltip);
       } else {
         if (mainSeries.current) chart.current.removeSeries(mainSeries.current);
@@ -271,7 +374,7 @@ function Chart({ stock, interval, height, width }: TProps): ReactElement {
         });
       }
     }
-  }, [data, theme, indicators]);
+  }, [data, theme, indicators, advanced]);
 
   // handle title change
   useEffect(() => {
@@ -289,11 +392,7 @@ function Chart({ stock, interval, height, width }: TProps): ReactElement {
 
   return (
     <div ref={divRef}>
-      <Tooltip
-        data={data}
-        series={hover || lastData || []}
-        indicators={indicators}
-      />
+      <Tooltip data={data} series={hover || lastData || []} />
     </div>
   );
 }
