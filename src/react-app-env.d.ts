@@ -1,5 +1,20 @@
 /// <reference types="react-scripts" />
 
+type TTheme = {
+  dark: boolean;
+  paper: string;
+  grid: string;
+  axis: string;
+  crosshair: string;
+  font: string;
+  fontSec: string;
+  red: string[];
+  green: string[];
+  volume: string;
+  indicators: string[];
+  advanced: string[];
+};
+
 type TInterval =
   | "m1"
   | "m5"
@@ -64,3 +79,8 @@ type TIndicator = {
   type: string;
   length: number;
 };
+
+type TAdvanced =
+  | { type: "rsi"; length: number }
+  | { type: "stoch"; k: number; d: number }
+  | { type: "macd"; slow: number; fast: number; smoothing: number };
