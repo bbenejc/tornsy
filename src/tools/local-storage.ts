@@ -5,6 +5,7 @@ const ORDER = "list-order";
 const STOCK = "stock";
 const INTERVAL = "interval";
 const INDICATORS = "indicators";
+const ADVANCED = "advanced";
 
 export function getTheme(): string | null {
   return localStorage.getItem(THEME);
@@ -66,4 +67,18 @@ export function getIndicators(): TIndicator[] {
 
 export function setIndicators(indicators: TIndicator[]): void {
   localStorage.setItem(INDICATORS, JSON.stringify(indicators));
+}
+
+export function getAdvanced(): TAdvanced | undefined {
+  try {
+    const advanced = JSON.parse(localStorage.getItem(ADVANCED) || "");
+    if (advanced) return advanced;
+  } catch {}
+
+  return undefined;
+}
+
+export function setAdvanced(advanced?: TAdvanced): void {
+  if (!advanced) localStorage.removeItem(ADVANCED);
+  else localStorage.setItem(ADVANCED, JSON.stringify(advanced));
 }
