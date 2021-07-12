@@ -6,10 +6,12 @@ const darkTheme = {
   crosshair: "#9598a0",
   font: "rgba(255,255,255, 0.87)",
   fontSec: "rgba(255,255,255, 0.56)",
-  green: "#4da39a",
-  red: "#e16052",
+  green: ["#4da39a", "#badddb"],
+  red: ["#e16052", "#f8cfd2"],
+
   // volume: "0,0,15",
   volume: "30,136,229", // rgb(30, 136, 229)
   indicators: ["#7CFC00", "#EE82EE"],
+  advanced: ["rgb(0, 148, 255)", "rgb(255, 106, 0)", "rgb(142, 21, 153)"],
 };
 export default darkTheme;
