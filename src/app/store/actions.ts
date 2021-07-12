@@ -5,8 +5,12 @@ import {
   CREATE_INDICATOR,
   REMOVE_INDICATOR,
   SET_INDICATOR,
+  CREATE_ADVANCED,
+  REMOVE_ADVANCED,
+  SET_ADVANCED,
   TState,
   TAction,
+  UPDATE_ADVANCED,
 } from "./declarations";
 
 export function setStocksList(list: TStockInfo[]): TAction {
@@ -31,4 +35,20 @@ export function removeIndicator(indicator: number): TAction {
 
 export function setIndicator(index: number, indicator: TIndicator): TAction {
   return { type: SET_INDICATOR, index, indicator };
+}
+
+export function createAdvanced(): TAction {
+  return { type: CREATE_ADVANCED };
+}
+
+export function removeAdvanced(): TAction {
+  return { type: REMOVE_ADVANCED };
+}
+
+export function setAdvanced(advanced: TAdvanced): TAction {
+  return { type: SET_ADVANCED, advanced };
+}
+
+export function updateAdvanced(key: string, value: number): TAction {
+  return { type: UPDATE_ADVANCED, key, value };
 }

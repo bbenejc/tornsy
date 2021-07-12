@@ -5,8 +5,12 @@ import {
   CREATE_INDICATOR,
   REMOVE_INDICATOR,
   SET_INDICATOR,
+  SET_ADVANCED,
+  REMOVE_ADVANCED,
   TState,
   TAction,
+  CREATE_ADVANCED,
+  UPDATE_ADVANCED,
 } from "./declarations";
 import {
   getTheme,
@@ -15,13 +19,17 @@ import {
   setListOrder,
   getIndicators,
   setIndicators,
+  getAdvanced,
+  setAdvanced,
 } from "tools";
+import { INDICATORS_ADVANCED } from "config";
 
 const initialState: TState = {
   list: [],
   listOrder: getListOrder() || "price-desc",
   theme: getTheme() || "dark",
   indicators: getIndicators(),
+  advanced: getAdvanced(),
 };
 
 export const reducer = (state = initialState, action: TAction): TState => {
@@ -50,11 +58,9 @@ export const reducer = (state = initialState, action: TAction): TState => {
       if (state.indicators.length < 2) {
         const indicators = [...state.indicators];
         indicators.push({
-          type:
-            indicators.length === 0 || indicators[0].type === "ema"
-              ? "sma"
-              : "ema",
-          length: indicators.length === 0 ? 12 : indicators[0].length,
+          type: "sma",
+          length:
+            indicators.length === 0 || indicators[0].length > 50 ? 12 : 200,
         });
         setIndicators(indicators);
         return { ...state, indicators };
@@ -81,6 +87,36 @@ export const reducer = (state = initialState, action: TAction): TState => {
       }
 
       return state;
+    }
+
+    case CREATE_ADVANCED: {
+      const indicator = INDICATORS_ADVANCED[0];
+      const advanced: any = { type: indicator.type };
+      indicator.params.forEach(({ key, value }) => (advanced[key] = value));
+      setAdvanced(advanced);
+
+      return { ...state, advanced };
+    }
+
+    case SET_ADVANCED:
+      setAdvanced(action.advanced);
+      return { ...state, advanced: action.advanced };
+
+    case REMOVE_ADVANCED: {
+      const newState = { ...state };
+      delete newState.advanced;
+      setAdvanced();
+
+      return newState;
+    }
+
+    case UPDATE_ADVANCED: {
+      const { key, value } = action;
+      if (state.advanced) {
+        const advanced = { ...state.advanced, [key]: value };
+        setAdvanced(advanced);
+        return { ...state, advanced };
+      } else return state;
     }
 
     default:

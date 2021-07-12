@@ -15,6 +15,9 @@ export const selectTheme = (state: TStore): string => state.theme;
 export const selectIndicators = (state: TStore): TIndicator[] =>
   state.indicators;
 
+export const selectAdvanced = (state: TStore): TAdvanced | undefined =>
+  state.advanced;
+
 export const selectOrderedStocksList = createSelector(
   selectStocksList,
   selectStocksListOrder,
