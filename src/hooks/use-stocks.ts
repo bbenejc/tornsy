@@ -28,7 +28,7 @@ export function useStocks(): void {
         .catch(() => {})
         .finally(() => {
           const timeNext = new Date();
-          timeNext.setMinutes(timeNext.getMinutes() + 1, 10, 0);
+          timeNext.setMinutes(timeNext.getMinutes() + 1, 8, 0);
           const interval = Math.max(5000, timeNext.getTime() - Date.now());
           worker.postMessage({ set: "stocks", interval });
         });

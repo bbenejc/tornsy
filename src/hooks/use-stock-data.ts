@@ -45,7 +45,7 @@ export function useStockData(
           const timeNext = new Date();
           timeNext.setMinutes(
             timeNext.getMinutes() + (timeNext.getSeconds() >= 10 ? 1 : 0),
-            10,
+            8,
             0
           );
           const interval = Math.max(5000, timeNext.getTime() - Date.now());
