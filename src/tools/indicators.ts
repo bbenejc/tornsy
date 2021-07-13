@@ -79,7 +79,7 @@ export function calculateStochastics(
   stockData: TStockData,
   kLength = 12,
   dLength = 3
-): [LineData[], LineData[]] {
+): LineData[][] {
   const { interval, data } = stockData;
   const hIndex = interval === "m1" ? 1 : 2;
   const lIndex = interval === "m1" ? 1 : 3;
@@ -123,11 +123,11 @@ export function calculateStochastics(
 
 export function calculateMACD(
   stockData: TStockData,
-  slowLength = 26,
   fastLength = 12,
+  slowLength = 26,
   signalLength = 9,
   theme: TTheme
-): any[] {
+): (LineData[] | HistogramData[])[] {
   const data = parseData_(stockData);
   const slow = calcEMA_(data, slowLength);
   const fast = calcEMA_(data, fastLength);
@@ -144,19 +144,91 @@ export function calculateMACD(
     }
     const signal: LineData[] = calcEMA_(MACD, signalLength);
     const lDiff = signal.length - MACD.length;
+    let prevValue = 0;
     for (let i = 0; i < signal.length; i += 1) {
       const value = MACD[i - lDiff].value - signal[i].value;
+      const cIndex =
+        value * prevValue > 0 && Math.abs(value) < Math.abs(prevValue) ? 1 : 0;
       histogram.push({
         time: signal[i].time,
         value,
-        color: value < 0 ? theme.red : theme.green,
+        color: value < 0 ? theme.red[cIndex] : theme.green[cIndex],
       });
+      prevValue = value;
     }
 
     return [MACD, signal, histogram];
   }
 
   return [];
+}
+
+export function calculateADX(
+  stockData: TStockData,
+  smoothing = 14
+): LineData[] {
+  const { interval, data } = stockData;
+  const hIndex = interval === "m1" ? 1 : 2;
+  const lIndex = interval === "m1" ? 1 : 3;
+  const cIndex = interval === "m1" ? 1 : 4;
+
+  const DMplus: LineData[] = [];
+  const DMminus: LineData[] = [];
+  const TR: LineData[] = [];
+
+  for (let i = 1; i < data.length; i += 1) {
+    const time = data[i][0];
+    const CH = parseFloat(data[i][hIndex] as string);
+    const PH = parseFloat(data[i - 1][hIndex] as string);
+    const CL = parseFloat(data[i][lIndex] as string);
+    const PL = parseFloat(data[i - 1][lIndex] as string);
+    const PC = parseFloat(data[i - 1][cIndex] as string);
+
+    const h = CH - PH;
+    const l = PL - CL;
+
+    DMplus.push({ time, value: h > l && h > 0 ? h : 0 });
+    DMminus.push({ time, value: l > h && l > 0 ? l : 0 });
+    TR.push({
+      time,
+      value: Math.max(CH - CL, Math.abs(CH - PC), Math.abs(CL - PC)),
+    });
+  }
+
+  const sTR = wilderSmooth_(TR, smoothing);
+  const sDMplus = wilderSmooth_(DMplus, smoothing);
+  const sDMminus = wilderSmooth_(DMminus, smoothing);
+
+  const DIplus: LineData[] = [];
+  const DIminus: LineData[] = [];
+  const DX: LineData[] = [];
+
+  for (let i = 0; i < sTR.length; i += 1) {
+    const { time, value: tr } = sTR[i];
+    const DIP = (sDMplus[i].value / tr) * 100;
+    const DIM = (sDMminus[i].value / tr) * 100;
+    DIplus.push({ time, value: DIP });
+    DIminus.push({ time, value: DIM });
+    DX.push({ time, value: (Math.abs(DIP - DIM) / (DIP + DIM)) * 100 });
+  }
+
+  const ADX: LineData[] = [];
+  if (DX.length > smoothing) {
+    let first = 0;
+    for (let i = 0; i < smoothing; i += 1) first += DX[i].value;
+    ADX.push({ time: DX[smoothing - 1].time, value: first / smoothing });
+
+    for (let i = smoothing; i < DX.length; i += 1) {
+      ADX.push({
+        time: DX[i].time,
+        value:
+          (ADX[i - smoothing].value * (smoothing - 1) + DX[i].value) /
+          smoothing,
+      });
+    }
+  }
+
+  return ADX;
 }
 
 function parseData_(stockData: TStockData): LineData[] {
@@ -194,4 +266,25 @@ function calcEMA_(data: LineData[], length: number, smoothing = 2): LineData[] {
   }
 
   return emaData;
+}
+
+function wilderSmooth_(data: LineData[], smoothing = 14): LineData[] {
+  const result: LineData[] = [];
+  if (data.length > smoothing) {
+    let first = 0;
+    for (let i = 0; i < smoothing; i += 1) first += data[i].value;
+    result.push({ time: data[smoothing - 1].time, value: first });
+
+    for (let i = smoothing; i < data.length; i += 1) {
+      result.push({
+        time: data[i].time,
+        value:
+          result[i - smoothing].value -
+          result[i - smoothing].value / smoothing +
+          data[i].value,
+      });
+    }
+  }
+
+  return result;
 }

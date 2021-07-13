@@ -56,9 +56,12 @@ function Tooltip({ data, series }: TProps): ReactElement {
     setIndicatorSettings(i);
   }, []);
 
-  const addAdvanced = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    dispatch(createAdvanced());
-  }, []);
+  const addAdvanced = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      dispatch(createAdvanced());
+    },
+    [dispatch]
+  );
 
   const editAdvanced = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     setAdvancedSettings(true);
@@ -66,7 +69,7 @@ function Tooltip({ data, series }: TProps): ReactElement {
 
   const removeAdvanced = useCallback(() => {
     dispatch(removeAdvancedAction());
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     if (indicatorSettings >= 0 || advancedSettings) {
@@ -233,7 +236,9 @@ function Tooltip({ data, series }: TProps): ReactElement {
                   ? val > 0
                     ? theme.green[0]
                     : theme.red[0]
-                  : theme.advanced[advanced.type === "rsi" ? 2 : a],
+                  : theme.advanced[
+                      ["rsi", "adx"].includes(advanced.type) ? 2 : a
+                    ],
             }}
             key={i}
           >

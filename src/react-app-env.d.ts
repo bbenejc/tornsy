@@ -83,4 +83,5 @@ type TIndicator = {
 type TAdvanced =
   | { type: "rsi"; length: number }
   | { type: "stoch"; k: number; d: number }
-  | { type: "macd"; slow: number; fast: number; smoothing: number };
+  | { type: "macd"; slow: number; fast: number; smoothing: number }
+  | { type: "adx"; length: number };

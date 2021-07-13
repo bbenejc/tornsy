@@ -243,6 +243,11 @@
   .Settings {
     top: 95px;
   }
+  .Settings,
+  .Settings input,
+  .Settings button {
+    font-size: 12px;
+  }
   .AdvancedIndicator .BigValue {
     width: 55px;
   }

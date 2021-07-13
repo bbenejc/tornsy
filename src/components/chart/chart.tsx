@@ -22,6 +22,7 @@ import {
   calculateRSI,
   calculateStochastics,
   calculateMACD,
+  calculateADX,
 } from "tools";
 
 function Chart({ stock, interval, height, width }: TProps): ReactElement {
@@ -313,13 +314,18 @@ function Chart({ stock, interval, height, width }: TProps): ReactElement {
                 theme
               );
               break;
+            case "adx":
+              priceLines.push(20);
+              const adxData = calculateADX(data, advanced.length);
+              if (adxData.length) advancedData.push(adxData);
+              break;
           }
 
           for (let i = 0; i < advancedData.length; i += 1) {
             advancedSeries.color =
-              theme.advanced[advanced.type === "rsi" ? 2 : i];
+              theme.advanced[["rsi", "adx"].includes(advanced.type) ? 2 : i];
             advancedSerieses.current.push(
-              i === 2
+              i === 2 && advanced.type === "rsi"
                 ? chart.current.addHistogramSeries(advancedSeries)
                 : chart.current.addLineSeries(advancedSeries)
             );
@@ -337,30 +343,30 @@ function Chart({ stock, interval, height, width }: TProps): ReactElement {
                   : 0,
             });
           }
-          if (
-            advancedSerieses.current.length &&
-            ["rsi", "stoch"].includes(advanced.type)
-          ) {
-            advancedSerieses.current[0].applyOptions({
-              autoscaleInfoProvider: () => ({
-                priceRange: {
-                  minValue: 0,
-                  maxValue: 100,
-                },
-              }),
-            });
-          }
 
-          priceLines.forEach((price) =>
-            advancedSerieses.current[0].createPriceLine({
-              color: theme.crosshair,
-              price,
-              lineStyle: LineStyle.Dotted,
-              lineWidth: 1,
-              axisLabelVisible: true,
-              title: "",
-            })
-          );
+          if (advancedSerieses.current.length) {
+            if (["rsi", "stoch"].includes(advanced.type)) {
+              advancedSerieses.current[0].applyOptions({
+                autoscaleInfoProvider: () => ({
+                  priceRange: {
+                    minValue: 0,
+                    maxValue: 100,
+                  },
+                }),
+              });
+            }
+
+            priceLines.forEach((price) =>
+              advancedSerieses.current[0].createPriceLine({
+                color: theme.crosshair,
+                price,
+                lineStyle: LineStyle.Dotted,
+                lineWidth: 1,
+                axisLabelVisible: true,
+                title: "",
+              })
+            );
+          }
         }
 
         setLastData(tooltip);

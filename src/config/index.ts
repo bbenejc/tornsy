@@ -33,4 +33,5 @@ export const INDICATORS_ADVANCED = [
       { key: "smoothing", value: 9, title: "Smoothing" },
     ],
   },
+  { type: "adx", params: [{ key: "length", value: 14, title: "Length" }] },
 ];
