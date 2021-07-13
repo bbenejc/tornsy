@@ -325,7 +325,7 @@ function Chart({ stock, interval, height, width }: TProps): ReactElement {
             advancedSeries.color =
               theme.advanced[["rsi", "adx"].includes(advanced.type) ? 2 : i];
             advancedSerieses.current.push(
-              i === 2 && advanced.type === "rsi"
+              i === 2 && advanced.type === "macd"
                 ? chart.current.addHistogramSeries(advancedSeries)
                 : chart.current.addLineSeries(advancedSeries)
             );
