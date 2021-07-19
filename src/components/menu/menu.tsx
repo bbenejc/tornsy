@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectTheme, setTheme } from "app/store";
 import { Link } from "react-router-dom";
 import { Watchlist } from "components";
-import { INTERVALS, SMALL } from "config";
+import { INTERVALS, SMALL, XSMALL } from "config";
 import css from "./menu.module.css";
 
 function Menu({ stock, interval, width, height }: TProps): ReactElement {
@@ -23,10 +23,15 @@ function Menu({ stock, interval, width, height }: TProps): ReactElement {
   useEffect(() => {
     if (list) {
       const closeList = () => setList(false);
+      const escKey = (e: KeyboardEvent) => {
+        if (e.key === "Escape") setList(false);
+      };
 
       document.addEventListener("click", closeList);
+      document.addEventListener("keyup", escKey);
       return () => {
         document.removeEventListener("click", closeList);
+        document.removeEventListener("keyup", escKey);
       };
     }
   }, [list]);
@@ -61,7 +66,7 @@ function Menu({ stock, interval, width, height }: TProps): ReactElement {
         <div
           className={css.List}
           style={
-            width < 640 || height < 640
+            width < XSMALL || height < XSMALL
               ? mobileListStyle
               : { width: 320, height: Math.min(height - 40, 450) }
           }

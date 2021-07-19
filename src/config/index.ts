@@ -1,6 +1,7 @@
 export const worker = new Worker("/worker.js");
 
 export const SMALL = 975;
+export const XSMALL = 640;
 export const INTERVALS: { [key in TInterval]: string } = {
   m1: "1m",
   m5: "5m",

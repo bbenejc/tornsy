@@ -62,7 +62,7 @@ function Watchlist({ interval }: TProps): ReactElement {
       </div>
     );
   }
-  return <div className="Watchlist" />;
+  return <div className={css.Watchlist} />;
 }
 
 export default memo(Watchlist);

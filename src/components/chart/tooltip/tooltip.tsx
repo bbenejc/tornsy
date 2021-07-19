@@ -27,7 +27,6 @@ import { getTheme } from "themes";
 import { INTERVALS, INDICATORS_ADVANCED } from "config";
 import css from "./tooltip.module.css";
 import { formatNumber } from "tools/format";
-import classes from "./tooltip.module.css";
 
 function Tooltip({ data, series }: TProps): ReactElement {
   const dispatch = useDispatch();
@@ -89,11 +88,11 @@ function Tooltip({ data, series }: TProps): ReactElement {
 
       document.addEventListener("mousedown", clickAway);
       document.addEventListener("touchstart", clickAway);
-      document.addEventListener("keydown", escKey);
+      document.addEventListener("keyup", escKey);
       return () => {
         document.removeEventListener("mousedown", clickAway);
         document.removeEventListener("touchstart", clickAway);
-        document.removeEventListener("keydown", escKey);
+        document.removeEventListener("keyup", escKey);
       };
     }
   }, [indicatorSettings, advancedSettings]);
@@ -403,14 +402,14 @@ const IndicatorSettingsC = React.forwardRef(
             <button
               onClick={changeType}
               value="sma"
-              className={type === "sma" ? classes.Active : ""}
+              className={type === "sma" ? css.Active : ""}
             >
               SMA
             </button>
             <button
               onClick={changeType}
               value="ema"
-              className={type === "ema" ? classes.Active : ""}
+              className={type === "ema" ? css.Active : ""}
             >
               EMA
             </button>
