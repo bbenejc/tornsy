@@ -28,9 +28,9 @@ import { INTERVALS, INDICATORS_ADVANCED } from "config";
 import css from "./tooltip.module.css";
 import { formatNumber } from "tools/format";
 
-function Tooltip({ data, series }: TProps): ReactElement {
+function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
   const dispatch = useDispatch();
-  const stockInfo = useSelector(selectStockInfo(data.stock));
+  const stockInfo = useSelector(selectStockInfo(stock));
   const indicators = useSelector(selectIndicators);
   const advanced = useSelector(selectAdvanced);
   const [indicatorSettings, setIndicatorSettings] = useState(-1);
@@ -112,15 +112,15 @@ function Tooltip({ data, series }: TProps): ReactElement {
     let prev;
 
     if (series[0].type === "line") {
-      const index = findDataIndex(data.data, series[0].time);
+      const index = findDataIndex(data, series[0].time);
       info.push(
         <div className={css.Ohlc} key="p">
           <span>{series[0].value ? series[0].value.toFixed(2) : ""}</span>
         </div>
       );
       if (index > 0) {
-        const cur = parseFloat(data.data[index][1]);
-        prev = parseFloat(data.data[index - 1][1]);
+        const cur = parseFloat(data[index][1]);
+        prev = parseFloat(data[index - 1][1]);
         diff = cur - prev;
 
         if (diff >= 0) infoCss.push(css.Green);
@@ -301,13 +301,10 @@ function Tooltip({ data, series }: TProps): ReactElement {
       <>
         <div className={css.Tooltip}>
           <div className={css.Title}>
-            <img
-              src={getStockLogoUrl(data.stock, theme.dark)}
-              alt={data.stock}
-            />
+            <img src={getStockLogoUrl(stock, theme.dark)} alt={stock} />
             <div>
               {stockInfo.name}
-              <span className={css.Interval}>{INTERVALS[data.interval]}</span>
+              <span className={css.Interval}>{INTERVALS[interval]}</span>
             </div>
           </div>
 
@@ -421,8 +418,7 @@ const IndicatorSettingsC = React.forwardRef(
           </div>
           <input
             type="number"
-            min={2}
-            max={250}
+            pattern="[0-9]*"
             defaultValue={length}
             onChange={changeLength}
             onKeyDown={inputKeyDown}
@@ -511,8 +507,7 @@ const AdvancedSettingsC = React.forwardRef(
               {title}
               <input
                 type="number"
-                min={2}
-                max={250}
+                pattern="[0-9]*"
                 defaultValue={
                   advanced && key in advanced
                     ? advanced[key as keyof TAdvanced]
@@ -534,8 +529,10 @@ const AdvancedSettings = memo(AdvancedSettingsC);
 export default memo(Tooltip);
 
 type TProps = {
-  data: TStockData;
   series: TTooltip[];
+  data: TStockData[];
+  stock: string;
+  interval: TInterval;
 };
 
 export type TTooltip =
