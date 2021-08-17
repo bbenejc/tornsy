@@ -14,7 +14,14 @@ import {
   SeriesOptions,
 } from "lightweight-charts";
 import { Tooltip, TTooltip } from "./tooltip";
-import { selectTheme, selectIndicators, selectAdvanced } from "app/store";
+import {
+  selectTheme,
+  selectIndicators,
+  selectAdvanced,
+  selectStock,
+  selectInterval,
+  selectStockPrice,
+} from "app/store";
 import { getTheme } from "themes";
 import {
   calculateSMA,
@@ -25,8 +32,11 @@ import {
   calculateADX,
 } from "tools";
 
-function Chart({ stock, interval, height, width }: TProps): ReactElement {
+function Chart({ height, width }: TProps): ReactElement {
+  const stock = useSelector(selectStock);
+  const interval = useSelector(selectInterval);
   const [data, loadHistory] = useStockData(stock, interval);
+  const currentPrice = useSelector(selectStockPrice);
   const indicators = useSelector(selectIndicators);
   const advanced = useSelector(selectAdvanced);
   const [hover, setHover] = useState<TTooltip[]>();
@@ -149,11 +159,11 @@ function Chart({ stock, interval, height, width }: TProps): ReactElement {
   // handle data series
   useEffect(() => {
     if (chart.current) {
-      if (data.data.length) {
+      if (data.length) {
         const tooltip: TTooltip[] = [];
 
         // line series
-        if (data.interval === "m1") {
+        if (interval === "m1") {
           if (
             mainSeries.current &&
             mainSeries.current.seriesType() !== "Line"
@@ -164,7 +174,7 @@ function Chart({ stock, interval, height, width }: TProps): ReactElement {
           if (!mainSeries.current)
             mainSeries.current = chart.current.addLineSeries();
 
-          const lineData: LineData[] = getLineData(data);
+          const lineData: LineData[] = getLineData(data, interval);
           mainSeries.current.setData(lineData);
           const { time, value } = lineData[lineData.length - 1];
           tooltip.push({
@@ -175,7 +185,7 @@ function Chart({ stock, interval, height, width }: TProps): ReactElement {
         }
         // candle series
         else {
-          const ohlcData = getOhlcData(data);
+          const ohlcData = getOhlcData(data, interval);
 
           if (
             mainSeries.current &&
@@ -213,9 +223,9 @@ function Chart({ stock, interval, height, width }: TProps): ReactElement {
         });
 
         const volumeData: LineData[] = [];
-        const v = data.data[0].length - 1;
-        for (let i = 0; i < data.data.length; i += 1) {
-          const row = data.data[i];
+        const v = data[0].length - 1;
+        for (let i = 0; i < data.length; i += 1) {
+          const row = data[i];
           volumeData.push({
             time: row[0],
             value: row[v],
@@ -231,7 +241,7 @@ function Chart({ stock, interval, height, width }: TProps): ReactElement {
         chart.current.applyOptions({
           watermark: { visible: false },
           timeScale: {
-            timeVisible: !["d1", "w1", "n1"].includes(data.interval),
+            timeVisible: !["d1", "w1", "n1"].includes(interval),
           },
           crosshair: {
             horzLine: { visible: true },
@@ -263,8 +273,8 @@ function Chart({ stock, interval, height, width }: TProps): ReactElement {
             );
             const indicatorData =
               indicators[i].type === "ema"
-                ? calculateEMA(data, indicators[i].length)
-                : calculateSMA(data, indicators[i].length);
+                ? calculateEMA(data, interval, indicators[i].length)
+                : calculateSMA(data, interval, indicators[i].length);
 
             indicatorSerieses.current[i].setData(indicatorData);
 
@@ -297,17 +307,23 @@ function Chart({ stock, interval, height, width }: TProps): ReactElement {
           switch (advanced.type) {
             case "rsi":
               priceLines.push(70, 30);
-              const rsiData = calculateRSI(data, advanced.length);
+              const rsiData = calculateRSI(data, interval, advanced.length);
               if (rsiData.length) advancedData.push(rsiData);
               break;
             case "stoch":
               priceLines.push(80, 20);
-              advancedData = calculateStochastics(data, advanced.k, advanced.d);
+              advancedData = calculateStochastics(
+                data,
+                interval,
+                advanced.k,
+                advanced.d
+              );
               break;
             case "macd":
               priceLines.push(0);
               advancedData = calculateMACD(
                 data,
+                interval,
                 advanced.fast,
                 advanced.slow,
                 advanced.smoothing,
@@ -316,7 +332,7 @@ function Chart({ stock, interval, height, width }: TProps): ReactElement {
               break;
             case "adx":
               priceLines.push(20);
-              const adxData = calculateADX(data, advanced.length);
+              const adxData = calculateADX(data, interval, advanced.length);
               if (adxData.length) advancedData.push(adxData);
               break;
           }
@@ -380,37 +396,38 @@ function Chart({ stock, interval, height, width }: TProps): ReactElement {
         });
       }
     }
-  }, [data, theme, indicators, advanced]);
+  }, [theme, data, interval, indicators, advanced]);
 
   // handle title change
   useEffect(() => {
     let title = stock.toUpperCase();
-    if (data.data.length) {
-      const last = data.data[data.data.length - 1];
-      title += " " + (data.interval === "m1" ? last[1] : last[4]);
-    }
-
+    if (currentPrice !== "") title += " " + currentPrice;
     if (title !== "") title += " | ";
     title += "Tornsy";
 
     if (document.title !== title) document.title = title;
-  }, [stock, data]);
+  }, [currentPrice, stock]);
 
   return (
     <div ref={divRef}>
-      <Tooltip data={data} series={hover || lastData || []} />
+      <Tooltip
+        data={data}
+        series={hover || lastData || []}
+        stock={stock}
+        interval={interval}
+      />
     </div>
   );
 }
 
 export default memo(Chart);
 
-function getLineData(data: TStockData): LineData[] {
-  const cIndex = data.interval === "m1" ? 1 : 4;
+function getLineData(data: TStockData[], interval: TInterval): LineData[] {
+  const cIndex = interval === "m1" ? 1 : 4;
   const lineData: LineData[] = [];
 
-  for (let i = 0, num = data.data.length; i < num; i += 1) {
-    const row = data.data[i];
+  for (let i = 0, num = data.length; i < num; i += 1) {
+    const row = data[i];
     lineData.push({
       time: row[0],
       value: parseFloat(row[cIndex] as string),
@@ -420,15 +437,15 @@ function getLineData(data: TStockData): LineData[] {
   return lineData;
 }
 
-function getOhlcData(data: TStockData): BarData[] {
+function getOhlcData(data: TStockData[], interval: TInterval): BarData[] {
   const oIndex = 1;
-  const hIndex = data.interval === "m1" ? 1 : 2;
-  const lIndex = data.interval === "m1" ? 1 : 3;
-  const cIndex = data.interval === "m1" ? 1 : 4;
+  const hIndex = interval === "m1" ? 1 : 2;
+  const lIndex = interval === "m1" ? 1 : 3;
+  const cIndex = interval === "m1" ? 1 : 4;
   const ohlcData: BarData[] = [];
 
-  for (let i = 0; i < data.data.length; i += 1) {
-    const row = data.data[i];
+  for (let i = 0; i < data.length; i += 1) {
+    const row = data[i];
     ohlcData.push({
       time: row[0],
       open: parseFloat(row[oIndex]),
@@ -442,8 +459,6 @@ function getOhlcData(data: TStockData): BarData[] {
 }
 
 type TProps = {
-  stock: string;
-  interval: TInterval;
   height: number;
   width: number;
 };

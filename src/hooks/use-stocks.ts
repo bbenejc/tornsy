@@ -9,9 +9,9 @@ export function useStocks(): void {
   useEffect(() => {
     function loadStocks() {
       fetchStocks()
-        .then((list) => {
+        .then(({ data, timestamp }) => {
           const stocks: TStockInfo[] = [];
-          list.forEach(({ stock, name, price, price_m1, total_shares }) => {
+          data.forEach(({ stock, name, price, price_m1, total_shares }) => {
             const cur = parseFloat(price);
             const prev = parseFloat(price_m1);
             stocks.push({
@@ -23,12 +23,12 @@ export function useStocks(): void {
               total_shares,
             });
           });
-          dispatch(setStocksList(stocks));
+          dispatch(setStocksList(stocks, timestamp));
         })
         .catch(() => {})
         .finally(() => {
           const timeNext = new Date();
-          timeNext.setMinutes(timeNext.getMinutes() + 1, 8, 0);
+          timeNext.setMinutes(timeNext.getMinutes() + 1, 3, 0);
           const interval = Math.max(5000, timeNext.getTime() - Date.now());
           worker.postMessage({ set: "stocks", interval });
         });
@@ -48,9 +48,15 @@ export function useStocks(): void {
   }, [dispatch]);
 }
 
-async function fetchStocks(): Promise<TStockList[]> {
+async function fetchStocks(): Promise<{
+  data: TStockList[];
+  timestamp: number;
+}> {
   const res = await fetch(process.env.REACT_APP_API + "/stocks").then(
     (response) => response.json()
   );
-  return res && res.data ? res.data : [];
+  const data = res && res.data ? res.data : [];
+  const timestamp = res && res.timestamp ? res.timestamp : 0;
+
+  return { data, timestamp };
 }

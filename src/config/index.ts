@@ -1,5 +1,6 @@
 export const worker = new Worker("/worker.js");
 
+export const API_LIMIT = 1000;
 export const SMALL = 975;
 export const XSMALL = 640;
 export const INTERVALS: { [key in TInterval]: string } = {

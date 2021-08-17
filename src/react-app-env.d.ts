@@ -47,10 +47,22 @@ type TStockInfo = {
 };
 
 type TStockData =
+  | [timestamp: UTCTimestamp, price: string, total_shares: number]
+  | [
+      timestamp: UTCTimestamp,
+      open: string,
+      high: string,
+      low: string,
+      close: string,
+      total_shares: number
+    ];
+
+/*
+type TStockData =
   | {
       stock: string;
       interval: "m1";
-      data: [timestamp: UTCTimestamp, price: string][];
+      data: [timestamp: UTCTimestamp, price: string, total_shares: number][];
     }
   | {
       stock: string;
@@ -71,9 +83,11 @@ type TStockData =
         open: string,
         high: string,
         low: string,
-        close: string
+        close: string,
+        total_shares: number
       ][];
     };
+*/
 
 type TIndicator = {
   type: string;

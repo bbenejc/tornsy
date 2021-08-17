@@ -1,8 +1,12 @@
 import type { HistogramData, LineData } from "lightweight-charts";
 import { sumArray } from "./utils";
 
-export function calculateSMA(stockData: TStockData, length = 6): LineData[] {
-  const data = parseData_(stockData);
+export function calculateSMA(
+  stockData: TStockData[],
+  interval: TInterval,
+  length = 6
+): LineData[] {
+  const data = parseData_(stockData, interval);
   const smaData: LineData[] = [];
   const smaSum = [];
 
@@ -21,17 +25,21 @@ export function calculateSMA(stockData: TStockData, length = 6): LineData[] {
 }
 
 export function calculateEMA(
-  stockData: TStockData,
+  stockData: TStockData[],
+  interval: TInterval,
   length = 6,
   smoothing = 2
 ): LineData[] {
-  const data = parseData_(stockData);
+  const data = parseData_(stockData, interval);
 
   return calcEMA_(data, length, smoothing);
 }
 
-export function calculateRSI(stockData: TStockData, length = 14): LineData[] {
-  const { data, interval } = stockData;
+export function calculateRSI(
+  data: TStockData[],
+  interval: TInterval,
+  length = 14
+): LineData[] {
   const isM1 = interval === "m1" ? 1 : 0;
   const cIndex = isM1 ? 1 : 4;
   const initialLength = length + isM1;
@@ -76,11 +84,11 @@ export function calculateRSI(stockData: TStockData, length = 14): LineData[] {
 }
 
 export function calculateStochastics(
-  stockData: TStockData,
+  data: TStockData[],
+  interval: TInterval,
   kLength = 12,
   dLength = 3
 ): LineData[][] {
-  const { interval, data } = stockData;
   const hIndex = interval === "m1" ? 1 : 2;
   const lIndex = interval === "m1" ? 1 : 3;
   const cIndex = interval === "m1" ? 1 : 4;
@@ -122,13 +130,14 @@ export function calculateStochastics(
 }
 
 export function calculateMACD(
-  stockData: TStockData,
+  stockData: TStockData[],
+  interval: TInterval,
   fastLength = 12,
   slowLength = 26,
   signalLength = 9,
   theme: TTheme
 ): (LineData[] | HistogramData[])[] {
-  const data = parseData_(stockData);
+  const data = parseData_(stockData, interval);
   const slow = calcEMA_(data, slowLength);
   const fast = calcEMA_(data, fastLength);
 
@@ -164,10 +173,10 @@ export function calculateMACD(
 }
 
 export function calculateADX(
-  stockData: TStockData,
+  data: TStockData[],
+  interval: TInterval,
   smoothing = 14
 ): LineData[] {
-  const { interval, data } = stockData;
   const hIndex = interval === "m1" ? 1 : 2;
   const lIndex = interval === "m1" ? 1 : 3;
   const cIndex = interval === "m1" ? 1 : 4;
@@ -231,8 +240,7 @@ export function calculateADX(
   return ADX;
 }
 
-function parseData_(stockData: TStockData): LineData[] {
-  const { data, interval } = stockData;
+function parseData_(data: TStockData[], interval: TInterval): LineData[] {
   const cIndex = interval === "m1" ? 1 : 4;
   const parsedData: LineData[] = [];
 

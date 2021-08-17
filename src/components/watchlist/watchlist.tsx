@@ -2,20 +2,22 @@ import React, { memo, ReactElement, MouseEvent } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import {
-  orderStocksList,
+  setListSorting,
   selectOrderedStocksList,
   selectTheme,
+  selectInterval,
 } from "app/store";
 import { getStockLogoUrl } from "tools";
 import css from "./watchlist.module.css";
 
-function Watchlist({ interval }: TProps): ReactElement {
+function Watchlist(): ReactElement {
   const dispatch = useDispatch();
+  const interval = useSelector(selectInterval);
   const stocks = useSelector(selectOrderedStocksList);
   const isDarkTheme = useSelector(selectTheme) === "dark";
 
   const changeOrder = (order: string) => (e: MouseEvent) => {
-    dispatch(orderStocksList(order));
+    dispatch(setListSorting(order));
     e.stopPropagation();
   };
 
@@ -66,7 +68,3 @@ function Watchlist({ interval }: TProps): ReactElement {
 }
 
 export default memo(Watchlist);
-
-type TProps = {
-  interval: TInterval;
-};

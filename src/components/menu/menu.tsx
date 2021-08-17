@@ -1,13 +1,15 @@
 import { memo, ReactElement, useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { selectTheme, setTheme } from "app/store";
+import { selectInterval, selectStock, selectTheme, setTheme } from "app/store";
 import { Link } from "react-router-dom";
 import { Watchlist } from "components";
 import { INTERVALS, SMALL, XSMALL } from "config";
 import css from "./menu.module.css";
 
-function Menu({ stock, interval, width, height }: TProps): ReactElement {
+function Menu({ width, height }: TProps): ReactElement {
   const dispatch = useDispatch();
+  const stock = useSelector(selectStock);
+  const interval = useSelector(selectInterval);
   const [list, setList] = useState(false);
   const theme = useSelector(selectTheme);
   const toggleTheme = useCallback(() => {
@@ -71,7 +73,7 @@ function Menu({ stock, interval, width, height }: TProps): ReactElement {
               : { width: 320, height: Math.min(height - 40, 450) }
           }
         >
-          <Watchlist interval={interval} />
+          <Watchlist />
         </div>
       )}
     </>
@@ -86,8 +88,6 @@ const mobileListStyle = {
 };
 
 type TProps = {
-  stock: string;
-  interval: TInterval;
   width: number;
   height: number;
 };

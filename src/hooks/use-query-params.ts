@@ -1,42 +1,54 @@
 import { useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { selectOrderedStocksList } from "app/store";
-import { getInterval, getStock, setStock, setInterval } from "tools";
+import { batch, useStore, useSelector } from "react-redux";
+import { selectOrderedStocksList, setStock, setInterval } from "app/store";
+import {
+  getInterval,
+  getStock,
+  setStock as setStockLS,
+  setInterval as setIntervalLS,
+} from "tools";
 import { INTERVALS } from "config";
+import { useEffect, useState } from "react";
 
-export function useQueryParams(): TQueryParams {
-  const stocks = useSelector(selectOrderedStocksList);
+export function useQueryParams(): string {
+  const store = useStore();
+  const stocksLoaded = useSelector(selectOrderedStocksList).length > 0;
   const { stock = "", interval = "m1" } = useParams<TParams>();
+  const [redirect, setRedirect] = useState("");
 
-  if (stocks.length) {
-    const verifiedStock = verifyStock(stocks, [
-      stock,
-      getStock(),
-      stocks[0].stock,
-    ]);
-    const verifiedInterval = verifyInterval(
-      stock === "" ? getInterval() : interval
-    );
+  useEffect(() => {
+    const stocks = selectOrderedStocksList(store.getState());
+    if (stocks.length) {
+      const verifiedStock = verifyStock(stocks, [
+        stock,
+        getStock(),
+        stocks[0].stock,
+      ]);
+      const verifiedInterval = verifyInterval(
+        stock === "" ? getInterval() : interval
+      );
 
-    if (verifiedStock === stock) setStock(stock);
-    if (verifiedInterval === interval) setInterval(interval);
+      // save to local storage
+      if (verifiedStock === stock) setStockLS(verifiedStock);
+      if (verifiedInterval === interval) setIntervalLS(verifiedInterval);
 
-    return {
-      stock: verifiedStock,
-      interval: verifiedInterval,
-      redirect:
+      // save to redux store
+      batch(() => {
+        store.dispatch(setStock(verifiedStock));
+        store.dispatch(setInterval(verifiedInterval));
+      });
+
+      setRedirect(
         verifiedStock === stock && verifiedInterval === interval
           ? ""
           : `/${verifiedStock}${
               verifiedInterval !== "m1" ? `/${verifiedInterval}` : ""
-            }`,
-    };
-  } else
-    return {
-      stock: "",
-      interval,
-      redirect: "",
-    };
+            }`
+      );
+    }
+  }, [store, stocksLoaded, stock, interval]);
+
+  return redirect;
 }
 
 function verifyStock(stocks: TStockInfo[], options: string[]): string {
@@ -66,5 +78,3 @@ type TParams = {
   stock: string;
   interval: TInterval;
 };
-
-type TQueryParams = TParams & { redirect: string };

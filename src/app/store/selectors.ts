@@ -9,14 +9,43 @@ export const selectStockInfo =
       (s) => s.stock.toUpperCase() === stock.toUpperCase()
     );
   };
+export const selectStockData =
+  (stock: string, interval: TInterval) =>
+  (state: TStore): TStore["ohlc"][string][TInterval] | undefined => {
+    if (stock in state.ohlc && interval in state.ohlc[stock])
+      return state.ohlc[stock][interval];
+    else return undefined;
+  };
 
-export const selectStocksListOrder = (state: TStore): string => state.listOrder;
+export const isFetchingStockData =
+  (stock: string, interval: TInterval) =>
+  (state: TStore): boolean => {
+    if (stock in state.ohlc && interval in state.ohlc[stock])
+      return !!state.ohlc[stock][interval].loading;
+    return false;
+  };
+
+export const selectStock = (state: TStore): string => state.stock;
+export const selectInterval = (state: TStore): TInterval => state.interval;
+
+export const selectStocksListOrder = (state: TStore): string => state.sorting;
 export const selectTheme = (state: TStore): string => state.theme;
 export const selectIndicators = (state: TStore): TIndicator[] =>
   state.indicators;
 
 export const selectAdvanced = (state: TStore): TAdvanced | undefined =>
   state.advanced;
+
+export const selectStockPrice = createSelector(
+  selectStock,
+  selectStocksList,
+  (stock, list) => {
+    const info = list.find(
+      (s) => s.stock.toUpperCase() === stock.toUpperCase()
+    );
+    return info ? info.price : "";
+  }
+);
 
 export const selectOrderedStocksList = createSelector(
   selectStocksList,

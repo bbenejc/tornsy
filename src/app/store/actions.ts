@@ -1,6 +1,11 @@
 import {
   SET_LIST,
-  SET_LIST_ORDER,
+  SET_OHLC,
+  START_FETCHING,
+  STOP_FETCHING,
+  SET_STOCK,
+  SET_INTERVAL,
+  SET_SORTING,
   SET_THEME,
   CREATE_INDICATOR,
   REMOVE_INDICATOR,
@@ -8,17 +13,41 @@ import {
   CREATE_ADVANCED,
   REMOVE_ADVANCED,
   SET_ADVANCED,
+  UPDATE_ADVANCED,
   TState,
   TAction,
-  UPDATE_ADVANCED,
 } from "./declarations";
 
-export function setStocksList(list: TStockInfo[]): TAction {
-  return { type: SET_LIST, list };
+export function setStocksList(list: TStockInfo[], timestamp: number): TAction {
+  return { type: SET_LIST, list, timestamp };
 }
 
-export function orderStocksList(order: string): TAction {
-  return { type: SET_LIST_ORDER, order };
+export function setStockData(
+  stock: string,
+  interval: TInterval,
+  data: TStockData[]
+): TAction {
+  return { type: SET_OHLC, stock, interval, data };
+}
+
+export function setStock(stock: string): TAction {
+  return { type: SET_STOCK, stock };
+}
+
+export function setInterval(interval: TInterval): TAction {
+  return { type: SET_INTERVAL, interval };
+}
+
+export function setListSorting(order: string): TAction {
+  return { type: SET_SORTING, order };
+}
+
+export function startFetching(stock: string, interval: TInterval): TAction {
+  return { type: START_FETCHING, stock, interval };
+}
+
+export function stopFetching(stock: string, interval: TInterval): TAction {
+  return { type: STOP_FETCHING, stock, interval };
 }
 
 export function setTheme(theme: TState["theme"]): TAction {
