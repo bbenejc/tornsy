@@ -1,15 +1,21 @@
 import React, { ReactElement, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useStore } from "react-redux";
 import { Redirect } from "react-router-dom";
 import { use100vh } from "react-div-100vh";
 import { useStocks, useQueryParams } from "hooks";
-import { selectInterval, selectStock, selectTheme } from "app/store";
+import {
+  selectInterval,
+  selectStock,
+  selectTheme,
+  setVisibility,
+} from "app/store";
 import { SMALL } from "config";
 import { Chart, Menu, Watchlist } from "components";
 import "./app.css";
 
 export function App(): ReactElement {
   useStocks();
+  const store = useStore();
   const redirect = useQueryParams();
   const stock = useSelector(selectStock);
   const interval = useSelector(selectInterval);
@@ -22,19 +28,19 @@ export function App(): ReactElement {
     const onResize = () => {
       setWidth(window.innerWidth);
     };
-    /*
+
     const onVisibility = () => {
-      console.log(document.visibilityState);
+      store.dispatch(setVisibility(document.visibilityState === "visible"));
     };
-    */
+
     window.addEventListener("resize", onResize);
-    // document.addEventListener("visibilitychange", onVisibility);
+    document.addEventListener("visibilitychange", onVisibility);
 
     return () => {
       window.removeEventListener("resize", onResize);
-      // document.removeEventListener("visibilitychange", onVisibility);
+      document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, []);
+  }, [store]);
 
   const appCss = ["App", theme];
   if (width < SMALL) appCss.push("small");

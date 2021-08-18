@@ -1,11 +1,16 @@
 import { createSelector } from "reselect";
 import { TStore } from ".";
 
-export const selectStocksList = (state: TStore): TStockInfo[] => state.list;
+export const selectVisibility = (state: TStore): boolean => state.visibility;
+
+export const selectStocksList = (state: TStore): TStockInfo[] =>
+  state.list.data;
+export const selectStocksUpdated = (state: TStore): number =>
+  state.list.lastUpdate;
 export const selectStockInfo =
   (stock: string) =>
   (state: TStore): TStockInfo | undefined => {
-    return state.list.find(
+    return state.list.data.find(
       (s) => s.stock.toUpperCase() === stock.toUpperCase()
     );
   };

@@ -3,6 +3,7 @@ import { useSelector, useStore } from "react-redux";
 import {
   isFetchingStockData,
   selectStockData,
+  selectVisibility,
   setStockData,
   startFetching,
   stopFetching,
@@ -15,13 +16,15 @@ export function useStockData(
 ): [TStockData[], (from: number) => void] {
   const store = useStore();
   const { data = [] } = useSelector(selectStockData(stock, interval)) || {};
+  const visibility = useSelector(selectVisibility);
 
   useEffect(() => {
     const state = store.getState();
     const isFetching = isFetchingStockData(stock, interval)(state);
-    if (!isFetching) {
+    if (!isFetching && visibility) {
       const { data = [], lastUpdate = 0 } =
         selectStockData(stock, interval)(state) || {};
+
       if (lastUpdate < Date.now() - 60000) {
         store.dispatch(startFetching(stock, interval));
         fetchStock(
@@ -39,7 +42,7 @@ export function useStockData(
           });
       }
     }
-  }, [store, stock, interval]);
+  }, [store, visibility, stock, interval]);
 
   const loadMore = useCallback(
     (from: number) => {

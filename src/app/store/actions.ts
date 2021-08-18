@@ -1,4 +1,5 @@
 import {
+  SET_VISIBILITY,
   SET_LIST,
   SET_OHLC,
   START_FETCHING,
@@ -17,6 +18,10 @@ import {
   TState,
   TAction,
 } from "./declarations";
+
+export function setVisibility(visibility: boolean): TAction {
+  return { type: SET_VISIBILITY, visibility };
+}
 
 export function setStocksList(list: TStockInfo[], timestamp: number): TAction {
   return { type: SET_LIST, list, timestamp };

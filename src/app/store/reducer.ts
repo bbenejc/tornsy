@@ -1,4 +1,5 @@
 import {
+  SET_VISIBILITY,
   SET_LIST,
   SET_OHLC,
   SET_STOCK,
@@ -31,9 +32,10 @@ import { API_LIMIT, INDICATORS_ADVANCED } from "config";
 import { getInterval } from "tools/intervals";
 
 const initialState: TState = {
+  visibility: document.visibilityState === "visible",
   stock: "",
   interval: "m1",
-  list: [],
+  list: { data: [], lastUpdate: 0 },
   ohlc: {},
   sorting: getListOrder() || "price-desc",
   theme: getTheme() || "dark",
@@ -43,6 +45,9 @@ const initialState: TState = {
 
 export const reducer = (state = initialState, action: TAction): TState => {
   switch (action.type) {
+    case SET_VISIBILITY:
+      return { ...state, visibility: action.visibility };
+
     case SET_LIST: {
       const { list, timestamp } = action;
       const ohlc = { ...state.ohlc };
@@ -113,7 +118,7 @@ export const reducer = (state = initialState, action: TAction): TState => {
         }
       }
 
-      return { ...state, list, ohlc };
+      return { ...state, list: { data: list, lastUpdate: now }, ohlc };
     }
 
     case SET_OHLC: {
@@ -133,12 +138,11 @@ export const reducer = (state = initialState, action: TAction): TState => {
           [interval]: { ...ohlc[stock][interval], loading: false, lastUpdate },
         };
         if (curData.length === 0 || newData[0][0] < curData[0][0]) {
-          ohlc[stock][interval].data = [
-            ...newData,
-            ...(ohlc[stock][interval].data || []),
-          ];
+          ohlc[stock][interval].data = [...newData, ...curData];
           ohlc[stock][interval].complete = newData.length < API_LIMIT;
         } else {
+          if (curData[curData.length - 1][0] === newData[0][0]) curData.pop();
+          ohlc[stock][interval].data = [...curData, ...newData];
         }
 
         return { ...state, ohlc };
@@ -241,7 +245,7 @@ export const reducer = (state = initialState, action: TAction): TState => {
       const ohlc = { ...state.ohlc };
       ohlc[stock] = ohlc[stock] ? { ...ohlc[stock] } : {};
       ohlc[stock][interval] = ohlc[stock][interval]
-        ? { ...ohlc[stock][interval], loading: true, lastUpdate: 0 }
+        ? { ...ohlc[stock][interval], loading: true }
         : { loading: true, lastUpdate: 0 };
 
       return { ...state, ohlc };
@@ -253,7 +257,7 @@ export const reducer = (state = initialState, action: TAction): TState => {
       const ohlc = { ...state.ohlc };
       ohlc[stock] = ohlc[stock] ? { ...ohlc[stock] } : {};
       ohlc[stock][interval] = ohlc[stock][interval]
-        ? { ...ohlc[stock][interval], loading: false, lastUpdate: 0 }
+        ? { ...ohlc[stock][interval], loading: false }
         : { loading: false, lastUpdate: 0 };
 
       return { ...state, ohlc };

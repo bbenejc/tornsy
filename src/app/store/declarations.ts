@@ -1,3 +1,4 @@
+export const SET_VISIBILITY = "SET_VISIBILITY";
 export const SET_LIST = "SET_LIST";
 export const SET_OHLC = "SET_OHLC";
 export const START_FETCHING = "START_FETCHING";
@@ -15,9 +16,13 @@ export const SET_ADVANCED = "SET_ADVANCED";
 export const UPDATE_ADVANCED = "UPDATE_ADVANCED";
 
 export type TState = {
+  visibility: boolean;
   stock: string;
   interval: TInterval;
-  list: TStockInfo[];
+  list: {
+    data: TStockInfo[];
+    lastUpdate: number;
+  };
   ohlc: {
     [stock: string]: {
       [interval: string]: {
@@ -35,6 +40,7 @@ export type TState = {
 };
 
 export type TAction =
+  | { type: typeof SET_VISIBILITY; visibility: boolean }
   | { type: typeof SET_LIST; list: TStockInfo[]; timestamp: number }
   | {
       type: typeof SET_OHLC;

@@ -1,12 +1,29 @@
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useSelector, useStore } from "react-redux";
 import { worker } from "config";
-import { setStocksList } from "app/store";
+import {
+  selectStocksUpdated,
+  selectVisibility,
+  setStocksList,
+} from "app/store";
 
 export function useStocks(): void {
-  const dispatch = useDispatch();
+  const store = useStore();
+  const visibility = useSelector(selectVisibility);
 
   useEffect(() => {
+    function scheduleStocksUpdate() {
+      const timeNext = new Date();
+      timeNext.setMinutes(
+        timeNext.getMinutes() + (timeNext.getSeconds() >= 3 ? 1 : 0),
+        3,
+        0
+      );
+      worker.postMessage({
+        set: "stocks",
+        interval: Math.max(0, timeNext.getTime() - Date.now()),
+      });
+    }
     function loadStocks() {
       fetchStocks()
         .then(({ data, timestamp }) => {
@@ -23,14 +40,11 @@ export function useStocks(): void {
               total_shares,
             });
           });
-          dispatch(setStocksList(stocks, timestamp));
+          store.dispatch(setStocksList(stocks, timestamp));
         })
         .catch(() => {})
         .finally(() => {
-          const timeNext = new Date();
-          timeNext.setMinutes(timeNext.getMinutes() + 1, 3, 0);
-          const interval = Math.max(5000, timeNext.getTime() - Date.now());
-          worker.postMessage({ set: "stocks", interval });
+          scheduleStocksUpdate();
         });
     }
 
@@ -39,13 +53,15 @@ export function useStocks(): void {
     };
     worker.addEventListener("message", onMessage);
 
-    loadStocks();
+    const lastUpdate = selectStocksUpdated(store.getState());
+    if (lastUpdate > Date.now() - 60000) scheduleStocksUpdate();
+    else loadStocks();
 
     return () => {
       worker.removeEventListener("message", onMessage);
       worker.postMessage({ clear: "stocks" });
     };
-  }, [dispatch]);
+  }, [store, visibility]);
 }
 
 async function fetchStocks(): Promise<{
