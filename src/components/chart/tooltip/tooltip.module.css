@@ -100,6 +100,7 @@
 .Indicator .Controls {
   display: flex;
   visibility: hidden;
+  height: 22px;
 }
 .Indicator .Controls > div {
   display: inline-flex;
@@ -199,6 +200,7 @@
   padding: 8px;
   border-radius: 4px;
   margin-left: auto;
+  user-select: text;
 }
 .Settings label {
   display: flex;
