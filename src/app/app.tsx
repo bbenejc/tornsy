@@ -54,7 +54,8 @@ export function App(): ReactElement {
           {height > 0 && (
             <div className="Content">
               <Chart
-                key={stock + interval}
+                stock={stock}
+                interval={interval}
                 height={height - 40}
                 width={width < SMALL ? width : width - 300}
               />

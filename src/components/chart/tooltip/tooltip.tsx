@@ -310,7 +310,7 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
 
           <div className={infoCss.join(" ")}>{info}</div>
         </div>
-        <div className={[css.Volume, css.Indicator].join(" ")} key="vol">
+        <div className={[css.Volume, css.Indicator].join(" ")}>
           <div
             className={css.Name}
             style={{ color: "rgb(" + theme.volume + ")" }}

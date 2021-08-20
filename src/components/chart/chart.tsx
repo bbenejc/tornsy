@@ -18,8 +18,6 @@ import {
   selectTheme,
   selectIndicators,
   selectAdvanced,
-  selectStock,
-  selectInterval,
   selectStockPrice,
 } from "app/store";
 import { getTheme } from "themes";
@@ -32,9 +30,7 @@ import {
   calculateADX,
 } from "tools";
 
-function Chart({ height, width }: TProps): ReactElement {
-  const stock = useSelector(selectStock);
-  const interval = useSelector(selectInterval);
+function Chart({ height, width, stock, interval }: TProps): ReactElement {
   const [data, loadHistory] = useStockData(stock, interval);
   const currentPrice = useSelector(selectStockPrice);
   const indicators = useSelector(selectIndicators);
@@ -50,6 +46,19 @@ function Chart({ height, width }: TProps): ReactElement {
   const indicatorSerieses = useRef<ISeriesApi<"Line">[]>([]);
   const advancedSerieses = useRef<ISeriesApi<"Line" | "Histogram">[]>([]);
   const historyDebounce = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (chart.current) {
+        chart.current.remove();
+        chart.current = undefined;
+      }
+      mainSeries.current = undefined;
+      volumeSeries.current = undefined;
+      indicatorSerieses.current = [];
+      advancedSerieses.current = [];
+    };
+  }, [stock, interval]);
 
   // init chart
   useEffect(() => {
@@ -459,6 +468,8 @@ function getOhlcData(data: TStockData[], interval: TInterval): BarData[] {
 }
 
 type TProps = {
+  stock: string;
+  interval: TInterval;
   height: number;
   width: number;
 };
