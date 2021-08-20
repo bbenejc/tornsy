@@ -60,15 +60,27 @@ export const reducer = (state = initialState, action: TAction): TState => {
         ohlc[stock] = { ...ohlc[stock] };
         for (const interval in ohlc[stock]) {
           if (
-            ohlc[stock][interval].data &&
             !ohlc[stock][interval].loading &&
             ohlc[stock][interval].lastUpdate >= now - 65000
           ) {
-            const data = {
+            const data: TState["ohlc"][string][TInterval] = {
               ...ohlc[stock][interval],
-              data: [...(ohlc[stock][interval].data || [])],
+              data: [...ohlc[stock][interval].data],
               lastUpdate: now,
             };
+            if (stock === state.stock && interval === state.interval) {
+              data.lastView = now;
+            } else {
+              if (data.lastView < now - 15 * 60000) {
+                // delete from cache completely if not viewed in last 15 minutes
+                delete ohlc[stock][interval];
+                continue;
+              } else if (data.data.length > API_LIMIT) {
+                // remove more than 1 fetch from cache if not currently active
+                data.data = data.data.slice(-API_LIMIT);
+                data.complete = false;
+              }
+            }
             const num = data.data.length;
 
             if (num > 0) {
@@ -123,7 +135,7 @@ export const reducer = (state = initialState, action: TAction): TState => {
 
     case SET_OHLC: {
       const { stock, interval, data: newData } = action;
-      const lastUpdate = Date.now();
+      const now = Date.now();
       const ohlc = { ...state.ohlc };
 
       if (
@@ -132,10 +144,15 @@ export const reducer = (state = initialState, action: TAction): TState => {
         ohlc[stock][interval] &&
         ohlc[stock][interval].loading
       ) {
-        const curData = ohlc[stock][interval].data || [];
+        const curData = ohlc[stock][interval].data;
         ohlc[stock] = {
           ...ohlc[stock],
-          [interval]: { ...ohlc[stock][interval], loading: false, lastUpdate },
+          [interval]: {
+            ...ohlc[stock][interval],
+            loading: false,
+            lastUpdate: now,
+            lastView: now,
+          },
         };
         if (curData.length === 0 || newData[0][0] < curData[0][0]) {
           ohlc[stock][interval].data = [...newData, ...curData];
@@ -246,7 +263,13 @@ export const reducer = (state = initialState, action: TAction): TState => {
       ohlc[stock] = ohlc[stock] ? { ...ohlc[stock] } : {};
       ohlc[stock][interval] = ohlc[stock][interval]
         ? { ...ohlc[stock][interval], loading: true }
-        : { loading: true, lastUpdate: 0 };
+        : {
+            data: [],
+            complete: false,
+            loading: true,
+            lastUpdate: 0,
+            lastView: 0,
+          };
 
       return { ...state, ohlc };
     }
@@ -258,7 +281,13 @@ export const reducer = (state = initialState, action: TAction): TState => {
       ohlc[stock] = ohlc[stock] ? { ...ohlc[stock] } : {};
       ohlc[stock][interval] = ohlc[stock][interval]
         ? { ...ohlc[stock][interval], loading: false }
-        : { loading: false, lastUpdate: 0 };
+        : {
+            data: [],
+            complete: false,
+            loading: false,
+            lastUpdate: 0,
+            lastView: 0,
+          };
 
       return { ...state, ohlc };
     }

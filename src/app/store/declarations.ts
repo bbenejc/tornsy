@@ -26,10 +26,11 @@ export type TState = {
   ohlc: {
     [stock: string]: {
       [interval: string]: {
-        data?: TStockData[];
+        data: TStockData[];
         loading: boolean;
-        complete?: boolean;
+        complete: boolean;
         lastUpdate: number;
+        lastView: number;
       };
     };
   };
