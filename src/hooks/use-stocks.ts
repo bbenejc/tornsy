@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useSelector, useStore } from "react-redux";
-import { worker } from "config";
+import { UPDATE_SECOND, worker } from "config";
 import {
   selectStocksUpdated,
   selectVisibility,
@@ -16,7 +16,7 @@ export function useStocks(): void {
       const timeNext = new Date();
       timeNext.setMinutes(
         timeNext.getMinutes() + (timeNext.getSeconds() >= 3 ? 1 : 0),
-        3,
+        UPDATE_SECOND,
         0
       );
       worker.postMessage({
