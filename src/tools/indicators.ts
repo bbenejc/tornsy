@@ -166,7 +166,7 @@ export function calculateMACD(
       prevValue = value;
     }
 
-    return [MACD, signal, histogram];
+    return [histogram, MACD, signal];
   }
 
   return [];
