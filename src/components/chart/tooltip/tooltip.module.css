@@ -33,7 +33,7 @@
 }
 
 .Ohlc {
-  flex: 0 0 60px;
+  flex: 0 0 70px;
 }
 
 .Ohlc span:first-child:not(:last-child) {
@@ -231,7 +231,7 @@
     margin-top: 8px;
   }
   .Ohlc {
-    flex: 0 0 50px;
+    flex: 0 0 60px;
   }
   .Volume {
     top: 52px;

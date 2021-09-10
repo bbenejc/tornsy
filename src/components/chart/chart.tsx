@@ -236,7 +236,7 @@ function Chart({ height, width, stock, interval }: TProps): ReactElement {
         });
 
         const volumeData: LineData[] = [];
-        const v = data[0].length - 1;
+        const v = data[0].length - 2;
         for (let i = 0; i < data.length; i += 1) {
           const row = data[i];
           volumeData.push({

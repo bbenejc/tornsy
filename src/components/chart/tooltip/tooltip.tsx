@@ -101,7 +101,17 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
     setAdvancedSettings(false);
   }, [setIndicatorSettings, setAdvancedSettings]);
 
-  if (stockInfo && series && series.length > 0) {
+  const dataIndex =
+    series && series.length > 0 && data.length > 0
+      ? findDataIndex(data, series[1].type === "line" ? series[1].time : 0)
+      : -1;
+
+  if (stockInfo && dataIndex >= 0) {
+    const dataIndex = findDataIndex(
+      data,
+      series[1].type === "line" ? series[1].time : 0
+    );
+
     const info: ReactElement[] = [];
     const extra: ReactElement[] = [];
     const advancedExtra: ReactElement[] = [];
@@ -111,47 +121,49 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
     let prev;
 
     if (series[0].type === "line") {
-      const index = findDataIndex(data, series[0].time);
       info.push(
         <div className={css.Ohlc} key="p">
-          <span>{series[0].value ? series[0].value.toFixed(2) : ""}</span>
+          <span>{series[0].value ? formatNumber(series[0].value) : ""}</span>
         </div>
       );
-      if (index > 0) {
-        const cur = parseFloat(data[index][1]);
-        prev = parseFloat(data[index - 1][1]);
+      if (dataIndex > 0) {
+        const cur = parseFloat(data[dataIndex][1]);
+        prev = parseFloat(data[dataIndex - 1][1]);
         diff = cur - prev;
 
         if (diff >= 0) infoCss.push(css.Green);
         else infoCss.push(css.Red);
       } else infoCss.push(css.Red);
     } else {
-      prev = series[0].open;
+      prev =
+        dataIndex > 0
+          ? parseFloat(data[dataIndex - 1][4] || "")
+          : series[0].open;
       diff = series[0].close - prev;
       infoCss.push(diff >= 0 ? css.Green : css.Red);
 
       info.push(
         <div className={css.Ohlc} key="o">
           <span>O</span>
-          <span>{series[0].open.toFixed(2)}</span>
+          <span>{formatNumber(series[0].open)}</span>
         </div>
       );
       info.push(
         <div className={css.Ohlc} key="h">
           <span>H</span>
-          <span>{series[0].high.toFixed(2)}</span>
+          <span>{formatNumber(series[0].high)}</span>
         </div>
       );
       info.push(
         <div className={css.Ohlc} key="l">
           <span>L</span>
-          <span>{series[0].low.toFixed(2)}</span>
+          <span>{formatNumber(series[0].low)}</span>
         </div>
       );
       info.push(
         <div className={css.Ohlc} key="c">
           <span>C</span>
-          <span>{series[0].close.toFixed(2)}</span>
+          <span>{formatNumber(series[0].close)}</span>
         </div>
       );
     }
@@ -159,14 +171,14 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
     if (diff !== undefined && prev !== undefined) {
       info.push(
         <div className={css.OhlcGrowth} key="d">
-          <span>{(diff >= 0 ? "+" : "") + diff.toFixed(2)}</span>
+          <span>{(diff >= 0 ? "+" : "") + formatNumber(diff)}</span>
           <span>
-            ({(diff >= 0 ? "+" : "") + ((diff / prev) * 100).toFixed(2) + "%"})
+            ({(diff >= 0 ? "+" : "") + formatNumber((diff / prev) * 100) + "%"})
           </span>
         </div>
       );
     }
-    //  {!!val ? val.toFixed(2) : <span>-</span>}
+
     for (let i = 0; i < indicators.length; i += 1) {
       if (series.length < i + 3) break;
       const s = series[i + 2];
@@ -230,12 +242,16 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
             ].join(" ")}
             style={{
               color:
-                a === 2
+                advanced.type === "macd" && a === 0
                   ? val > 0
                     ? theme.green[0]
                     : theme.red[0]
                   : theme.advanced[
-                      ["rsi", "adx"].includes(advanced.type) ? 2 : a
+                      ["rsi", "adx"].includes(advanced.type)
+                        ? 2
+                        : advanced.type === "macd"
+                        ? a - 1
+                        : a
                     ],
             }}
             key={i}
@@ -244,6 +260,7 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
           </div>
         );
       }
+      if (advanced.type === "macd") advancedSeries.push(advancedSeries.shift());
       const nameInfo = [];
       for (let i = 0; i < INDICATORS_ADVANCED.length; i += 1) {
         if (INDICATORS_ADVANCED[i].type === advanced.type) {
@@ -293,8 +310,7 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
 
     const totalStocks =
       (series[1].type === "line" ? series[1].value : series[1].close) || 0;
-    const curPrice =
-      (series[0].type === "line" ? series[0].value : series[0].close) || 0;
+    const curMarketcap = data[dataIndex][data[dataIndex].length - 1];
 
     return (
       <>
@@ -320,7 +336,7 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
             {formatNumber(totalStocks, true)}{" "}
             <span>
               ($
-              {formatNumber(totalStocks * curPrice, true)})
+              {formatNumber(curMarketcap, true)})
             </span>
           </div>
         </div>

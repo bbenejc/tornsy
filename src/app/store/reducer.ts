@@ -89,12 +89,19 @@ export const reducer = (state = initialState, action: TAction): TState => {
               );
               if (info) {
                 if (interval === "m1" && timestamp > data.data[num - 1][0]) {
+                  const mcap =
+                    info.marketcap ||
+                    parseFloat(info.price) * info.total_shares;
                   data.data = [
                     ...data.data,
-                    [timestamp, info.price, info.total_shares],
+                    [timestamp, info.price, info.total_shares, mcap],
                   ];
                 } else if (interval !== "m1") {
                   const i = getInterval(timestamp, interval as TInterval);
+                  const mcap =
+                    info.marketcap ||
+                    parseFloat(info.price) * info.total_shares;
+
                   if (i === data.data[num - 1][0]) {
                     const [, o, h, l] = data.data[num - 1];
                     const hNum = parseFloat(h as string);
@@ -108,6 +115,7 @@ export const reducer = (state = initialState, action: TAction): TState => {
                       lNum < priceNum ? l : info.price,
                       info.price,
                       info.total_shares,
+                      mcap,
                     ] as TStockData;
                   } else if (i > data.data[num - 1][0]) {
                     data.data = [
@@ -119,6 +127,7 @@ export const reducer = (state = initialState, action: TAction): TState => {
                         info.price,
                         info.price,
                         info.total_shares,
+                        mcap,
                       ],
                     ];
                   }
@@ -154,6 +163,16 @@ export const reducer = (state = initialState, action: TAction): TState => {
             lastView: now,
           },
         };
+
+        const num = newData[0].length;
+        if (num === 3 || num === 6) {
+          for (let i = 0; i < newData.length; i += 1) {
+            newData[i].push(
+              parseFloat(newData[i][num - 2]) * newData[i][num - 1]
+            );
+          }
+        }
+
         if (curData.length === 0 || newData[0][0] < curData[0][0]) {
           ohlc[stock][interval].data = [...newData, ...curData];
           ohlc[stock][interval].complete = newData.length < API_LIMIT;

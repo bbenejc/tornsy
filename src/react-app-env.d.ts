@@ -30,11 +30,13 @@ type TInterval =
   | "n1";
 
 type TStockList = {
-  stock: string;
+  stock?: string;
+  index?: string;
   name: string;
   price: string;
   price_m1: string;
   total_shares: number;
+  marketcap?: number;
 };
 
 type TStockInfo = {
@@ -44,17 +46,24 @@ type TStockInfo = {
   diff_m1: number;
   diff_percent_m1: number;
   total_shares: number;
+  marketcap?: number;
 };
 
 type TStockData =
-  | [timestamp: UTCTimestamp, price: string, total_shares: number]
+  | [
+      timestamp: UTCTimestamp,
+      price: string,
+      total_shares: number,
+      marketcap?: number
+    ]
   | [
       timestamp: UTCTimestamp,
       open: string,
       high: string,
       low: string,
       close: string,
-      total_shares: number
+      total_shares: number,
+      marketcap?: number
     ];
 
 /*

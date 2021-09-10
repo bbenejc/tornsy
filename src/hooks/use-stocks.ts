@@ -28,18 +28,30 @@ export function useStocks(): void {
       fetchStocks()
         .then(({ data, timestamp }) => {
           const stocks: TStockInfo[] = [];
-          data.forEach(({ stock, name, price, price_m1, total_shares }) => {
-            const cur = parseFloat(price);
-            const prev = parseFloat(price_m1);
-            stocks.push({
+          data.forEach(
+            ({
               stock,
+              index,
               name,
               price,
-              diff_m1: cur - prev,
-              diff_percent_m1: ((cur - prev) / prev) * 100,
+              price_m1,
               total_shares,
-            });
-          });
+              marketcap,
+            }) => {
+              const cur = parseFloat(price);
+              const prev = parseFloat(price_m1);
+
+              stocks.push({
+                stock: stock || index || "",
+                name,
+                price,
+                diff_m1: cur - prev,
+                diff_percent_m1: ((cur - prev) / prev) * 100,
+                total_shares,
+                marketcap,
+              });
+            }
+          );
           store.dispatch(setStocksList(stocks, timestamp));
         })
         .catch(() => {})
@@ -68,7 +80,7 @@ async function fetchStocks(): Promise<{
   data: TStockList[];
   timestamp: number;
 }> {
-  const res = await fetch(process.env.REACT_APP_API + "/stocks").then(
+  const res = await fetch(process.env.REACT_APP_API + "/stocks?indexes=1").then(
     (response) => response.json()
   );
   const data = res && res.data ? res.data : [];
