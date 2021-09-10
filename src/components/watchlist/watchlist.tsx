@@ -7,7 +7,7 @@ import {
   selectTheme,
   selectInterval,
 } from "app/store";
-import { getStockLogoUrl } from "tools";
+import { getStockLogoUrl, formatNumber } from "tools";
 import css from "./watchlist.module.css";
 
 function Watchlist(): ReactElement {
@@ -52,7 +52,7 @@ function Watchlist(): ReactElement {
               <img src={getStockLogoUrl(stock, isDarkTheme)} alt={stock} />
               <div>{stock}</div>
             </div>
-            <div>{price}</div>
+            <div>{formatNumber(parseFloat(price))}</div>
             <div className={diff_m1 >= 0 ? css.Green : css.Red}>
               {(diff_m1 >= 0 ? "+" : "") + diff_m1.toFixed(2)}
             </div>

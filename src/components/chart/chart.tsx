@@ -28,6 +28,7 @@ import {
   calculateStochastics,
   calculateMACD,
   calculateADX,
+  formatNumber,
 } from "tools";
 
 function Chart({ height, width, stock, interval }: TProps): ReactElement {
@@ -414,7 +415,8 @@ function Chart({ height, width, stock, interval }: TProps): ReactElement {
   // handle title change
   useEffect(() => {
     let title = stock.toUpperCase();
-    if (currentPrice !== "") title += " " + currentPrice;
+    if (currentPrice !== "")
+      title += " " + formatNumber(parseFloat(currentPrice));
     if (title !== "") title += " | ";
     title += "Tornsy";
 

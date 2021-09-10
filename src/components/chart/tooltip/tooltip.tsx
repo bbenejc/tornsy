@@ -22,11 +22,10 @@ import {
   setAdvanced,
   updateAdvanced,
 } from "app/store";
-import { getStockLogoUrl, findDataIndex } from "tools";
+import { getStockLogoUrl, findDataIndex, formatNumber } from "tools";
 import { getTheme } from "themes";
 import { INTERVALS, INDICATORS_ADVANCED } from "config";
 import css from "./tooltip.module.css";
-import { formatNumber } from "tools/format";
 
 function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
   const dispatch = useDispatch();
@@ -167,7 +166,7 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
         </div>
       );
     }
-
+    //  {!!val ? val.toFixed(2) : <span>-</span>}
     for (let i = 0; i < indicators.length; i += 1) {
       if (series.length < i + 3) break;
       const s = series[i + 2];
@@ -178,7 +177,7 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
             {indicators[i].type.toUpperCase() + " " + indicators[i].length}
           </div>
           <div className={css.Value}>
-            {!!val ? val.toFixed(2) : <span>-</span>}
+            {!!val ? formatNumber(val) : <span>-</span>}
           </div>
           <div className={css.Controls}>
             <div title="Edit indicator" data-index={i} onClick={editIndicator}>
@@ -241,7 +240,7 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
             }}
             key={i}
           >
-            {val.toFixed(advanced.type === "macd" ? 4 : 2)}
+            {formatNumber(val, false, advanced.type === "macd" ? 4 : 2)}
           </div>
         );
       }
@@ -318,10 +317,10 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
             # Shares
           </div>
           <div className={css.Value}>
-            {formatNumber(totalStocks)}{" "}
+            {formatNumber(totalStocks, true)}{" "}
             <span>
               ($
-              {formatNumber(totalStocks * curPrice)})
+              {formatNumber(totalStocks * curPrice, true)})
             </span>
           </div>
         </div>
