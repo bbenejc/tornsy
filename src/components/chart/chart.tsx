@@ -79,6 +79,9 @@ function Chart({ height, width, stock, interval }: TProps): ReactElement {
             horzLine: { visible: false },
             vertLine: { visible: false },
           },
+          localization: {
+            priceFormatter: (price: number) => formatNumber(price),
+          },
         });
         chart.current
           .timeScale()
