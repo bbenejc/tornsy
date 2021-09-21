@@ -4,9 +4,24 @@ Options -Indexes
 
 AddType text/cache-manifest .manifest
 
+# Redirect HTTP -> HTTPS
+RewriteCond %{HTTPS} off 
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R]
+
+# API passthrough
 RewriteRule ^api($|/) - [L]
 
+# URL rewrite
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !^api\. [NC]
 RewriteRule ^(.*)$ /index.html
+
+AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+
+# Cache Headers
+ExpiresActive On
+ExpiresByType text/html M0
+ExpiresByType image/svg+xml "access plus 1 month"
+ExpiresByType text/css "access plus 1 year"
+ExpiresByType application/javascript "access plus 1 year"
