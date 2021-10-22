@@ -28,7 +28,7 @@ import {
   getAdvanced,
   setAdvanced,
 } from "tools";
-import { API_LIMIT, INDICATORS_ADVANCED } from "config";
+import { API_LIMIT, INDICATORS_ADVANCED, INTERVALS_MAX } from "config";
 import { getInterval } from "tools/intervals";
 
 const initialState: TState = {
@@ -211,12 +211,15 @@ export const reducer = (state = initialState, action: TAction): TState => {
       return { ...state, theme: action.theme };
 
     case CREATE_INDICATOR: {
-      if (state.indicators.length < 2) {
+      if (state.indicators.length < INTERVALS_MAX) {
         const indicators = [...state.indicators];
+        const num = indicators.length;
+        const type = num >= INTERVALS_MAX / 2 ? "ema" : "sma";
+        const length = num % 2 === 0 ? 12 : 200;
+
         indicators.push({
-          type: "sma",
-          length:
-            indicators.length === 0 || indicators[0].length > 50 ? 12 : 200,
+          type,
+          length,
         });
         setIndicators(indicators);
         return { ...state, indicators };

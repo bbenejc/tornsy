@@ -24,7 +24,7 @@ import {
 } from "app/store";
 import { getStockLogoUrl, findDataIndex, formatNumber } from "tools";
 import { getTheme } from "themes";
-import { INTERVALS, INDICATORS_ADVANCED } from "config";
+import { INTERVALS, INDICATORS_ADVANCED, INTERVALS_MAX } from "config";
 import css from "./tooltip.module.css";
 
 function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
@@ -210,7 +210,7 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
         </div>
       );
     }
-    if (indicators.length < 2) {
+    if (indicators.length < INTERVALS_MAX) {
       extra.push(
         <div
           key="add-indicator"

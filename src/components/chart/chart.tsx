@@ -1,4 +1,11 @@
-import React, { memo, ReactElement, useEffect, useRef, useState } from "react";
+import React, {
+  memo,
+  ReactElement,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useSelector } from "react-redux";
 import { useStockData } from "hooks";
 import {
@@ -38,7 +45,7 @@ function Chart({ height, width, stock, interval }: TProps): ReactElement {
   const advanced = useSelector(selectAdvanced);
   const [hover, setHover] = useState<TTooltip[]>();
   const hoverPrev = useRef<string>();
-  const [lastData, setLastData] = useState<TTooltip[]>();
+
   const theme = getTheme(useSelector(selectTheme));
   const divRef = useRef<HTMLDivElement>(null);
   const chart = useRef<IChartApi>();
@@ -170,7 +177,7 @@ function Chart({ height, width, stock, interval }: TProps): ReactElement {
   }, [width, height, loadHistory, theme]);
 
   // handle data series
-  useEffect(() => {
+  const lastData: TTooltip[] = useMemo(() => {
     if (chart.current) {
       if (data.length) {
         const tooltip: TTooltip[] = [];
@@ -402,7 +409,7 @@ function Chart({ height, width, stock, interval }: TProps): ReactElement {
           }
         }
 
-        setLastData(tooltip);
+        return tooltip;
       } else {
         if (mainSeries.current) chart.current.removeSeries(mainSeries.current);
         if (volumeSeries.current)
@@ -413,6 +420,7 @@ function Chart({ height, width, stock, interval }: TProps): ReactElement {
         });
       }
     }
+    return [];
   }, [theme, data, interval, indicators, advanced]);
 
   // handle title change
