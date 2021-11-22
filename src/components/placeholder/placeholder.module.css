@@ -1,0 +1,10 @@
+.Placeholder {
+  width: 3em;
+  height: 1em;
+  background-color: var(--color-font-sec);
+  display: inline-block;
+  vertical-align: bottom;
+
+  border-radius: 0.5em;
+  opacity: 0.35;
+}

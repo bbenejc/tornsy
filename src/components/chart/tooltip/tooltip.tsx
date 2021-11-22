@@ -26,6 +26,7 @@ import { getStockLogoUrl, findDataIndex, formatNumber } from "tools";
 import { getTheme } from "themes";
 import { INTERVALS, INDICATORS_ADVANCED, INTERVALS_MAX } from "config";
 import css from "./tooltip.module.css";
+import { Placeholder } from "components/placeholder";
 
 function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
   const dispatch = useDispatch();
@@ -101,16 +102,11 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
     setAdvancedSettings(false);
   }, [setIndicatorSettings, setAdvancedSettings]);
 
-  const dataIndex =
-    series && series.length > 0 && data.length > 0
-      ? findDataIndex(data, series[1].type === "line" ? series[1].time : 0)
-      : -1;
-
-  if (stockInfo && dataIndex >= 0) {
-    const dataIndex = findDataIndex(
-      data,
-      series[1].type === "line" ? series[1].time : 0
-    );
+  if (stockInfo) {
+    const dataIndex =
+      series && series.length > 0 && data.length > 0
+        ? findDataIndex(data, series[1].type === "line" ? series[1].time : 0)
+        : -1;
 
     const info: ReactElement[] = [];
     const extra: ReactElement[] = [];
@@ -119,53 +115,54 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
 
     let diff;
     let prev;
+    if (dataIndex >= 0) {
+      if (series[0].type === "line") {
+        info.push(
+          <div className={css.Ohlc} key="p">
+            <span>{series[0].value ? formatNumber(series[0].value) : ""}</span>
+          </div>
+        );
+        if (dataIndex > 0) {
+          const cur = parseFloat(data[dataIndex][1]);
+          prev = parseFloat(data[dataIndex - 1][1]);
+          diff = cur - prev;
 
-    if (series[0].type === "line") {
-      info.push(
-        <div className={css.Ohlc} key="p">
-          <span>{series[0].value ? formatNumber(series[0].value) : ""}</span>
-        </div>
-      );
-      if (dataIndex > 0) {
-        const cur = parseFloat(data[dataIndex][1]);
-        prev = parseFloat(data[dataIndex - 1][1]);
-        diff = cur - prev;
+          if (diff >= 0) infoCss.push(css.Green);
+          else infoCss.push(css.Red);
+        } else infoCss.push(css.Red);
+      } else {
+        prev =
+          dataIndex > 0
+            ? parseFloat(data[dataIndex - 1][4] || "")
+            : series[0].open;
+        diff = series[0].close - prev;
+        infoCss.push(diff >= 0 ? css.Green : css.Red);
 
-        if (diff >= 0) infoCss.push(css.Green);
-        else infoCss.push(css.Red);
-      } else infoCss.push(css.Red);
-    } else {
-      prev =
-        dataIndex > 0
-          ? parseFloat(data[dataIndex - 1][4] || "")
-          : series[0].open;
-      diff = series[0].close - prev;
-      infoCss.push(diff >= 0 ? css.Green : css.Red);
-
-      info.push(
-        <div className={css.Ohlc} key="o">
-          <span>O</span>
-          <span>{formatNumber(series[0].open)}</span>
-        </div>
-      );
-      info.push(
-        <div className={css.Ohlc} key="h">
-          <span>H</span>
-          <span>{formatNumber(series[0].high)}</span>
-        </div>
-      );
-      info.push(
-        <div className={css.Ohlc} key="l">
-          <span>L</span>
-          <span>{formatNumber(series[0].low)}</span>
-        </div>
-      );
-      info.push(
-        <div className={css.Ohlc} key="c">
-          <span>C</span>
-          <span>{formatNumber(series[0].close)}</span>
-        </div>
-      );
+        info.push(
+          <div className={css.Ohlc} key="o">
+            <span>O</span>
+            <span>{formatNumber(series[0].open)}</span>
+          </div>
+        );
+        info.push(
+          <div className={css.Ohlc} key="h">
+            <span>H</span>
+            <span>{formatNumber(series[0].high)}</span>
+          </div>
+        );
+        info.push(
+          <div className={css.Ohlc} key="l">
+            <span>L</span>
+            <span>{formatNumber(series[0].low)}</span>
+          </div>
+        );
+        info.push(
+          <div className={css.Ohlc} key="c">
+            <span>C</span>
+            <span>{formatNumber(series[0].close)}</span>
+          </div>
+        );
+      }
     }
 
     if (diff !== undefined && prev !== undefined) {
@@ -309,8 +306,15 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
     }
 
     const totalStocks =
-      (series[1].type === "line" ? series[1].value : series[1].close) || 0;
-    const curMarketcap = data[dataIndex][data[dataIndex].length - 1];
+      dataIndex < 0
+        ? stockInfo.total_shares
+        : (series[1].type === "line" ? series[1].value : series[1].close) || 0;
+    const curMarketcap =
+      dataIndex < 0
+        ? stockInfo.marketcap
+          ? stockInfo.marketcap
+          : stockInfo.total_shares * parseFloat(stockInfo.price)
+        : data[dataIndex][data[dataIndex].length - 1];
 
     return (
       <>

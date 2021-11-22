@@ -37,6 +37,7 @@ import {
   calculateADX,
   formatNumber,
 } from "tools";
+import css from "./chart.module.css";
 
 function Chart({ height, width, stock, interval }: TProps): ReactElement {
   const [data, loadHistory] = useStockData(stock, interval);
@@ -54,19 +55,6 @@ function Chart({ height, width, stock, interval }: TProps): ReactElement {
   const indicatorSerieses = useRef<ISeriesApi<"Line">[]>([]);
   const advancedSerieses = useRef<ISeriesApi<"Line" | "Histogram">[]>([]);
   const historyDebounce = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (chart.current) {
-        chart.current.remove();
-        chart.current = undefined;
-      }
-      mainSeries.current = undefined;
-      volumeSeries.current = undefined;
-      indicatorSerieses.current = [];
-      advancedSerieses.current = [];
-    };
-  }, [stock, interval]);
 
   // init chart
   useEffect(() => {
@@ -100,7 +88,11 @@ function Chart({ height, width, stock, interval }: TProps): ReactElement {
             }, 50);
           });
         chart.current.subscribeCrosshairMove((param: MouseEventParams) => {
-          if (param.seriesPrices.size && mainSeries.current) {
+          if (
+            param.seriesPrices.size &&
+            mainSeries.current &&
+            !chart.current?.options().watermark.visible
+          ) {
             const tooltip: TTooltip[] = [];
             const main = param.seriesPrices.get(mainSeries.current);
             const vol = volumeSeries.current
@@ -411,10 +403,6 @@ function Chart({ height, width, stock, interval }: TProps): ReactElement {
 
         return tooltip;
       } else {
-        if (mainSeries.current) chart.current.removeSeries(mainSeries.current);
-        if (volumeSeries.current)
-          chart.current.removeSeries(volumeSeries.current);
-
         chart.current.applyOptions({
           watermark: { visible: true },
         });
@@ -435,7 +423,7 @@ function Chart({ height, width, stock, interval }: TProps): ReactElement {
   }, [currentPrice, stock]);
 
   return (
-    <div ref={divRef}>
+    <div ref={divRef} className={css.Chart}>
       <Tooltip
         data={data}
         series={hover || lastData || []}

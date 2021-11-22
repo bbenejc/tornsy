@@ -43,7 +43,8 @@ export function App(): ReactElement {
   }, [store]);
 
   const appCss = ["App", theme];
-  if (width < SMALL) appCss.push("small");
+  const isSmall = width < SMALL;
+  if (isSmall) appCss.push("small");
 
   return (
     <>
@@ -52,15 +53,15 @@ export function App(): ReactElement {
         <div className={appCss.join(" ")} style={{ height }}>
           <Menu width={width} height={height} />
           {height > 0 && (
-            <div className="Content">
+            <>
               <Chart
                 stock={stock}
                 interval={interval}
                 height={height - 40}
-                width={width < SMALL ? width : width - 300}
+                width={isSmall ? width : width - 300}
               />
-              {width >= SMALL && <Watchlist />}
-            </div>
+              {!isSmall && <Watchlist />}
+            </>
           )}
         </div>
       )}

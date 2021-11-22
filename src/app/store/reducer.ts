@@ -214,8 +214,11 @@ export const reducer = (state = initialState, action: TAction): TState => {
       if (state.indicators.length < INTERVALS_MAX) {
         const indicators = [...state.indicators];
         const num = indicators.length;
-        const type = num >= INTERVALS_MAX / 2 ? "ema" : "sma";
         const length = num % 2 === 0 ? 12 : 200;
+        const type =
+          num >= INTERVALS_MAX / 2 && indicators[0].type !== "ema"
+            ? "ema"
+            : "sma";
 
         indicators.push({
           type,

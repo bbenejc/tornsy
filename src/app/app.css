@@ -25,21 +25,11 @@
 .App {
   display: grid;
   grid-template-rows: 39px 1fr;
-  grid-gap: 1px;
+  grid-template-columns: 1fr 295px;
+  grid-auto-flow: column;
+  grid-gap: 1px 5px;
   overflow: hidden;
   height: 100%;
   background-color: var(--color-bg);
   color: var(--color-font);
-}
-
-.Content {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr 295px;
-  grid-gap: 5px;
-  overflow: hidden;
-}
-
-.Content > div {
-  background-color: var(--color-paper);
 }

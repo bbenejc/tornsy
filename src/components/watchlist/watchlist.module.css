@@ -3,6 +3,7 @@
   height: 100%;
   overflow: auto;
   background-color: var(--color-paper);
+  grid-row: span 2;
 }
 
 .Watchlist a {
