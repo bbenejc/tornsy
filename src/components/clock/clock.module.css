@@ -1,3 +1,8 @@
 .Clock {
+  position: absolute;
+  right: 8px;
+  bottom: 6px;
+  font-size: 11px;
+  opacity: 0.5;
   font-variant-numeric: tabular-nums;
 }

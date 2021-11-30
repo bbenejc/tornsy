@@ -20,14 +20,12 @@ import {
   LineStyle,
   SeriesOptions,
 } from "lightweight-charts";
-import { Tooltip, TTooltip } from "./tooltip";
 import {
   selectTheme,
   selectIndicators,
   selectAdvanced,
   selectStockPrice,
 } from "app/store";
-import { getTheme } from "themes";
 import {
   calculateSMA,
   calculateEMA,
@@ -37,6 +35,9 @@ import {
   calculateADX,
   formatNumber,
 } from "tools";
+import { Clock } from "components";
+import { Tooltip, TTooltip } from "./tooltip";
+import { getTheme } from "themes";
 import css from "./chart.module.css";
 
 function Chart({ height, width, stock, interval }: TProps): ReactElement {
@@ -430,6 +431,7 @@ function Chart({ height, width, stock, interval }: TProps): ReactElement {
         stock={stock}
         interval={interval}
       />
+      <Clock />
     </div>
   );
 }
