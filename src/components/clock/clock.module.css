@@ -1,5 +1,6 @@
 .Clock {
   position: absolute;
+  z-index: 1;
   right: 8px;
   bottom: 6px;
   font-size: 11px;
