@@ -1,0 +1,17 @@
+.Status {
+  position: fixed;
+  z-index: 10;
+  padding: 8px;
+  font-size: 12px;
+  left: 20px;
+  bottom: 40px;
+  color: var(--color-green);
+  background-color: var(--color-paper);
+  border: 1px solid;
+  border-radius: 16px;
+  pointer-events: none;
+}
+
+.Offline {
+  color: var(--color-red);
+}
