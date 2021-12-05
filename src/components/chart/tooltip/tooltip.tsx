@@ -1,14 +1,5 @@
-import React, {
-  memo,
-  ReactElement,
-  useCallback,
-  useState,
-  ChangeEvent,
-  useEffect,
-  useRef,
-  Ref,
-} from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { memo, ReactElement, useCallback, useState, ChangeEvent, useEffect, useRef, Ref } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   selectIndicators,
   selectAdvanced,
@@ -21,12 +12,12 @@ import {
   removeAdvanced as removeAdvancedAction,
   setAdvanced,
   updateAdvanced,
-} from "app/store";
-import { getStockLogoUrl, findDataIndex, formatNumber } from "tools";
-import { getTheme } from "themes";
-import { INTERVALS, INDICATORS_ADVANCED, INTERVALS_MAX } from "config";
-import css from "./tooltip.module.css";
-import { Placeholder } from "components/placeholder";
+} from 'app/store';
+import { Placeholder } from 'components';
+import { getTheme } from 'themes';
+import { getStockLogoUrl, findDataIndex, formatNumber } from 'tools';
+import { INTERVALS, INDICATORS_ADVANCED, INTERVALS_MAX } from 'config';
+import css from './tooltip.module.css';
 
 function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
   const dispatch = useDispatch();
@@ -44,14 +35,14 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
 
   const removeIndicator = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
-      const i = parseInt(e.currentTarget.getAttribute("data-index") || "");
+      const i = parseInt(e.currentTarget.getAttribute('data-index') || '');
       dispatch(removeIndicatorAction(i));
     },
     [dispatch]
   );
 
   const editIndicator = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    const i = parseInt(e.currentTarget.getAttribute("data-index") || "");
+    const i = parseInt(e.currentTarget.getAttribute('data-index') || '');
     setIndicatorSettings(i);
   }, []);
 
@@ -80,19 +71,19 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
       };
 
       const escKey = (e: KeyboardEvent) => {
-        if (e.key === "Escape") {
+        if (e.key === 'Escape') {
           setIndicatorSettings(-1);
           setAdvancedSettings(false);
         }
       };
 
-      document.addEventListener("mousedown", clickAway);
-      document.addEventListener("touchstart", clickAway);
-      document.addEventListener("keyup", escKey);
+      document.addEventListener('mousedown', clickAway);
+      document.addEventListener('touchstart', clickAway);
+      document.addEventListener('keyup', escKey);
       return () => {
-        document.removeEventListener("mousedown", clickAway);
-        document.removeEventListener("touchstart", clickAway);
-        document.removeEventListener("keyup", escKey);
+        document.removeEventListener('mousedown', clickAway);
+        document.removeEventListener('touchstart', clickAway);
+        document.removeEventListener('keyup', escKey);
       };
     }
   }, [indicatorSettings, advancedSettings]);
@@ -105,7 +96,7 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
   if (stockInfo) {
     const dataIndex =
       series && series.length > 0 && data.length > 0
-        ? findDataIndex(data, series[1].type === "line" ? series[1].time : 0)
+        ? findDataIndex(data, series[1].type === 'line' ? series[1].time : 0)
         : -1;
 
     const info: ReactElement[] = [];
@@ -113,13 +104,13 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
     const advancedExtra: ReactElement[] = [];
     const infoCss = [css.Info];
 
-    let diff;
-    let prev;
     if (dataIndex >= 0) {
-      if (series[0].type === "line") {
+      let diff;
+      let prev;
+      if (series[0].type === 'line') {
         info.push(
           <div className={css.Ohlc} key="p">
-            <span>{series[0].value ? formatNumber(series[0].value) : ""}</span>
+            <span>{series[0].value ? formatNumber(series[0].value) : ''}</span>
           </div>
         );
         if (dataIndex > 0) {
@@ -131,10 +122,7 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
           else infoCss.push(css.Red);
         } else infoCss.push(css.Red);
       } else {
-        prev =
-          dataIndex > 0
-            ? parseFloat(data[dataIndex - 1][4] || "")
-            : series[0].open;
+        prev = dataIndex > 0 ? parseFloat(data[dataIndex - 1][4] || '') : series[0].open;
         diff = series[0].close - prev;
         infoCss.push(diff >= 0 ? css.Green : css.Red);
 
@@ -163,42 +151,45 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
           </div>
         );
       }
-    }
-
-    if (diff !== undefined && prev !== undefined) {
-      info.push(
-        <div className={css.OhlcGrowth} key="d">
-          <span>{(diff >= 0 ? "+" : "") + formatNumber(diff)}</span>
-          <span>
-            ({(diff >= 0 ? "+" : "") + formatNumber((diff / prev) * 100) + "%"})
-          </span>
-        </div>
-      );
+      if (diff !== undefined && prev !== undefined) {
+        info.push(
+          <div className={css.OhlcGrowth} key="d">
+            <span>{(diff >= 0 ? '+' : '') + formatNumber(diff)}</span>
+            <span>({(diff >= 0 ? '+' : '') + formatNumber((diff / prev) * 100) + '%'})</span>
+          </div>
+        );
+      }
+    } else {
+      for (let i = 0; i < (interval === 'm1' ? 2 : 5); i += 1) {
+        info.push(
+          <div className={css.Ohlc} key={i}>
+            <Placeholder />
+          </div>
+        );
+      }
     }
 
     for (let i = 0; i < indicators.length; i += 1) {
-      if (series.length < i + 3) break;
-      const s = series[i + 2];
-      const val = s.type === "line" ? s.value : s.close;
+      let Value;
+      if (series.length < i + 3) Value = <Placeholder />;
+      else {
+        const s = series[i + 2];
+        const val = s.type === 'line' ? s.value : s.close;
+        Value = <div className={css.Value}>{!!val ? formatNumber(val) : <span>-</span>}</div>;
+      }
       extra.push(
-        <div className={css.Indicator} key={"i" + i}>
+        <div className={css.Indicator} key={'i' + i}>
           <div className={css.Name} style={{ color: theme.indicators[i] }}>
-            {indicators[i].type.toUpperCase() + " " + indicators[i].length}
+            {indicators[i].type.toUpperCase() + ' ' + indicators[i].length}
           </div>
-          <div className={css.Value}>
-            {!!val ? formatNumber(val) : <span>-</span>}
-          </div>
+          {Value}
           <div className={css.Controls}>
             <div title="Edit indicator" data-index={i} onClick={editIndicator}>
               <svg viewBox="0 0 100 100">
                 <use xlinkHref={`#icon-settings`} />
               </svg>
             </div>
-            <div
-              title="Remove indicator"
-              data-index={i}
-              onClick={removeIndicator}
-            >
+            <div title="Remove indicator" data-index={i} onClick={removeIndicator}>
               <svg viewBox="0 0 100 100">
                 <use xlinkHref={`#icon-trash`} />
               </svg>
@@ -211,7 +202,7 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
       extra.push(
         <div
           key="add-indicator"
-          className={[css.Indicator, css.Add].join(" ")}
+          className={[css.Indicator, css.Add].join(' ')}
           onClick={addIndicator}
           style={{ color: theme.indicators[indicators.length] }}
         >
@@ -220,78 +211,55 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
       );
     }
 
-    if (advanced) {
+    const advancedIndicator = advanced ? INDICATORS_ADVANCED.find((i) => i.type === advanced.type) : undefined;
+    if (advanced && advancedIndicator) {
+      const { type, params } = advancedIndicator;
       const advancedSeries = [];
 
-      for (
-        let a = 0, i = 2 + indicators.length;
-        i < series.length;
-        i += 1, a += 1
-      ) {
+      for (let a = 0, i = 2 + indicators.length; a < params.length; a += 1, i += 1) {
         const s = series[i];
-        const val = s.type === "line" ? s.value : s.close;
+        const val = s ? (s.type === 'line' ? s.value : s.close) : undefined;
+        let Value = val ? formatNumber(val, false, type === 'macd' ? 4 : 2) : <Placeholder />;
 
         advancedSeries.push(
           <div
-            className={[
-              css.Value,
-              advanced.type === "macd" ? css.BigValue : "",
-            ].join(" ")}
+            className={[css.Value, type === 'macd' ? css.BigValue : ''].join(' ')}
             style={{
               color:
-                advanced.type === "macd" && a === 0
+                val !== undefined && type === 'macd' && a === 0
                   ? val > 0
                     ? theme.green[0]
                     : theme.red[0]
-                  : theme.advanced[
-                      ["rsi", "adx"].includes(advanced.type)
-                        ? 2
-                        : advanced.type === "macd"
-                        ? a - 1
-                        : a
-                    ],
+                  : theme.advanced[['rsi', 'adx'].includes(type) ? 2 : type === 'macd' ? a - 1 : a],
             }}
             key={i}
           >
-            {formatNumber(val, false, advanced.type === "macd" ? 4 : 2)}
+            {Value}
           </div>
         );
       }
-      if (advanced.type === "macd") advancedSeries.push(advancedSeries.shift());
-      const nameInfo = [];
-      for (let i = 0; i < INDICATORS_ADVANCED.length; i += 1) {
-        if (INDICATORS_ADVANCED[i].type === advanced.type) {
-          for (let j = 0; j < INDICATORS_ADVANCED[i].params.length; j += 1) {
-            const { key, value } = INDICATORS_ADVANCED[i].params[j];
-            nameInfo.push(
-              key in advanced ? advanced[key as keyof TAdvanced] : value
-            );
-          }
-          break;
-        }
-      }
+
+      if (type === 'macd') advancedSeries.push(advancedSeries.shift());
+      const nameInfo: number[] = [];
+      params.forEach(({ key, value }) => {
+        nameInfo.push(key in advanced ? advanced[key as keyof TAdvanced] : value);
+      });
 
       advancedExtra.push(
         <div className={css.Indicator} key={advanced.type}>
-          <div
-            className={[
-              css.Name,
-              advanced.type === "macd" ? css.BigName : "",
-            ].join(" ")}
-          >
-            {advanced.type.toUpperCase()}{" "}
-            <span className={css.NameInfo}>{nameInfo.join(" ")}</span>
+          <div className={[css.Name, advanced.type === 'macd' ? css.BigName : ''].join(' ')}>
+            {advanced.type.toUpperCase()} <span className={css.NameInfo}>{nameInfo.join(' ')}</span>
           </div>
           {advancedSeries}
           <div className={css.Controls}>
             <div title="Edit indicator" onClick={editAdvanced}>
               <svg viewBox="0 0 100 100">
-                <use xlinkHref={`#icon-settings`} />
+                <use xlinkHref="#icon-settings" />
               </svg>
             </div>
             <div title="Remove indicator" onClick={removeAdvanced}>
               <svg viewBox="0 0 100 100">
-                <use xlinkHref={`#icon-trash`} />
+                <use xlinkHref="#icon-trash" />
               </svg>
             </div>
           </div>
@@ -306,9 +274,7 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
     }
 
     const totalStocks =
-      dataIndex < 0
-        ? stockInfo.total_shares
-        : (series[1].type === "line" ? series[1].value : series[1].close) || 0;
+      dataIndex < 0 ? stockInfo.total_shares : (series[1].type === 'line' ? series[1].value : series[1].close) || 0;
     const curMarketcap =
       dataIndex < 0
         ? stockInfo.marketcap
@@ -327,17 +293,14 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
             </div>
           </div>
 
-          <div className={infoCss.join(" ")}>{info}</div>
+          <div className={infoCss.join(' ')}>{info}</div>
         </div>
-        <div className={[css.Volume, css.Indicator].join(" ")}>
-          <div
-            className={css.Name}
-            style={{ color: "rgb(" + theme.volume + ")" }}
-          >
+        <div className={[css.Volume, css.Indicator].join(' ')}>
+          <div className={css.Name} style={{ color: 'rgb(' + theme.volume + ')' }}>
             # Shares
           </div>
           <div className={css.Value}>
-            {formatNumber(totalStocks, true)}{" "}
+            {formatNumber(totalStocks, true)}{' '}
             <span>
               ($
               {formatNumber(curMarketcap, true)})
@@ -346,22 +309,10 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
         </div>
         <div className={css.Indicators}>{extra}</div>
         {indicatorSettings >= 0 && (
-          <IndicatorSettings
-            ref={wrapperRef}
-            index={indicatorSettings}
-            onClose={closeIndicatorSettings}
-          />
+          <IndicatorSettings ref={wrapperRef} index={indicatorSettings} onClose={closeIndicatorSettings} />
         )}
-        <div
-          className={[css.AdvancedIndicator, !advanced ? css.None : ""].join(
-            " "
-          )}
-        >
-          {advancedExtra}
-        </div>
-        {advancedSettings && (
-          <AdvancedSettings ref={wrapperRef} onClose={closeIndicatorSettings} />
-        )}
+        <div className={[css.AdvancedIndicator, !advanced ? css.None : ''].join(' ')}>{advancedExtra}</div>
+        {advancedSettings && <AdvancedSettings ref={wrapperRef} onClose={closeIndicatorSettings} />}
       </>
     );
   }
@@ -370,10 +321,7 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
 }
 
 const IndicatorSettingsC = React.forwardRef(
-  (
-    { index, onClose }: { index: number; onClose: () => void },
-    ref: Ref<HTMLDivElement>
-  ): ReactElement => {
+  ({ index, onClose }: { index: number; onClose: () => void }, ref: Ref<HTMLDivElement>): ReactElement => {
     const dispatch = useDispatch();
     const indicators = useSelector(selectIndicators);
 
@@ -403,7 +351,7 @@ const IndicatorSettingsC = React.forwardRef(
 
     const inputKeyDown = useCallback(
       (e: React.KeyboardEvent) => {
-        if (e.key === "Enter") onClose();
+        if (e.key === 'Enter') onClose();
       },
       [onClose]
     );
@@ -415,18 +363,10 @@ const IndicatorSettingsC = React.forwardRef(
         <div>
           <div className={css.Label}>Indicator</div>
           <div>
-            <button
-              onClick={changeType}
-              value="sma"
-              className={type === "sma" ? css.Active : ""}
-            >
+            <button onClick={changeType} value="sma" className={type === 'sma' ? css.Active : ''}>
               SMA
             </button>
-            <button
-              onClick={changeType}
-              value="ema"
-              className={type === "ema" ? css.Active : ""}
-            >
+            <button onClick={changeType} value="ema" className={type === 'ema' ? css.Active : ''}>
               EMA
             </button>
           </div>
@@ -450,10 +390,7 @@ const IndicatorSettingsC = React.forwardRef(
 const IndicatorSettings = memo(IndicatorSettingsC);
 
 const AdvancedSettingsC = React.forwardRef(
-  (
-    { onClose }: { onClose: () => void },
-    ref: Ref<HTMLDivElement>
-  ): ReactElement => {
+  ({ onClose }: { onClose: () => void }, ref: Ref<HTMLDivElement>): ReactElement => {
     const dispatch = useDispatch();
     const advanced = useSelector(selectAdvanced);
 
@@ -479,7 +416,7 @@ const AdvancedSettingsC = React.forwardRef(
 
     const changeLength = useCallback(
       (e: ChangeEvent<HTMLInputElement>) => {
-        const field = e.currentTarget.getAttribute("data-field");
+        const field = e.currentTarget.getAttribute('data-field');
         let length = parseInt(e.currentTarget.value);
         if (field && !isNaN(length)) {
           if (length > 250) length = 250;
@@ -492,26 +429,24 @@ const AdvancedSettingsC = React.forwardRef(
 
     const inputKeyDown = useCallback(
       (e: React.KeyboardEvent) => {
-        if (e.key === "Enter") onClose();
+        if (e.key === 'Enter') onClose();
       },
       [onClose]
     );
 
     const { params } = advanced
-      ? (INDICATORS_ADVANCED.find(
-          (e) => e.type === advanced.type
-        ) as typeof INDICATORS_ADVANCED[number])
+      ? (INDICATORS_ADVANCED.find((e) => e.type === advanced.type) as typeof INDICATORS_ADVANCED[number])
       : INDICATORS_ADVANCED[0];
 
     return (
-      <div ref={ref} className={[css.Settings, css.Advanced].join(" ")}>
+      <div ref={ref} className={[css.Settings, css.Advanced].join(' ')}>
         <div>
           <div className={css.Label}>Indicator</div>
           <div>
             {INDICATORS_ADVANCED.map(({ type }) => (
               <button
                 key={type}
-                className={advanced && advanced.type === type ? css.Active : ""}
+                className={advanced && advanced.type === type ? css.Active : ''}
                 value={type}
                 onClick={changeType}
               >
@@ -527,11 +462,7 @@ const AdvancedSettingsC = React.forwardRef(
               <input
                 type="number"
                 pattern="[0-9]*"
-                defaultValue={
-                  advanced && key in advanced
-                    ? advanced[key as keyof TAdvanced]
-                    : value
-                }
+                defaultValue={advanced && key in advanced ? advanced[key as keyof TAdvanced] : value}
                 onKeyDown={inputKeyDown}
                 onChange={changeLength}
                 data-field={key}
@@ -556,14 +487,14 @@ type TProps = {
 
 export type TTooltip =
   | {
-      type: "ohlc";
+      type: 'ohlc';
       open: number;
       high: number;
       low: number;
       close: number;
     }
   | {
-      type: "line";
+      type: 'line';
       time: number;
       value: number;
     };

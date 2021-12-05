@@ -58,7 +58,6 @@
   top: 32px;
   left: 8px;
   z-index: 8;
-  pointer-events: none;
 }
 .Indicators {
   position: absolute;
@@ -141,6 +140,7 @@
   color: var(--color-font-sec);
 }
 .AdvancedIndicator .Value {
+  display: flex;
   width: 50px;
 }
 .AdvancedIndicator .BigValue {
