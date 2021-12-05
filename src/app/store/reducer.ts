@@ -1,4 +1,5 @@
 import {
+  SET_ONLINE,
   SET_VISIBILITY,
   SET_LIST,
   SET_OHLC,
@@ -17,7 +18,7 @@ import {
   STOP_FETCHING,
   TState,
   TAction,
-} from "./declarations";
+} from './declarations';
 import {
   getTheme,
   getListOrder,
@@ -27,24 +28,29 @@ import {
   setIndicators,
   getAdvanced,
   setAdvanced,
-} from "tools";
-import { API_LIMIT, INDICATORS_ADVANCED, INTERVALS_MAX } from "config";
-import { getInterval } from "tools/intervals";
+  EMPTY_ARRAY,
+} from 'tools';
+import { API_LIMIT, INDICATORS_ADVANCED, INTERVALS_MAX } from 'config';
+import { getInterval } from 'tools/intervals';
 
 const initialState: TState = {
-  visibility: document.visibilityState === "visible",
-  stock: "",
-  interval: "m1",
+  visibility: document.visibilityState === 'visible',
+  online: window.navigator.onLine,
+  stock: '',
+  interval: 'm1',
   list: { data: [], lastUpdate: 0 },
   ohlc: {},
-  sorting: getListOrder() || "price-desc",
-  theme: getTheme() || "dark",
+  sorting: getListOrder() || 'price-desc',
+  theme: getTheme() || 'dark',
   indicators: getIndicators(),
   advanced: getAdvanced(),
 };
 
 export const reducer = (state = initialState, action: TAction): TState => {
   switch (action.type) {
+    case SET_ONLINE:
+      return { ...state, online: action.online };
+
     case SET_VISIBILITY:
       return { ...state, visibility: action.visibility };
 
@@ -59,11 +65,8 @@ export const reducer = (state = initialState, action: TAction): TState => {
       for (const stock in ohlc) {
         ohlc[stock] = { ...ohlc[stock] };
         for (const interval in ohlc[stock]) {
-          if (
-            !ohlc[stock][interval].loading &&
-            ohlc[stock][interval].lastUpdate >= now - 65000
-          ) {
-            const data: TState["ohlc"][string][TInterval] = {
+          if (!ohlc[stock][interval].loading && ohlc[stock][interval].lastUpdate >= now - 65000) {
+            const data: TState['ohlc'][string][TInterval] = {
               ...ohlc[stock][interval],
               data: [...ohlc[stock][interval].data],
               lastUpdate: now,
@@ -84,23 +87,14 @@ export const reducer = (state = initialState, action: TAction): TState => {
             const num = data.data.length;
 
             if (num > 0) {
-              const info = list.find(
-                (e) => e.stock.toUpperCase() === stock.toUpperCase()
-              );
+              const info = list.find((e) => e.stock.toUpperCase() === stock.toUpperCase());
               if (info) {
-                if (interval === "m1" && timestamp > data.data[num - 1][0]) {
-                  const mcap =
-                    info.marketcap ||
-                    parseFloat(info.price) * info.total_shares;
-                  data.data = [
-                    ...data.data,
-                    [timestamp, info.price, info.total_shares, mcap],
-                  ];
-                } else if (interval !== "m1") {
+                if (interval === 'm1' && timestamp > data.data[num - 1][0]) {
+                  const mcap = info.marketcap || parseFloat(info.price) * info.total_shares;
+                  data.data = [...data.data, [timestamp, info.price, info.total_shares, mcap]];
+                } else if (interval !== 'm1') {
                   const i = getInterval(timestamp, interval as TInterval);
-                  const mcap =
-                    info.marketcap ||
-                    parseFloat(info.price) * info.total_shares;
+                  const mcap = info.marketcap || parseFloat(info.price) * info.total_shares;
 
                   if (i === data.data[num - 1][0]) {
                     const [, o, h, l] = data.data[num - 1];
@@ -120,15 +114,7 @@ export const reducer = (state = initialState, action: TAction): TState => {
                   } else if (i > data.data[num - 1][0]) {
                     data.data = [
                       ...data.data,
-                      [
-                        i,
-                        info.price,
-                        info.price,
-                        info.price,
-                        info.price,
-                        info.total_shares,
-                        mcap,
-                      ],
+                      [i, info.price, info.price, info.price, info.price, info.total_shares, mcap],
                     ];
                   }
                 }
@@ -147,12 +133,7 @@ export const reducer = (state = initialState, action: TAction): TState => {
       const now = Date.now();
       const ohlc = { ...state.ohlc };
 
-      if (
-        newData.length > 0 &&
-        ohlc[stock] &&
-        ohlc[stock][interval] &&
-        ohlc[stock][interval].loading
-      ) {
+      if (newData.length > 0 && ohlc[stock] && ohlc[stock][interval] && ohlc[stock][interval].loading) {
         const curData = ohlc[stock][interval].data;
         ohlc[stock] = {
           ...ohlc[stock],
@@ -167,9 +148,7 @@ export const reducer = (state = initialState, action: TAction): TState => {
         const num = newData[0].length;
         if (num === 3 || num === 6) {
           for (let i = 0; i < newData.length; i += 1) {
-            newData[i].push(
-              parseFloat(newData[i][num - 2]) * newData[i][num - 1]
-            );
+            newData[i].push(parseFloat(newData[i][num - 2]) * newData[i][num - 1]);
           }
         }
 
@@ -194,13 +173,12 @@ export const reducer = (state = initialState, action: TAction): TState => {
       return { ...state, interval: action.interval };
 
     case SET_SORTING: {
-      const [curField, curDirection] = state.sorting.split("-");
+      const [curField, curDirection] = state.sorting.split('-');
       const newOrder = [action.order];
-      if (curField === action.order)
-        newOrder.push(curDirection === "asc" ? "desc" : "asc");
-      else newOrder.push(action.order === "name" ? "asc" : "desc");
+      if (curField === action.order) newOrder.push(curDirection === 'asc' ? 'desc' : 'asc');
+      else newOrder.push(action.order === 'name' ? 'asc' : 'desc');
 
-      const listOrder = newOrder.join("-");
+      const listOrder = newOrder.join('-');
       setListOrder(listOrder);
 
       return { ...state, sorting: listOrder };
@@ -215,10 +193,7 @@ export const reducer = (state = initialState, action: TAction): TState => {
         const indicators = [...state.indicators];
         const num = indicators.length;
         const length = num % 2 === 0 ? 12 : 200;
-        const type =
-          num >= INTERVALS_MAX / 2 && indicators[0].type !== "ema"
-            ? "ema"
-            : "sma";
+        const type = num >= INTERVALS_MAX / 2 && indicators[0].type !== 'ema' ? 'ema' : 'sma';
 
         indicators.push({
           type,
@@ -289,7 +264,7 @@ export const reducer = (state = initialState, action: TAction): TState => {
       ohlc[stock][interval] = ohlc[stock][interval]
         ? { ...ohlc[stock][interval], loading: true }
         : {
-            data: [],
+            data: EMPTY_ARRAY,
             complete: false,
             loading: true,
             lastUpdate: 0,
@@ -307,7 +282,7 @@ export const reducer = (state = initialState, action: TAction): TState => {
       ohlc[stock][interval] = ohlc[stock][interval]
         ? { ...ohlc[stock][interval], loading: false }
         : {
-            data: [],
+            data: EMPTY_ARRAY,
             complete: false,
             loading: false,
             lastUpdate: 0,

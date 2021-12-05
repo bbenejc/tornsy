@@ -1,4 +1,5 @@
 import {
+  SET_ONLINE,
   SET_VISIBILITY,
   SET_LIST,
   SET_OHLC,
@@ -17,7 +18,11 @@ import {
   UPDATE_ADVANCED,
   TState,
   TAction,
-} from "./declarations";
+} from './declarations';
+
+export function setOnline(online: boolean): TAction {
+  return { type: SET_ONLINE, online };
+}
 
 export function setVisibility(visibility: boolean): TAction {
   return { type: SET_VISIBILITY, visibility };
@@ -27,11 +32,7 @@ export function setStocksList(list: TStockInfo[], timestamp: number): TAction {
   return { type: SET_LIST, list, timestamp };
 }
 
-export function setStockData(
-  stock: string,
-  interval: TInterval,
-  data: TStockData[]
-): TAction {
+export function setStockData(stock: string, interval: TInterval, data: TStockData[]): TAction {
   return { type: SET_OHLC, stock, interval, data };
 }
 
@@ -55,7 +56,7 @@ export function stopFetching(stock: string, interval: TInterval): TAction {
   return { type: STOP_FETCHING, stock, interval };
 }
 
-export function setTheme(theme: TState["theme"]): TAction {
+export function setTheme(theme: TState['theme']): TAction {
   return { type: SET_THEME, theme };
 }
 

@@ -1,22 +1,24 @@
-export const SET_VISIBILITY = "SET_VISIBILITY";
-export const SET_LIST = "SET_LIST";
-export const SET_OHLC = "SET_OHLC";
-export const START_FETCHING = "START_FETCHING";
-export const STOP_FETCHING = "STOP_FETCHING";
-export const SET_STOCK = "SET_STOCK";
-export const SET_INTERVAL = "SET_INTERVAL";
-export const SET_SORTING = "SET_SORTING";
-export const SET_THEME = "SET_THEME";
-export const CREATE_INDICATOR = "CREATE_INDICATOR";
-export const REMOVE_INDICATOR = "REMOVE_INDICATOR";
-export const SET_INDICATOR = "SET_INDICATOR";
-export const CREATE_ADVANCED = "CREATE_ADVANCED";
-export const REMOVE_ADVANCED = "REMOVE_ADVANCED";
-export const SET_ADVANCED = "SET_ADVANCED";
-export const UPDATE_ADVANCED = "UPDATE_ADVANCED";
+export const SET_VISIBILITY = 'SET_VISIBILITY';
+export const SET_ONLINE = 'SET_ONLINE';
+export const SET_LIST = 'SET_LIST';
+export const SET_OHLC = 'SET_OHLC';
+export const START_FETCHING = 'START_FETCHING';
+export const STOP_FETCHING = 'STOP_FETCHING';
+export const SET_STOCK = 'SET_STOCK';
+export const SET_INTERVAL = 'SET_INTERVAL';
+export const SET_SORTING = 'SET_SORTING';
+export const SET_THEME = 'SET_THEME';
+export const CREATE_INDICATOR = 'CREATE_INDICATOR';
+export const REMOVE_INDICATOR = 'REMOVE_INDICATOR';
+export const SET_INDICATOR = 'SET_INDICATOR';
+export const CREATE_ADVANCED = 'CREATE_ADVANCED';
+export const REMOVE_ADVANCED = 'REMOVE_ADVANCED';
+export const SET_ADVANCED = 'SET_ADVANCED';
+export const UPDATE_ADVANCED = 'UPDATE_ADVANCED';
 
 export type TState = {
   visibility: boolean;
+  online: boolean;
   stock: string;
   interval: TInterval;
   list: {
@@ -41,6 +43,7 @@ export type TState = {
 };
 
 export type TAction =
+  | { type: typeof SET_ONLINE; online: boolean }
   | { type: typeof SET_VISIBILITY; visibility: boolean }
   | { type: typeof SET_LIST; list: TStockInfo[]; timestamp: number }
   | {
@@ -57,7 +60,7 @@ export type TAction =
   | { type: typeof SET_STOCK; stock: string }
   | { type: typeof SET_INTERVAL; interval: TInterval }
   | { type: typeof SET_SORTING; order: string }
-  | { type: typeof SET_THEME; theme: TState["theme"] }
+  | { type: typeof SET_THEME; theme: TState['theme'] }
   | { type: typeof SET_INDICATOR; index: number; indicator: TIndicator }
   | { type: typeof CREATE_INDICATOR }
   | { type: typeof REMOVE_INDICATOR; indicator: number }
