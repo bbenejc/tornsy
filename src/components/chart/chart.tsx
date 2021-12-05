@@ -56,7 +56,8 @@ function Chart({ height, width, stock, interval }: TProps): ReactElement {
           indicatorSeries,
           advancedSeries,
           setHover,
-          hoverPrev
+          hoverPrev,
+          isLoading
         );
       } else chart.current.resize(width, height);
     }
@@ -68,7 +69,7 @@ function Chart({ height, width, stock, interval }: TProps): ReactElement {
       let timeout: NodeJS.Timeout;
       const timeRangeHandler = (e: TimeRange | null) => {
         if (timeout) clearTimeout(timeout);
-        if (!chart.current?.options().watermark.visible) {
+        if (!isLoading.current) {
           timeout = setTimeout(() => {
             if (e !== null && loadHistory) loadHistory(e.from as number);
           }, 50);

@@ -55,10 +55,11 @@ export function createCrosshairHandler(
   indicators: MutableRefObject<ISeriesApi<'Line'>[]>,
   advanced: MutableRefObject<ISeriesApi<'Line' | 'Histogram'>[]>,
   setHover: Dispatch<SetStateAction<TTooltip[] | undefined>>,
-  hoverPrev: MutableRefObject<string | undefined>
+  hoverPrev: MutableRefObject<string | undefined>,
+  isLoading: MutableRefObject<boolean>
 ) {
   chart.subscribeCrosshairMove((param: MouseEventParams) => {
-    if (param.seriesPrices.size && main.current && !isLoading(chart)) {
+    if (param.seriesPrices.size && main.current && !isLoading.current) {
       const tooltip: TTooltip[] = [];
       const ohlc = param.seriesPrices.get(main.current);
       const vol = volume.current ? param.seriesPrices.get(volume.current) : undefined;
@@ -385,10 +386,6 @@ function getOhlcData(data: TStockData[], interval: TInterval): BarData[] {
   }
 
   return ohlcData;
-}
-
-export function isLoading(chart: IChartApi): boolean {
-  return chart.options().watermark.visible;
 }
 
 export function enableLoadingMode(chart: IChartApi): void {
