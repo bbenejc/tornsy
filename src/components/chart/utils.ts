@@ -1,3 +1,4 @@
+import { VOLUME } from 'config';
 import {
   BarData,
   createChart,
@@ -188,6 +189,7 @@ export function createVolumeSeries(
   chart: IChartApi,
   series: MutableRefObject<ISeriesApi<'Area'> | undefined>,
   data: TStockData[],
+  volume: string,
   tooltip: TTooltip[],
   theme: TTheme
 ) {
@@ -206,9 +208,8 @@ export function createVolumeSeries(
     bottomColor: `rgba(${theme.volume},0)`,
   });
 
-  // TODO: accept parameter to support either #shares / marketcap
   const volumeData: LineData[] = [];
-  const v = data[0].length - 2;
+  const v = data[0].length - (volume === VOLUME[0] ? 2 : 1);
   for (let i = 0; i < data.length; i += 1) {
     const row = data[i];
     volumeData.push({

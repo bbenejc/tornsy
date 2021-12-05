@@ -2,7 +2,7 @@ import React, { memo, ReactElement, useEffect, useMemo, useRef, useState } from 
 import { useSelector } from 'react-redux';
 import { useStockData } from 'hooks';
 import { IChartApi, ISeriesApi, TimeRange } from 'lightweight-charts';
-import { selectTheme, selectIndicators, selectAdvanced, selectStockPrice } from 'app/store';
+import { selectTheme, selectIndicators, selectAdvanced, selectStockPrice, selectVolume } from 'app/store';
 import { formatNumber } from 'tools';
 import { Clock } from 'components';
 import { Tooltip, TTooltip } from './tooltip';
@@ -25,6 +25,7 @@ function Chart({ height, width, stock, interval }: TProps): ReactElement {
   const currentPrice = useSelector(selectStockPrice);
   const indicators = useSelector(selectIndicators);
   const advanced = useSelector(selectAdvanced);
+  const volume = useSelector(selectVolume);
   const [hover, setHover] = useState<TTooltip[]>();
   const hoverPrev = useRef<string>();
 
@@ -96,7 +97,7 @@ function Chart({ height, width, stock, interval }: TProps): ReactElement {
       if (data.length) {
         const tooltip: TTooltip[] = [];
         createMainSeries(chart.current, mainSeries, data, interval, tooltip, theme);
-        createVolumeSeries(chart.current, volumeSeries, data, tooltip, theme);
+        createVolumeSeries(chart.current, volumeSeries, data, volume, tooltip, theme);
         createIndicatorSeries(chart.current, indicatorSeries, data, interval, indicators, tooltip, theme);
         createAdvancedSeries(chart.current, advancedSeries, data, interval, advanced, tooltip, theme);
         if (isLoading.current) {
@@ -111,7 +112,7 @@ function Chart({ height, width, stock, interval }: TProps): ReactElement {
       }
     }
     return [];
-  }, [theme, data, interval, indicators, advanced]);
+  }, [theme, data, interval, indicators, advanced, volume]);
 
   // handle title change
   useEffect(() => {

@@ -15,6 +15,7 @@ export const CREATE_ADVANCED = 'CREATE_ADVANCED';
 export const REMOVE_ADVANCED = 'REMOVE_ADVANCED';
 export const SET_ADVANCED = 'SET_ADVANCED';
 export const UPDATE_ADVANCED = 'UPDATE_ADVANCED';
+export const TOGGLE_VOLUME = 'TOGGLE_VOLUME';
 
 export type TState = {
   visibility: boolean;
@@ -40,6 +41,7 @@ export type TState = {
   theme: string;
   indicators: TIndicator[];
   advanced?: TAdvanced;
+  volume: string;
 };
 
 export type TAction =
@@ -67,4 +69,5 @@ export type TAction =
   | { type: typeof CREATE_ADVANCED }
   | { type: typeof REMOVE_ADVANCED }
   | { type: typeof SET_ADVANCED; advanced: TAdvanced }
-  | { type: typeof UPDATE_ADVANCED; key: string; value: number };
+  | { type: typeof UPDATE_ADVANCED; key: string; value: number }
+  | { type: typeof TOGGLE_VOLUME; volume?: string };

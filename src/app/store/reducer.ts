@@ -14,6 +14,7 @@ import {
   REMOVE_ADVANCED,
   CREATE_ADVANCED,
   UPDATE_ADVANCED,
+  TOGGLE_VOLUME,
   START_FETCHING,
   STOP_FETCHING,
   TState,
@@ -28,9 +29,11 @@ import {
   setIndicators,
   getAdvanced,
   setAdvanced,
+  getVolume,
+  setVolume,
   EMPTY_ARRAY,
 } from 'tools';
-import { API_LIMIT, INDICATORS_ADVANCED, INTERVALS_MAX } from 'config';
+import { API_LIMIT, INDICATORS_ADVANCED, INTERVALS_MAX, VOLUME } from 'config';
 import { getInterval } from 'tools/intervals';
 
 const initialState: TState = {
@@ -44,6 +47,7 @@ const initialState: TState = {
   theme: getTheme() || 'dark',
   indicators: getIndicators(),
   advanced: getAdvanced(),
+  volume: getVolume(),
 };
 
 export const reducer = (state = initialState, action: TAction): TState => {
@@ -254,6 +258,12 @@ export const reducer = (state = initialState, action: TAction): TState => {
         setAdvanced(advanced);
         return { ...state, advanced };
       } else return state;
+    }
+
+    case TOGGLE_VOLUME: {
+      const volume = action.volume ? action.volume : state.volume === VOLUME[1] ? VOLUME[0] : VOLUME[1];
+      setVolume(volume);
+      return { ...state, volume };
     }
 
     case START_FETCHING: {

@@ -25,13 +25,17 @@ export const isFetchingStockData =
   };
 
 export const selectStock = (state: TStore): string => state.stock;
+export const selectIsActiveStock =
+  (stock: string) =>
+  (state: TStore): boolean =>
+    state.stock === stock;
 export const selectInterval = (state: TStore): TInterval => state.interval;
 
 export const selectStocksListOrder = (state: TStore): string => state.sorting;
 export const selectTheme = (state: TStore): string => state.theme;
 export const selectIndicators = (state: TStore): TIndicator[] => state.indicators;
-
 export const selectAdvanced = (state: TStore): TAdvanced | undefined => state.advanced;
+export const selectVolume = (state: TStore): string => state.volume;
 
 export const selectStockPrice = createSelector(selectStock, selectStocksList, (stock, list) => {
   const info = list.find((s) => s.stock.toUpperCase() === stock.toUpperCase());

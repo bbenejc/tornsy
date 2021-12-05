@@ -59,6 +59,10 @@
   left: 8px;
   z-index: 8;
 }
+.Volume .Name:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
 .Indicators {
   position: absolute;
   top: 52px;

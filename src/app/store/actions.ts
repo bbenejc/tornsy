@@ -16,6 +16,7 @@ import {
   REMOVE_ADVANCED,
   SET_ADVANCED,
   UPDATE_ADVANCED,
+  TOGGLE_VOLUME,
   TState,
   TAction,
 } from './declarations';
@@ -86,4 +87,8 @@ export function setAdvanced(advanced: TAdvanced): TAction {
 
 export function updateAdvanced(key: string, value: number): TAction {
   return { type: UPDATE_ADVANCED, key, value };
+}
+
+export function setVolume(volume?: string): TAction {
+  return { type: TOGGLE_VOLUME, volume };
 }

@@ -1,11 +1,12 @@
-import { INTERVALS } from "config";
+import { INTERVALS } from 'config';
 
-const THEME = "theme";
-const ORDER = "list-order";
-const STOCK = "stock";
-const INTERVAL = "interval";
-const INDICATORS = "indicators";
-const ADVANCED = "advanced";
+const THEME = 'theme';
+const ORDER = 'list-order';
+const STOCK = 'stock';
+const INTERVAL = 'interval';
+const VOLUME = 'volume';
+const INDICATORS = 'indicators';
+const ADVANCED = 'advanced';
 
 export function getTheme(): string | null {
   return localStorage.getItem(THEME);
@@ -24,7 +25,7 @@ export function setListOrder(order: string): void {
 }
 
 export function getStock(): string {
-  return localStorage.getItem(STOCK) || "";
+  return localStorage.getItem(STOCK) || '';
 }
 
 export function setStock(stock: string): void {
@@ -33,7 +34,7 @@ export function setStock(stock: string): void {
 
 export function getInterval(): TInterval {
   const interval = localStorage.getItem(INTERVAL);
-  return (interval && interval in INTERVALS ? interval : "m1") as TInterval;
+  return (interval && interval in INTERVALS ? interval : 'm1') as TInterval;
 }
 
 export function setInterval(interval: string): void {
@@ -42,16 +43,16 @@ export function setInterval(interval: string): void {
 
 export function getIndicators(): TIndicator[] {
   try {
-    const lsIndicators = JSON.parse(localStorage.getItem(INDICATORS) || "");
+    const lsIndicators = JSON.parse(localStorage.getItem(INDICATORS) || '');
     if (Array.isArray(lsIndicators)) {
       const indicators = [];
       let updateLs = false;
       for (let i = 0; i < lsIndicators.length; i += 1) {
         const indicator = lsIndicators[i];
         if (
-          typeof indicator === "object" &&
-          ["sma", "ema"].includes(indicator.type) &&
-          typeof indicator.length === "number"
+          typeof indicator === 'object' &&
+          ['sma', 'ema'].includes(indicator.type) &&
+          typeof indicator.length === 'number'
         ) {
           indicators.push(indicator);
         } else updateLs = true;
@@ -71,7 +72,7 @@ export function setIndicators(indicators: TIndicator[]): void {
 
 export function getAdvanced(): TAdvanced | undefined {
   try {
-    const advanced = JSON.parse(localStorage.getItem(ADVANCED) || "");
+    const advanced = JSON.parse(localStorage.getItem(ADVANCED) || '');
     if (advanced) return advanced;
   } catch {}
 
@@ -81,4 +82,12 @@ export function getAdvanced(): TAdvanced | undefined {
 export function setAdvanced(advanced?: TAdvanced): void {
   if (!advanced) localStorage.removeItem(ADVANCED);
   else localStorage.setItem(ADVANCED, JSON.stringify(advanced));
+}
+
+export function getVolume(): string {
+  return localStorage.getItem(VOLUME) || 'total_shares';
+}
+
+export function setVolume(volume: string): void {
+  localStorage.setItem(VOLUME, volume);
 }

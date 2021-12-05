@@ -5,6 +5,7 @@ import {
   selectAdvanced,
   selectStockInfo,
   selectTheme,
+  selectVolume,
   createIndicator,
   removeIndicator as removeIndicatorAction,
   setIndicator,
@@ -12,11 +13,12 @@ import {
   removeAdvanced as removeAdvancedAction,
   setAdvanced,
   updateAdvanced,
+  setVolume,
 } from 'app/store';
 import { Placeholder } from 'components';
 import { getTheme } from 'themes';
 import { getStockLogoUrl, findDataIndex, formatNumber } from 'tools';
-import { INTERVALS, INDICATORS_ADVANCED, INTERVALS_MAX } from 'config';
+import { INTERVALS, INDICATORS_ADVANCED, INTERVALS_MAX, VOLUME } from 'config';
 import css from './tooltip.module.css';
 
 function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
@@ -24,10 +26,15 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
   const stockInfo = useSelector(selectStockInfo(stock));
   const indicators = useSelector(selectIndicators);
   const advanced = useSelector(selectAdvanced);
+  const volume = useSelector(selectVolume);
   const [indicatorSettings, setIndicatorSettings] = useState(-1);
   const [advancedSettings, setAdvancedSettings] = useState(false);
   const theme = getTheme(useSelector(selectTheme));
   const wrapperRef = useRef<any>();
+
+  const toggleVolume = useCallback(() => {
+    dispatch(setVolume());
+  }, [dispatch]);
 
   const addIndicator = useCallback(() => {
     dispatch(createIndicator());
@@ -273,14 +280,16 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
       );
     }
 
-    const totalStocks =
-      dataIndex < 0 ? stockInfo.total_shares : (series[1].type === 'line' ? series[1].value : series[1].close) || 0;
-    const curMarketcap =
+    const volumeValues = [
+      dataIndex < 0 ? stockInfo.total_shares : data[dataIndex][data[dataIndex].length - 2],
       dataIndex < 0
         ? stockInfo.marketcap
           ? stockInfo.marketcap
           : stockInfo.total_shares * parseFloat(stockInfo.price)
-        : data[dataIndex][data[dataIndex].length - 1];
+        : data[dataIndex][data[dataIndex].length - 1],
+    ];
+    const volumeMarketcap = volume === VOLUME[1];
+    if (volumeMarketcap) volumeValues.reverse();
 
     return (
       <>
@@ -296,14 +305,19 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
           <div className={infoCss.join(' ')}>{info}</div>
         </div>
         <div className={[css.Volume, css.Indicator].join(' ')}>
-          <div className={css.Name} style={{ color: 'rgb(' + theme.volume + ')' }}>
-            # Shares
+          <div
+            className={css.Name}
+            style={{ color: 'rgb(' + theme.volume + ')' }}
+            onClick={toggleVolume}
+            title={volumeMarketcap ? '# Shares' : 'Marketcap'}
+          >
+            {volumeMarketcap ? 'M. Cap' : '# Shares'}
           </div>
           <div className={css.Value}>
-            {formatNumber(totalStocks, true)}{' '}
+            {formatNumber(volumeValues[0], true)}{' '}
             <span>
               ($
-              {formatNumber(curMarketcap, true)})
+              {formatNumber(volumeValues[1], true)})
             </span>
           </div>
         </div>
