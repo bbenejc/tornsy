@@ -2,3 +2,12 @@
   position: relative;
   background-color: var(--color-paper);
 }
+
+.Chart :global .tv-lightweight-charts {
+  opacity: 1;
+  transition: opacity 100ms;
+}
+
+.Loading :global .tv-lightweight-charts {
+  opacity: 0.5;
+}
