@@ -2,7 +2,15 @@ import React, { memo, ReactElement, useEffect, useMemo, useRef, useState } from 
 import { useSelector } from 'react-redux';
 import { useStockData } from 'hooks';
 import { IChartApi, ISeriesApi, TimeRange } from 'lightweight-charts';
-import { selectTheme, selectIndicators, selectAdvanced, selectStockPrice, selectVolume } from 'app/store';
+import {
+  selectTheme,
+  selectIndicators,
+  selectAdvanced,
+  selectStockPrice,
+  selectVolume,
+  selectStock,
+  selectInterval,
+} from 'app/store';
 import { formatNumber } from 'tools';
 import { Clock } from 'components';
 import { Tooltip, TTooltip } from './tooltip';
@@ -20,7 +28,9 @@ import {
 } from './utils';
 import css from './chart.module.css';
 
-function Chart({ height, width, stock, interval }: TProps): ReactElement {
+function Chart({ height, width }: TProps): ReactElement {
+  const stock = useSelector(selectStock);
+  const interval = useSelector(selectInterval);
   const [data, loadHistory] = useStockData(stock, interval);
   const currentPrice = useSelector(selectStockPrice);
   const indicators = useSelector(selectIndicators);
@@ -138,8 +148,6 @@ function Chart({ height, width, stock, interval }: TProps): ReactElement {
 export default memo(Chart);
 
 type TProps = {
-  stock: string;
-  interval: TInterval;
   height: number;
   width: number;
 };

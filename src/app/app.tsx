@@ -3,17 +3,13 @@ import { useSelector, useStore } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import { use100vh } from 'react-div-100vh';
 import { useStocks, useQueryParams } from 'hooks';
-import { selectInterval, selectStock, selectTheme, setOnline, setVisibility } from 'app/store';
+import { selectTheme, setOnline, setVisibility } from 'app/store';
 import { SMALL } from 'config';
 import { Chart, Menu, Watchlist, Status } from 'components';
 import './app.css';
 
 export function App(): ReactElement {
-  useStocks();
   const store = useStore();
-  const redirect = useQueryParams();
-  const stock = useSelector(selectStock);
-  const interval = useSelector(selectInterval);
   const [width, setWidth] = useState(window.innerWidth);
   const theme = useSelector(selectTheme);
   const height = use100vh() || 0;
@@ -47,19 +43,21 @@ export function App(): ReactElement {
 
   return (
     <>
-      {redirect && <Redirect to={redirect} />}
-      {!redirect && stock !== '' && (
-        <div className={appCss.join(' ')} style={{ height }}>
-          <div className="Main">
-            <Menu width={width} height={height} />
-            {height > 0 && (
-              <Chart stock={stock} interval={interval} height={height - 40} width={isSmall ? width : width - 400} />
-            )}
-          </div>
-          {height > 0 && !isSmall && <Watchlist />}
-          <Status />
+      <CheckRedirect />
+      <div className={appCss.join(' ')} style={{ height }}>
+        <div className="Main">
+          <Menu width={width} height={height} />
+          {height > 0 && <Chart height={height - 40} width={isSmall ? width : width - 350} />}
         </div>
-      )}
+        {height > 0 && !isSmall && <Watchlist />}
+        <Status />
+      </div>
     </>
   );
+}
+
+function CheckRedirect(): ReactElement {
+  useStocks();
+  const redirect = useQueryParams();
+  return redirect ? <Redirect to={redirect} /> : <></>;
 }
