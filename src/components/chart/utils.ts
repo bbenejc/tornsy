@@ -3,13 +3,10 @@ import {
   BarData,
   createChart,
   CrosshairMode,
-  HistogramData,
-  HistogramStyleOptions,
   IChartApi,
   ISeriesApi,
   LineData,
   LineStyle,
-  LineStyleOptions,
   MouseEventParams,
   SeriesOptions,
 } from 'lightweight-charts';
