@@ -1,0 +1,19 @@
+.Header {
+  position: sticky;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--color-paper);
+  border-bottom: 1px solid var(--color-bg);
+  font-size: 12px;
+  top: 0;
+}
+
+.Header span {
+  padding: 8px 4px;
+  cursor: pointer;
+}
+
+.Header span:hover {
+  text-decoration: underline;
+}

@@ -1,0 +1,27 @@
+.Item img {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+}
+
+.Item:hover {
+  background-color: var(--color-highlight);
+}
+
+.Active {
+  background-color: var(--color-highlight);
+}
+
+.Growth {
+  font-size: 12px;
+}
+
+.Red {
+  color: var(--color-red);
+}
+.Green {
+  color: var(--color-green);
+}
+.Grey {
+  color: var(--color-grey);
+}

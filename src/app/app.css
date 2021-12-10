@@ -9,6 +9,7 @@
   --color-highlight-text: #1e88e5;
   --color-red: #f44336;
   --color-green: #26a69a;
+  --color-grey: #aaa;
 }
 .App.dark {
   --color-bg: #2a2e38;
@@ -20,16 +21,21 @@
   --color-highlight-text: #1e88e5;
   --color-red: #ef5350;
   --color-green: #26a69a;
+  --color-grey: #aaa;
 }
 
 .App {
   display: grid;
-  grid-template-rows: 39px 1fr;
-  grid-template-columns: 1fr 295px;
-  grid-auto-flow: column;
-  grid-gap: 1px 5px;
+  grid-template-columns: 1fr 345px;
+  grid-gap: 5px;
   overflow: hidden;
   height: 100%;
   background-color: var(--color-bg);
   color: var(--color-font);
+}
+
+.Main {
+  display: grid;
+  grid-template-rows: 39px 1fr;
+  grid-gap: 1px;
 }

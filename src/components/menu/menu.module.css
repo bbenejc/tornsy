@@ -1,15 +1,16 @@
 .Menu {
   background-color: var(--color-paper);
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: 50px 1fr auto;
   align-items: center;
   padding: 0 8px;
 }
 
 .Stock {
-  padding: 8px;
+  padding: 8px 0;
   font-weight: 600;
   cursor: pointer;
+  text-align: center;
 }
 
 .Intervals {
@@ -54,8 +55,9 @@
 .List {
   position: fixed;
   z-index: 9;
-  top: 40px;
+  top: 0;
   left: 0;
+  overflow: hidden;
 }
 
 .Indicators {

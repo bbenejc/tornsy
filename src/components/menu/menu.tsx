@@ -1,10 +1,10 @@
-import { memo, ReactElement, useCallback, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { selectInterval, selectStock, selectTheme, setTheme } from "app/store";
-import { Link } from "react-router-dom";
-import { Watchlist } from "components";
-import { INTERVALS, SMALL, XSMALL } from "config";
-import css from "./menu.module.css";
+import { memo, ReactElement, useCallback, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectInterval, selectStock, selectTheme, setTheme } from 'app/store';
+import { Link } from 'react-router-dom';
+import { Watchlist } from 'components';
+import { INTERVALS, SMALL, XSMALL } from 'config';
+import css from './menu.module.css';
 
 function Menu({ width, height }: TProps): ReactElement {
   const dispatch = useDispatch();
@@ -13,7 +13,7 @@ function Menu({ width, height }: TProps): ReactElement {
   const [list, setList] = useState(false);
   const theme = useSelector(selectTheme);
   const toggleTheme = useCallback(() => {
-    dispatch(setTheme(theme === "light" ? "dark" : "light"));
+    dispatch(setTheme(theme === 'light' ? 'dark' : 'light'));
   }, [dispatch, theme]);
 
   const isSmall = width < SMALL;
@@ -26,25 +26,26 @@ function Menu({ width, height }: TProps): ReactElement {
     if (list) {
       const closeList = () => setList(false);
       const escKey = (e: KeyboardEvent) => {
-        if (e.key === "Escape") setList(false);
+        if (e.key === 'Escape') setList(false);
       };
 
-      document.addEventListener("click", closeList);
-      document.addEventListener("keyup", escKey);
+      document.addEventListener('click', closeList);
+      document.addEventListener('keyup', escKey);
+      if (!isSmall) setList(false);
       return () => {
-        document.removeEventListener("click", closeList);
-        document.removeEventListener("keyup", escKey);
+        document.removeEventListener('click', closeList);
+        document.removeEventListener('keyup', escKey);
       };
     }
-  }, [list]);
+  }, [list, isSmall]);
 
   const intervals: ReactElement[] = [];
   for (const i in INTERVALS) {
     intervals.push(
       <Link
-        className={i === interval ? css.Active : ""}
+        className={i === interval ? css.Active : ''}
         key={i}
-        to={"/" + stock.toLowerCase() + (i !== "m1" ? "/" + i : "")}
+        to={'/' + stock.toLowerCase() + (i !== 'm1' ? '/' + i : '')}
       >
         {INTERVALS[i as TInterval]}
       </Link>
@@ -70,7 +71,7 @@ function Menu({ width, height }: TProps): ReactElement {
           style={
             width < XSMALL || height < XSMALL
               ? mobileListStyle
-              : { width: 320, height: Math.min(height - 40, 450) }
+              : { top: -1, width: 345, height: Math.min(height - 40, 450), border: '1px solid var(--color-border)' }
           }
         >
           <Watchlist />
