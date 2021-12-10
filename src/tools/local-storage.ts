@@ -1,27 +1,44 @@
 import { INTERVALS } from 'config';
 
+const LIST_ORDER = 'list-order';
+const LIST_INTERVAL = 'list-interval';
+const LIST_SEC = 'list-secondary';
 const THEME = 'theme';
-const ORDER = 'list-order';
 const STOCK = 'stock';
 const INTERVAL = 'interval';
 const VOLUME = 'volume';
 const INDICATORS = 'indicators';
 const ADVANCED = 'advanced';
 
+export function getListOrder(): string | null {
+  return localStorage.getItem(LIST_ORDER);
+}
+
+export function setListOrder(order: string): void {
+  localStorage.setItem(LIST_ORDER, order);
+}
+
+export function getListInterval(): string | null {
+  return localStorage.getItem(LIST_INTERVAL);
+}
+
+export function setListInterval(interval: string): void {
+  localStorage.setItem(LIST_INTERVAL, interval);
+}
+
+export function getListSecondary(): string | null {
+  return localStorage.getItem(LIST_SEC);
+}
+
+export function setListSecondary(secondary: string): void {
+  localStorage.setItem(LIST_SEC, secondary);
+}
 export function getTheme(): string | null {
   return localStorage.getItem(THEME);
 }
 
 export function setTheme(theme: string): void {
   localStorage.setItem(THEME, theme);
-}
-
-export function getListOrder(): string | null {
-  return localStorage.getItem(ORDER);
-}
-
-export function setListOrder(order: string): void {
-  localStorage.setItem(ORDER, order);
 }
 
 export function getStock(): string {
