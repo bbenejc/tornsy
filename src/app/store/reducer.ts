@@ -33,7 +33,7 @@ import {
   setVolume,
   EMPTY_ARRAY,
 } from 'tools';
-import { API_LIMIT, INDICATORS_ADVANCED, INTERVALS_MAX, VOLUME } from 'config';
+import { API_LIMIT, INDICATORS_ADVANCED, INDICATORS_MAX, VOLUME } from 'config';
 import { getInterval } from 'tools/intervals';
 
 const initialState: TState = {
@@ -193,11 +193,11 @@ export const reducer = (state = initialState, action: TAction): TState => {
       return { ...state, theme: action.theme };
 
     case CREATE_INDICATOR: {
-      if (state.indicators.length < INTERVALS_MAX) {
+      if (state.indicators.length < INDICATORS_MAX) {
         const indicators = [...state.indicators];
         const num = indicators.length;
         const length = num % 2 === 0 ? 12 : 200;
-        const type = num >= INTERVALS_MAX / 2 && indicators[0].type !== 'ema' ? 'ema' : 'sma';
+        const type = num >= INDICATORS_MAX / 2 && indicators[0].type !== 'ema' ? 'ema' : 'sma';
 
         indicators.push({
           type,
