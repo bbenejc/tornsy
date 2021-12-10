@@ -30,10 +30,12 @@
 .Info {
   display: flex;
   font-size: 14px;
+  grid-gap: 10px;
 }
 
 .Ohlc {
-  flex: 0 0 70px;
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
 }
 
 .Ohlc span:first-child:not(:last-child) {
@@ -230,12 +232,9 @@
     font-size: 12px;
   }
   .Info {
-    align-self: flex-start;
     font-size: 12px;
     margin-top: 8px;
-  }
-  .Ohlc {
-    flex: 0 0 60px;
+    grid-gap: 6px;
   }
   .Volume {
     top: 52px;
