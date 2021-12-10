@@ -1,4 +1,5 @@
 import React, { memo, ReactElement, useCallback, useState, ChangeEvent, useEffect, useRef, Ref } from 'react';
+import ReactDOM from 'react-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   selectIndicators,
@@ -51,31 +52,44 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
   );
 
   const editIndicator = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    const i = parseInt(e.currentTarget.getAttribute('data-index') || '');
-    setIndicatorSettings(i);
+    const i = parseInt(e.currentTarget.getAttribute('data-index') || '-1');
+    ReactDOM.unstable_batchedUpdates(() => {
+      setIndicatorSettings((cur) => (cur === i ? -1 : i));
+      setAdvancedSettings(false);
+    });
+    e.preventDefault();
+    e.stopPropagation();
   }, []);
 
-  const addAdvanced = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      dispatch(createAdvanced());
-    },
-    [dispatch]
-  );
+  const addAdvanced = useCallback(() => {
+    dispatch(createAdvanced());
+  }, [dispatch]);
 
   const editAdvanced = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    setAdvancedSettings(true);
+    ReactDOM.unstable_batchedUpdates(() => {
+      setAdvancedSettings((cur) => !cur);
+      setIndicatorSettings(-1);
+    });
+    e.preventDefault();
+    e.stopPropagation();
   }, []);
 
   const removeAdvanced = useCallback(() => {
     dispatch(removeAdvancedAction());
   }, [dispatch]);
 
+  const closeIndicatorSettings = useCallback(() => {
+    ReactDOM.unstable_batchedUpdates(() => {
+      setIndicatorSettings(-1);
+      setAdvancedSettings(false);
+    });
+  }, []);
+
   useEffect(() => {
     if (indicatorSettings >= 0 || advancedSettings) {
       const clickAway = (e: MouseEvent | TouchEvent) => {
         if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
-          setIndicatorSettings(-1);
-          setAdvancedSettings(false);
+          closeIndicatorSettings();
         }
       };
 
@@ -86,21 +100,14 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
         }
       };
 
-      document.addEventListener('mousedown', clickAway);
-      document.addEventListener('touchstart', clickAway);
+      document.addEventListener('click', clickAway);
       document.addEventListener('keyup', escKey);
       return () => {
-        document.removeEventListener('mousedown', clickAway);
-        document.removeEventListener('touchstart', clickAway);
+        document.removeEventListener('click', clickAway);
         document.removeEventListener('keyup', escKey);
       };
     }
-  }, [indicatorSettings, advancedSettings]);
-
-  const closeIndicatorSettings = useCallback(() => {
-    setIndicatorSettings(-1);
-    setAdvancedSettings(false);
-  }, [setIndicatorSettings, setAdvancedSettings]);
+  }, [indicatorSettings, advancedSettings, closeIndicatorSettings]);
 
   if (stockInfo) {
     const dataIndex =
@@ -346,9 +353,10 @@ const IndicatorSettingsC = React.forwardRef(
     const changeType = useCallback(
       (e: React.MouseEvent<HTMLButtonElement>) => {
         const clickedType = e.currentTarget.value;
-        const { length, type } = indicators[index];
-        if (type !== clickedType) {
-          dispatch(setIndicator(index, { type: clickedType, length }));
+        const indicator = { ...indicators[index] };
+        if (indicator.type !== clickedType) {
+          indicator.type = clickedType;
+          dispatch(setIndicator(index, indicator));
         }
       },
       [dispatch, index, indicators]
@@ -356,16 +364,23 @@ const IndicatorSettingsC = React.forwardRef(
 
     const changeLength = useCallback(
       (e: ChangeEvent<HTMLInputElement>) => {
-        const { type } = indicators[index];
         let length = parseInt(e.currentTarget.value);
         if (!isNaN(length)) {
           if (length > 250) length = 250;
           else if (length < 2) length = 2;
-          dispatch(setIndicator(index, { type, length }));
+          const indicator = { ...indicators[index], length };
+          dispatch(setIndicator(index, indicator));
         }
       },
       [dispatch, index, indicators]
     );
+
+    const toggleScaleVisibility = useCallback(() => {
+      const indicator = { ...indicators[index] };
+      if (indicator.showPrice) delete indicator.showPrice;
+      else indicator.showPrice = true;
+      dispatch(setIndicator(index, indicator));
+    }, [dispatch, index, indicators]);
 
     const inputKeyDown = useCallback(
       (e: React.KeyboardEvent) => {
@@ -375,7 +390,7 @@ const IndicatorSettingsC = React.forwardRef(
     );
 
     if (indicators.length < index + 1) return <></>;
-    const { type, length } = indicators[index];
+    const { type, length, showPrice } = indicators[index];
     return (
       <div ref={ref} className={css.Settings} style={{ marginTop: index * 20 }}>
         <div>
@@ -400,6 +415,14 @@ const IndicatorSettingsC = React.forwardRef(
             onChange={changeLength}
             onKeyDown={inputKeyDown}
           />
+        </div>
+        <div>
+          <div className={css.Label}>Show on scale</div>
+          <div>
+            <button onClick={toggleScaleVisibility} className={!!showPrice ? css.Active : ''}>
+              Yes
+            </button>
+          </div>
         </div>
       </div>
     );

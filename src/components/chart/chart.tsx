@@ -103,9 +103,9 @@ function Chart({ height, width }: TProps): ReactElement {
 
   // handle data series
   const lastData: TTooltip[] = useMemo(() => {
+    const tooltip: TTooltip[] = [];
     if (chart.current) {
       if (data.length) {
-        const tooltip: TTooltip[] = [];
         createMainSeries(chart.current, mainSeries, data, interval, tooltip, theme);
         createVolumeSeries(chart.current, volumeSeries, data, volume, tooltip, theme);
         createIndicatorSeries(chart.current, indicatorSeries, data, interval, indicators, tooltip, theme);
@@ -114,14 +114,13 @@ function Chart({ height, width }: TProps): ReactElement {
           disableLoadingMode(chart.current, interval);
           isLoading.current = false;
         }
-
-        return tooltip;
       } else {
         isLoading.current = true;
         enableLoadingMode(chart.current);
       }
     }
-    return [];
+
+    return tooltip;
   }, [theme, data, interval, indicators, advanced, volume]);
 
   // handle title change

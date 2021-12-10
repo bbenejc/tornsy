@@ -54,6 +54,7 @@ type TStockData =
 type TIndicator = {
   type: string;
   length: number;
+  showPrice?: boolean;
 };
 
 type TAdvanced =

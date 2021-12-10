@@ -28,13 +28,8 @@ export function initChart(div: HTMLDivElement, width: number, height: number): I
     height,
     leftPriceScale: { scaleMargins: { top: 0.75 } },
     rightPriceScale: { scaleMargins: { bottom: 0.3 } },
-    kineticScroll: {
-      mouse: true,
-    },
-    watermark: {
-      text: 'Loading',
-      fontSize: 20,
-    },
+    kineticScroll: { mouse: true },
+    watermark: { text: 'Loading', fontSize: 20 },
     crosshair: {
       mode: CrosshairMode.Normal,
       horzLine: { visible: false },
@@ -246,7 +241,7 @@ export function createIndicatorSeries(
       series.current.push(
         chart.addLineSeries({
           priceLineVisible: false,
-          lastValueVisible: false,
+          lastValueVisible: !!indicators[i].showPrice,
           crosshairMarkerVisible: false,
           color: theme.indicators[i],
           lineStyle: LineStyle.Solid,

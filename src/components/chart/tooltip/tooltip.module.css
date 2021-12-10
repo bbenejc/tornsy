@@ -106,6 +106,7 @@
   display: flex;
   visibility: hidden;
   height: 22px;
+  transition: visibility 0.01s 0.01s;
 }
 .Indicator .Controls > div {
   display: inline-flex;
@@ -113,7 +114,6 @@
 }
 .Indicator:hover .Controls {
   visibility: visible;
-  pointer-events: all;
 }
 .Indicator .Controls svg {
   fill: var(--color-font-sec);
@@ -176,6 +176,7 @@
   grid-gap: 8px;
 }
 .Settings .Label {
+  flex: 1;
   margin-right: 24px;
 }
 .Settings .Label span {
