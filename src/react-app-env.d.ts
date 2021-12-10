@@ -15,23 +15,11 @@ type TTheme = {
   advanced: string[];
 };
 
-type TInterval =
-  | "m1"
-  | "m5"
-  | "m15"
-  | "m30"
-  | "h1"
-  | "h2"
-  | "h4"
-  | "h6"
-  | "h12"
-  | "d1"
-  | "w1"
-  | "n1";
+type TInterval = 'm1' | 'm5' | 'm15' | 'm30' | 'h1' | 'h2' | 'h4' | 'h6' | 'h12' | 'd1' | 'w1' | 'n1';
 
 type TStockList = {
-  stock?: string;
-  index?: string;
+  stock: string;
+  index?: boolean;
   name: string;
   price: string;
   price_m1: string;
@@ -43,19 +31,16 @@ type TStockInfo = {
   stock: string;
   name: string;
   price: string;
-  diff_m1: number;
-  diff_percent_m1: number;
+  price_diff: number;
+  price_growth: number;
+  marketcap: number;
+  marketcap_diff: number;
+  marketcap_growth: number;
   total_shares: number;
-  marketcap?: number;
 };
 
 type TStockData =
-  | [
-      timestamp: UTCTimestamp,
-      price: string,
-      total_shares: number,
-      marketcap?: number
-    ]
+  | [timestamp: UTCTimestamp, price: string, total_shares: number, marketcap?: number]
   | [
       timestamp: UTCTimestamp,
       open: string,
@@ -66,45 +51,14 @@ type TStockData =
       marketcap?: number
     ];
 
-/*
-type TStockData =
-  | {
-      stock: string;
-      interval: "m1";
-      data: [timestamp: UTCTimestamp, price: string, total_shares: number][];
-    }
-  | {
-      stock: string;
-      interval:
-        | "m5"
-        | "m15"
-        | "m30"
-        | "h1"
-        | "h2"
-        | "h4"
-        | "h6"
-        | "h12"
-        | "d1"
-        | "w1"
-        | "n1";
-      data: [
-        timestamp: UTCTimestamp,
-        open: string,
-        high: string,
-        low: string,
-        close: string,
-        total_shares: number
-      ][];
-    };
-*/
-
 type TIndicator = {
   type: string;
   length: number;
 };
 
 type TAdvanced =
-  | { type: "rsi"; length: number }
-  | { type: "stoch"; k: number; d: number }
-  | { type: "macd"; slow: number; fast: number; smoothing: number }
-  | { type: "adx"; length: number };
+  | undefined
+  | { type: 'rsi'; length: number }
+  | { type: 'stoch'; k: number; d: number }
+  | { type: 'macd'; slow: number; fast: number; smoothing: number }
+  | { type: 'adx'; length: number };
