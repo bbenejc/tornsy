@@ -21,3 +21,5 @@ export function sumArray(data: number[]): number {
     return pv + cv;
   }, 0);
 }
+
+export const EMPTY_ARRAY = [];
