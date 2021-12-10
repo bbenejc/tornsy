@@ -1,2 +1,2 @@
-export { default as Tooltip } from "./tooltip";
-export type { TTooltip } from "./tooltip";
+export { default as Tooltip } from './tooltip';
+export type { TTooltip } from './tooltip';

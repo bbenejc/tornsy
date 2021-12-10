@@ -1,11 +1,7 @@
-import type { HistogramData, LineData } from "lightweight-charts";
-import { sumArray } from "./utils";
+import type { HistogramData, LineData } from 'lightweight-charts';
+import { sumArray } from './utils';
 
-export function calculateSMA(
-  stockData: TStockData[],
-  interval: TInterval,
-  length = 6
-): LineData[] {
+export function calculateSMA(stockData: TStockData[], interval: TInterval, length = 6): LineData[] {
   const data = parseData_(stockData, interval);
   const smaData: LineData[] = [];
   const smaSum = [];
@@ -24,23 +20,14 @@ export function calculateSMA(
   return smaData;
 }
 
-export function calculateEMA(
-  stockData: TStockData[],
-  interval: TInterval,
-  length = 6,
-  smoothing = 2
-): LineData[] {
+export function calculateEMA(stockData: TStockData[], interval: TInterval, length = 6, smoothing = 2): LineData[] {
   const data = parseData_(stockData, interval);
 
   return calcEMA_(data, length, smoothing);
 }
 
-export function calculateRSI(
-  data: TStockData[],
-  interval: TInterval,
-  length = 14
-): LineData[] {
-  const isM1 = interval === "m1" ? 1 : 0;
+export function calculateRSI(data: TStockData[], interval: TInterval, length = 14): LineData[] {
+  const isM1 = interval === 'm1' ? 1 : 0;
   const cIndex = isM1 ? 1 : 4;
   const initialLength = length + isM1;
   if (data.length < initialLength) return [];
@@ -83,15 +70,10 @@ export function calculateRSI(
   return RSI;
 }
 
-export function calculateStochastics(
-  data: TStockData[],
-  interval: TInterval,
-  kLength = 12,
-  dLength = 3
-): LineData[][] {
-  const hIndex = interval === "m1" ? 1 : 2;
-  const lIndex = interval === "m1" ? 1 : 3;
-  const cIndex = interval === "m1" ? 1 : 4;
+export function calculateStochastics(data: TStockData[], interval: TInterval, kLength = 12, dLength = 3): LineData[][] {
+  const hIndex = interval === 'm1' ? 1 : 2;
+  const lIndex = interval === 'm1' ? 1 : 3;
+  const cIndex = interval === 'm1' ? 1 : 4;
   const K: LineData[] = [];
   const D: LineData[] = [];
   const lArr: number[] = [];
@@ -156,8 +138,7 @@ export function calculateMACD(
     let prevValue = 0;
     for (let i = 0; i < signal.length; i += 1) {
       const value = MACD[i - lDiff].value - signal[i].value;
-      const cIndex =
-        value * prevValue > 0 && Math.abs(value) < Math.abs(prevValue) ? 1 : 0;
+      const cIndex = value * prevValue > 0 && Math.abs(value) < Math.abs(prevValue) ? 1 : 0;
       histogram.push({
         time: signal[i].time,
         value,
@@ -172,14 +153,10 @@ export function calculateMACD(
   return [];
 }
 
-export function calculateADX(
-  data: TStockData[],
-  interval: TInterval,
-  smoothing = 14
-): LineData[] {
-  const hIndex = interval === "m1" ? 1 : 2;
-  const lIndex = interval === "m1" ? 1 : 3;
-  const cIndex = interval === "m1" ? 1 : 4;
+export function calculateADX(data: TStockData[], interval: TInterval, smoothing = 14): LineData[] {
+  const hIndex = interval === 'm1' ? 1 : 2;
+  const lIndex = interval === 'm1' ? 1 : 3;
+  const cIndex = interval === 'm1' ? 1 : 4;
 
   const DMplus: LineData[] = [];
   const DMminus: LineData[] = [];
@@ -230,9 +207,7 @@ export function calculateADX(
     for (let i = smoothing; i < DX.length; i += 1) {
       ADX.push({
         time: DX[i].time,
-        value:
-          (ADX[i - smoothing].value * (smoothing - 1) + DX[i].value) /
-          smoothing,
+        value: (ADX[i - smoothing].value * (smoothing - 1) + DX[i].value) / smoothing,
       });
     }
   }
@@ -241,7 +216,7 @@ export function calculateADX(
 }
 
 function parseData_(data: TStockData[], interval: TInterval): LineData[] {
-  const cIndex = interval === "m1" ? 1 : 4;
+  const cIndex = interval === 'm1' ? 1 : 4;
   const parsedData: LineData[] = [];
 
   for (let i = 0; i < data.length; i += 1) {
@@ -286,10 +261,7 @@ function wilderSmooth_(data: LineData[], smoothing = 14): LineData[] {
     for (let i = smoothing; i < data.length; i += 1) {
       result.push({
         time: data[i].time,
-        value:
-          result[i - smoothing].value -
-          result[i - smoothing].value / smoothing +
-          data[i].value,
+        value: result[i - smoothing].value - result[i - smoothing].value / smoothing + data[i].value,
       });
     }
   }

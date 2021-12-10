@@ -1,5 +1,5 @@
-import { ReactElement, useEffect, useRef, useState } from "react";
-import css from "./clock.module.css";
+import { ReactElement, useEffect, useRef, useState } from 'react';
+import css from './clock.module.css';
 
 export function Clock(): ReactElement {
   const timer = useRef<NodeJS.Timeout>();
@@ -21,11 +21,9 @@ export function Clock(): ReactElement {
 
 function getTime(): string {
   const date = new Date();
-  return `${padZero(date.getUTCHours())}:${padZero(
-    date.getUTCMinutes()
-  )}:${padZero(date.getUTCSeconds())}`;
+  return `${padZero(date.getUTCHours())}:${padZero(date.getUTCMinutes())}:${padZero(date.getUTCSeconds())}`;
 }
 
 function padZero(num: number): string {
-  return num < 10 ? "0" + num : num.toString();
+  return num < 10 ? '0' + num : num.toString();
 }

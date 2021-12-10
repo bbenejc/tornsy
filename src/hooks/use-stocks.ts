@@ -64,6 +64,7 @@ export function useStocks(): void {
   }, [store, visibility, online]);
 }
 
+// TODO: retry on fail
 async function fetchStocks(): Promise<{
   data: TStockList[];
   timestamp: number;
