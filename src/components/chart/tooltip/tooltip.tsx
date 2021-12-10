@@ -21,6 +21,8 @@ import { getStockLogoUrl, findDataIndex, formatNumber } from 'tools';
 import { INTERVALS, INDICATORS_ADVANCED, INDICATORS_MAX, VOLUME } from 'config';
 import css from './tooltip.module.css';
 
+// TODO: add backgrounds
+// TODO: mobile visibility on "edit" and "remove" buttons... can click even when hidden
 function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
   const dispatch = useDispatch();
   const stockInfo = useSelector(selectStockInfo(stock));
@@ -167,10 +169,12 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
         );
       }
     } else {
+      const spans = interval === 'm1' ? [] : ['O', 'H', 'L', 'C'];
       for (let i = 0; i < (interval === 'm1' ? 2 : 5); i += 1) {
         info.push(
           <div className={css.Ohlc} key={i}>
-            <Placeholder />
+            {spans[i] && <span>{spans[i]}</span>}
+            <Placeholder width={3.5} />
           </div>
         );
       }
