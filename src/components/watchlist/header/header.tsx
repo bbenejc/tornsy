@@ -22,7 +22,7 @@ export function WatchlistHeader({ className }: TProps): ReactElement {
         <span onClick={changeOrder('diff')}>Diff %</span>
       </div>
       <div>
-        <span onClick={changeOrder('marketcap')}># Shares</span>
+        <span onClick={changeOrder('marketcap')}>M. Cap</span>
       </div>
       <div>
         <span onClick={changeOrder('marketcap')}>Diff %</span>

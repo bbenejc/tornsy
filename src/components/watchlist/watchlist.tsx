@@ -1,13 +1,12 @@
-import React, { memo, ReactElement, MouseEvent } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { setListSorting, selectOrderedStocksList } from 'app/store';
+import React, { ReactElement } from 'react';
+import { useSelector } from 'react-redux';
+import { selectOrderedStocksList } from 'app/store';
 import { WatchlistMenu } from './menu';
 import { WatchlistHeader } from './header';
 import { WatchlistItem } from './item';
 import css from './watchlist.module.css';
 
 export function Watchlist(): ReactElement {
-  console.log('Watchlist');
   return (
     <div className={css.Watchlist}>
       <WatchlistMenu />
@@ -20,7 +19,6 @@ export function Watchlist(): ReactElement {
 }
 
 function List(): ReactElement {
-  console.log('List');
   const stocks = useSelector(selectOrderedStocksList);
   return (
     <>
