@@ -9,7 +9,7 @@ const darkTheme = {
   green: ['#4da39a', '#badddb'],
   red: ['#e16052', '#f8cfd2'],
   volume: '30,136,229', // rgb(30, 136, 229)
-  indicators: ['#7CFC00', '#EE82EE', '#F0FF00', '#FF00A2'],
+  indicators: ['#7CFC00', '#EE82EE', '#F0FF00', '#1CE1CE'],
   advanced: ['rgb(0, 148, 255)', 'rgb(255, 106, 0)', 'rgb(142, 21, 153)'],
 };
 
