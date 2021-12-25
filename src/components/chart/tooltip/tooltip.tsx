@@ -1,4 +1,14 @@
-import React, { memo, ReactElement, useCallback, useState, ChangeEvent, useEffect, useRef, Ref } from 'react';
+import React, {
+  memo,
+  ReactElement,
+  useCallback,
+  useState,
+  ChangeEvent,
+  useEffect,
+  useRef,
+  Ref,
+  MutableRefObject,
+} from 'react';
 import ReactDOM from 'react-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -21,10 +31,11 @@ import { getTheme } from 'themes';
 import { getStockLogoUrl, findDataIndex, formatNumber } from 'tools';
 import { INTERVALS, INDICATORS_ADVANCED, INDICATORS_MAX, VOLUME } from 'config';
 import css from './tooltip.module.css';
+import type { IChartApi } from 'lightweight-charts';
 
 // TODO: add backgrounds
 // TODO: mobile visibility on "edit" and "remove" buttons... can click even when hidden
-function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
+function Tooltip({ data, series, stock, interval, chart }: TProps): ReactElement {
   const dispatch = useDispatch();
   const stockInfo = useSelector(selectStockInfo(stock));
   const indicators = useSelector(selectIndicators);
@@ -100,11 +111,18 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
         }
       };
 
+      const chartClick = () => {
+        closeIndicatorSettings();
+      };
+
       document.addEventListener('click', clickAway);
       document.addEventListener('keyup', escKey);
+      if (chart.current) chart.current.subscribeClick(chartClick);
+
       return () => {
         document.removeEventListener('click', clickAway);
         document.removeEventListener('keyup', escKey);
+        if (chart.current) chart.current.unsubscribeClick(chartClick);
       };
     }
   }, [indicatorSettings, advancedSettings, closeIndicatorSettings]);
@@ -524,6 +542,7 @@ type TProps = {
   data: TStockData[];
   stock: string;
   interval: TInterval;
+  chart: MutableRefObject<IChartApi | undefined>;
 };
 
 export type TTooltip =

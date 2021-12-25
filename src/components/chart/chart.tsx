@@ -150,7 +150,7 @@ function Chart({ height, width }: TProps): ReactElement {
 
   return (
     <div ref={divRef} className={classNames.join(' ')}>
-      <Tooltip data={data} series={hover || lastData || []} stock={stock} interval={interval} />
+      <Tooltip data={data} series={hover || lastData || []} stock={stock} interval={interval} chart={chart} />
       <Clock />
     </div>
   );
