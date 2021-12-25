@@ -237,7 +237,7 @@ function Tooltip({ data, series, stock, interval }: TProps): ReactElement {
       for (let a = 0, i = 2 + indicators.length; a < params.length; a += 1, i += 1) {
         const s = series[i];
         const val = s ? (s.type === 'line' ? s.value : s.close) : undefined;
-        let Value = val ? formatNumber(val, false, type === 'macd' ? 4 : 2) : <Placeholder />;
+        let Value = data.length ? val ? formatNumber(val, false, type === 'macd' ? 4 : 2) : '-' : <Placeholder />;
 
         advancedSeries.push(
           <div
