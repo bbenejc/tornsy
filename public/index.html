@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#000000" />
     <meta name="description" content="Torn City Stock Exchange" />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
@@ -25,10 +25,7 @@
   </head>
   <body>
     <script>
-      document.body.style.backgroundColor =
-        window.localStorage.getItem("theme") === "light"
-          ? "#e0e3eb"
-          : "#2a2e38";
+      document.body.style.backgroundColor = window.localStorage.getItem('theme') === 'light' ? '#e0e3eb' : '#2a2e38';
     </script>
     <svg xmlns="http://www.w3.org/2000/svg">
       <symbol id="icon-theme" viewBox="0 0 32 32">
@@ -48,7 +45,7 @@
       </symbol>
     </svg>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
+    <div id="tornsy"></div>
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
