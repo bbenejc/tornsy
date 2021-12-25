@@ -391,11 +391,16 @@ export function enableLoadingMode(chart: IChartApi): void {
 }
 
 export function disableLoadingMode(chart: IChartApi, interval: TInterval): void {
+  const range = chart.timeScale().getVisibleLogicalRange();
+  let bar = 6;
+  if (range) {
+    bar = Math.round(chart.timeScale().width() / (range.to - range.from));
+  }
   chart.applyOptions({
     watermark: { visible: false },
     timeScale: {
       timeVisible: !['d1', 'w1', 'n1'].includes(interval),
-      rightOffset: 2,
+      rightOffset: 10 / bar,
     },
     handleScroll: true,
     handleScale: true,

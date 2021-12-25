@@ -132,6 +132,7 @@ function Chart({ height, width }: TProps): ReactElement {
       }
     }
     setLastData(tooltip);
+    setHover(undefined);
   }, [theme, data, interval, indicators, advanced, volume]);
 
   // handle title change
