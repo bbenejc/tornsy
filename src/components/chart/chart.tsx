@@ -1,4 +1,4 @@
-import React, { memo, ReactElement, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, ReactElement, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useStockData } from 'hooks';
 import { IChartApi, ISeriesApi, TimeRange } from 'lightweight-charts';
@@ -37,6 +37,7 @@ function Chart({ height, width }: TProps): ReactElement {
   const advanced = useSelector(selectAdvanced);
   const volume = useSelector(selectVolume);
   const [hover, setHover] = useState<TTooltip[]>();
+  const [lastData, setLastData] = useState<TTooltip[]>();
   const hoverPrev = useRef<string>();
 
   const theme = getTheme(useSelector(selectTheme));
@@ -102,25 +103,35 @@ function Chart({ height, width }: TProps): ReactElement {
   }, [theme]);
 
   // handle data series
-  const lastData: TTooltip[] = useMemo(() => {
+  useEffect(() => {
     const tooltip: TTooltip[] = [];
     if (chart.current) {
       if (data.length) {
+        if (isLoading.current) {
+          // fix for a kinetic bug (to stop kinetic scroll when new stock / interval is loaded)
+          try {
+            const ref =
+              divRef.current?.childNodes[5].childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[1];
+            if (ref) {
+              ref.dispatchEvent(new Event('mousedown'));
+              ref.dispatchEvent(new Event('mouseup', { bubbles: true }));
+              setTimeout(() => {}, 10);
+            }
+          } catch {}
+
+          disableLoadingMode(chart.current, interval);
+          isLoading.current = false;
+        }
         createMainSeries(chart.current, mainSeries, data, interval, tooltip, theme);
         createVolumeSeries(chart.current, volumeSeries, data, volume, tooltip, theme);
         createIndicatorSeries(chart.current, indicatorSeries, data, interval, indicators, tooltip, theme);
         createAdvancedSeries(chart.current, advancedSeries, data, interval, advanced, tooltip, theme);
-        if (isLoading.current) {
-          disableLoadingMode(chart.current, interval);
-          isLoading.current = false;
-        }
       } else {
         isLoading.current = true;
         enableLoadingMode(chart.current);
       }
     }
-
-    return tooltip;
+    setLastData(tooltip);
   }, [theme, data, interval, indicators, advanced, volume]);
 
   // handle title change

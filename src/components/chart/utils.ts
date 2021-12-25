@@ -391,11 +391,11 @@ export function enableLoadingMode(chart: IChartApi): void {
 }
 
 export function disableLoadingMode(chart: IChartApi, interval: TInterval): void {
-  chart.timeScale().resetTimeScale();
   chart.applyOptions({
     watermark: { visible: false },
     timeScale: {
       timeVisible: !['d1', 'w1', 'n1'].includes(interval),
+      rightOffset: 2,
     },
     handleScroll: true,
     handleScale: true,
