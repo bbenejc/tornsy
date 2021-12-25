@@ -15,16 +15,22 @@ type TTheme = {
   advanced: string[];
 };
 
-type TInterval = 'm1' | 'm5' | 'm15' | 'm30' | 'h1' | 'h2' | 'h4' | 'h6' | 'h12' | 'd1' | 'w1' | 'n1';
+type TInterval = 'm1' | 'm5' | 'm15' | 'm30' | 'h1' | 'h2' | 'h4' | 'h6' | 'h12' | 'd1' | 'w1' | 'n1' | 'y1';
 
 type TStockList = {
   stock: string;
   index?: boolean;
   name: string;
   price: string;
-  price_m1: string;
   total_shares: number;
   marketcap?: number;
+  intervals?: {
+    [interval: string]: {
+      price: string;
+      total_shares: number;
+      marketcap?: number;
+    };
+  };
 };
 
 type TStockInfo = {
