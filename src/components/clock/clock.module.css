@@ -1,9 +1,11 @@
 .Clock {
   position: absolute;
-  z-index: 1;
+  z-index: 2;
   right: 8px;
-  bottom: 6px;
+  bottom: calc(6px + var(--sab) / 2);
+  padding-left: 4px;
   font-size: 11px;
-  opacity: 0.5;
   font-variant-numeric: tabular-nums;
+  color: var(--color-font-sec);
+  background-color: var(--color-paper);
 }
