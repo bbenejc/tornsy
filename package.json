@@ -14,7 +14,6 @@
     "@types/react-router-dom": "^5.3.2",
     "lightweight-charts": "^3.7.0",
     "react": "^17.0.2",
-    "react-div-100vh": "^0.7.0",
     "react-dom": "^17.0.2",
     "react-redux": "^7.2.6",
     "react-router-dom": "^5.2.1",
