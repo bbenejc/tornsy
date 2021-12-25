@@ -43,9 +43,7 @@ export function App(): ReactElement {
     };
   }, [store]);
 
-  const top = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sab'));
   const bottom = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sab'));
-
   const appCss = ['App', theme];
   const isSmall = width < SMALL;
   if (isSmall) appCss.push('small');
