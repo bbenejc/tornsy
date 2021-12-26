@@ -1,4 +1,4 @@
-import { memo, ReactElement, useEffect, useRef, useState } from 'react';
+import { memo, ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useStockData } from 'hooks';
 import { IChartApi, ISeriesApi, TimeRange } from 'lightweight-charts';
@@ -57,6 +57,7 @@ function Chart({ height, width }: TProps): ReactElement {
     chartKey.current = curKey;
   }
 
+  // initialize or resize chart
   useEffect(() => {
     if (divRef.current) {
       if (!chart.current) {
@@ -75,27 +76,38 @@ function Chart({ height, width }: TProps): ReactElement {
     }
   }, [width, height]);
 
+  // handle loading additional data
+  const loadMoreTimeout = useRef<NodeJS.Timeout | null>(null)
+  const loadMoreData = useCallback((immediately = false) => {
+    if (!isLoading.current && !loadMoreTimeout.current) {
+      loadMoreTimeout.current = setTimeout(() => {
+        loadMoreTimeout.current = null;
+        if(chart.current) {
+          const range = chart.current.timeScale().getVisibleRange();
+          if(range && loadHistory) loadHistory(range.from as number);
+        }
+      }, immediately ? 0 : 100);
+    }
+  }, [loadHistory])
+
   // subscribe "load more" function
   useEffect(() => {
     if (chart.current) {
-      let timeout: NodeJS.Timeout;
-      const timeRangeHandler = (e: TimeRange | null) => {
-        if (timeout) clearTimeout(timeout);
-        if (!isLoading.current) {
-          timeout = setTimeout(() => {
-            if (e !== null && loadHistory) loadHistory(e.from as number);
-          }, 50);
-        }
-      };
       const timeScale = chart.current.timeScale();
+      const timeRangeHandler = (e: TimeRange | null) => {
+        loadMoreData();
+      };
       timeScale.subscribeVisibleTimeRangeChange(timeRangeHandler);
 
       return () => {
         timeScale.unsubscribeVisibleTimeRangeChange(timeRangeHandler);
-        clearTimeout(timeout);
+        if (loadMoreTimeout.current) {
+          clearTimeout(loadMoreTimeout.current);
+          loadMoreTimeout.current = null;
+        }
       };
     }
-  }, [loadHistory]);
+  }, [loadMoreData]);
 
   // apply general theme
   useEffect(() => {
@@ -114,18 +126,22 @@ function Chart({ height, width }: TProps): ReactElement {
               divRef.current?.childNodes[5].childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[1];
             if (ref) {
               ref.dispatchEvent(new Event('mousedown'));
+              ref.dispatchEvent(new Event('mouseleave'));
               ref.dispatchEvent(new Event('mouseup', { bubbles: true }));
-              setTimeout(() => {}, 10);
             }
           } catch {}
-
-          disableLoadingMode(chart.current, interval);
-          isLoading.current = false;
         }
+
         createMainSeries(chart.current, mainSeries, data, interval, tooltip, theme);
         createVolumeSeries(chart.current, volumeSeries, data, volume, tooltip, theme);
         createIndicatorSeries(chart.current, indicatorSeries, data, interval, indicators, tooltip, theme);
         createAdvancedSeries(chart.current, advancedSeries, data, interval, advanced, tooltip, theme);
+
+        if (isLoading.current) {
+          disableLoadingMode(chart.current, interval);
+          isLoading.current = false; // has to create main series before and volume series after setting this flag
+          loadMoreData(true);
+        }
       } else {
         isLoading.current = true;
         enableLoadingMode(chart.current);
@@ -133,9 +149,9 @@ function Chart({ height, width }: TProps): ReactElement {
     }
     setLastData(tooltip);
     setHover(undefined);
-  }, [theme, data, interval, indicators, advanced, volume]);
+  }, [theme, data, interval, indicators, advanced, volume, loadMoreData]);
 
-  // handle title change
+  // change document title
   useEffect(() => {
     let title = stock.toUpperCase();
     if (currentPrice !== '') title += ' ' + formatNumber(parseFloat(currentPrice));

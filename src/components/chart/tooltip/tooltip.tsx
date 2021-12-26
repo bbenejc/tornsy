@@ -117,15 +117,17 @@ function Tooltip({ data, series, stock, interval, chart }: TProps): ReactElement
 
       document.addEventListener('click', clickAway);
       document.addEventListener('keyup', escKey);
-      if (chart.current) chart.current.subscribeClick(chartClick);
+
+      const curChart = chart.current;
+      if (curChart) curChart.subscribeClick(chartClick);
 
       return () => {
         document.removeEventListener('click', clickAway);
         document.removeEventListener('keyup', escKey);
-        if (chart.current) chart.current.unsubscribeClick(chartClick);
+        if (curChart) curChart.unsubscribeClick(chartClick);
       };
     }
-  }, [indicatorSettings, advancedSettings, closeIndicatorSettings]);
+  }, [indicatorSettings, advancedSettings, closeIndicatorSettings, chart]);
 
   if (stockInfo) {
     const dataIndex =

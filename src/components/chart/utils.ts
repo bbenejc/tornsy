@@ -117,8 +117,8 @@ export function applyTheme(chart: IChartApi, theme: TTheme) {
     timeScale: {
       timeVisible: true,
       secondsVisible: false,
-      rightOffset: 8,
       borderColor: theme.axis,
+
     },
     crosshair: {
       horzLine: { color: theme.crosshair },
@@ -391,11 +391,10 @@ export function enableLoadingMode(chart: IChartApi): void {
 }
 
 export function disableLoadingMode(chart: IChartApi, interval: TInterval): void {
-  const range = chart.timeScale().getVisibleLogicalRange();
-  let bar = 6;
-  if (range) {
-    bar = Math.round(chart.timeScale().width() / (range.to - range.from));
-  }
+  const scale = chart.timeScale();
+  const range = scale.getVisibleLogicalRange();
+  const bar = range ? Math.round(scale.width() / (range.to - range.from)) : 6;
+
   chart.applyOptions({
     watermark: { visible: false },
     timeScale: {
