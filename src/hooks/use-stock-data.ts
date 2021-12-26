@@ -12,6 +12,8 @@ import {
 import { EMPTY_ARRAY } from 'tools';
 import { API_LIMIT } from 'config';
 
+const API_PREFETCH = Math.round(API_LIMIT * 0.65);
+
 export function useStockData(stock: string, interval: TInterval): [TStockData[], null | ((from: number) => void)] {
   const store = useStore();
   const stockData = useSelector(selectStockData(stock, interval));
@@ -46,7 +48,7 @@ export function useStockData(stock: string, interval: TInterval): [TStockData[],
       const isOnline = selectOnline(state);
       const { data = [], complete = false } = selectStockData(stock, interval)(state) || {};
 
-      if (isOnline && !isFetching && !complete && data.length >= API_LIMIT && data[API_LIMIT / 2][0] >= from) {
+      if (isOnline && !isFetching && !complete && data.length >= API_LIMIT && data[API_PREFETCH][0] >= from) {
         store.dispatch(startFetching(stock, interval));
         fetchStock(stock, interval, 0, data[0][0])
           .then((data) => {
