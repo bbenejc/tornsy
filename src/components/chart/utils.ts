@@ -28,7 +28,6 @@ export function initChart(div: HTMLDivElement, width: number, height: number): I
     height,
     leftPriceScale: { scaleMargins: { top: 0.75 } },
     rightPriceScale: { scaleMargins: { bottom: 0.3 } },
-    kineticScroll: { mouse: true },
     watermark: { text: 'Loading', fontSize: 20 },
     crosshair: {
       mode: CrosshairMode.Normal,
@@ -118,7 +117,6 @@ export function applyTheme(chart: IChartApi, theme: TTheme) {
       timeVisible: true,
       secondsVisible: false,
       borderColor: theme.axis,
-
     },
     crosshair: {
       horzLine: { color: theme.crosshair },
@@ -201,7 +199,7 @@ export function createVolumeSeries(
   });
 
   const volumeData: LineData[] = [];
-  const v = data[0].length - (volume === VOLUME[0] ? 2 : 1);
+  const v = data[0].length - (volume === VOLUME[0][0] ? 2 : 1);
   for (let i = 0; i < data.length; i += 1) {
     const row = data[i];
     volumeData.push({
