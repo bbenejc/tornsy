@@ -1,22 +1,28 @@
 import {
-  SET_ONLINE,
   SET_VISIBILITY,
-  SET_LIST,
-  SET_OHLC,
+  SET_ONLINE,
+  SET_CONTEXT,
   SET_STOCK,
   SET_INTERVAL,
-  SET_SORTING,
-  SET_THEME,
+  SET_VOLUME,
+  SET_INDICATOR,
   CREATE_INDICATOR,
   REMOVE_INDICATOR,
-  SET_INDICATOR,
   SET_ADVANCED,
-  REMOVE_ADVANCED,
   CREATE_ADVANCED,
+  REMOVE_ADVANCED,
   UPDATE_ADVANCED,
-  TOGGLE_VOLUME,
+  SET_THEME,
+  SET_LIST,
+  SET_OHLC,
   START_FETCHING,
   STOP_FETCHING,
+  ADD_FAVOURITE,
+  REMOVE_FAVOURITE,
+  SET_LIST_SORTING,
+  SET_LIST_INTERVAL,
+  SET_LIST_DIFF,
+  SET_LIST_SECONDARY,
   TState,
   TAction,
 } from './declarations';
@@ -31,23 +37,36 @@ import {
   setAdvanced,
   getVolume,
   setVolume,
+  getListFavourites,
+  getListDiff,
+  getListSecondary,
+  setListDiff,
+  setListSecondary,
   EMPTY_ARRAY,
+  setListFavourites,
+  getListInterval,
+  setListInterval,
 } from 'tools';
-import { API_LIMIT, INDICATORS_ADVANCED, INDICATORS_MAX, VOLUME } from 'config';
+import { API_LIMIT, INDICATORS_ADVANCED, INDICATORS_MAX, VOLUME, SORTING, DIFF, SECONDARY } from 'config';
 import { getInterval } from 'tools/intervals';
 
 const initialState: TState = {
   visibility: document.visibilityState === 'visible',
   online: window.navigator.onLine,
+  contextMenu: null,
   stock: '',
   interval: 'm1',
-  list: { data: [], lastUpdate: 0 },
-  ohlc: {},
-  sorting: getListOrder() || 'price-desc',
-  theme: getTheme() || 'dark',
+  volume: getVolume() || VOLUME[0][0],
   indicators: getIndicators(),
   advanced: getAdvanced(),
-  volume: getVolume(),
+  theme: getTheme() || 'dark',
+  list: { data: [], lastUpdate: 0 },
+  ohlc: {},
+  listFavourites: getListFavourites(),
+  listSorting: getListOrder() || 'price-desc',
+  listInterval: getListInterval() || 'm1',
+  listDiffType: getListDiff() || DIFF[0][0],
+  listSecondaryMode: getListSecondary() || SECONDARY[0][0],
 };
 
 export const reducer = (state = initialState, action: TAction): TState => {
@@ -57,6 +76,9 @@ export const reducer = (state = initialState, action: TAction): TState => {
 
     case SET_VISIBILITY:
       return { ...state, visibility: action.visibility };
+
+    case SET_CONTEXT:
+      return { ...state, contextMenu: { position: action.position, which: action.which, data: action.data } };
 
     case SET_LIST: {
       const { list, timestamp } = action;
@@ -176,18 +198,6 @@ export const reducer = (state = initialState, action: TAction): TState => {
     case SET_INTERVAL:
       return { ...state, interval: action.interval };
 
-    case SET_SORTING: {
-      const [curField, curDirection] = state.sorting.split('-');
-      const newOrder = [action.order];
-      if (curField === action.order) newOrder.push(curDirection === 'asc' ? 'desc' : 'asc');
-      else newOrder.push(action.order === 'name' ? 'asc' : 'desc');
-
-      const listOrder = newOrder.join('-');
-      setListOrder(listOrder);
-
-      return { ...state, sorting: listOrder };
-    }
-
     case SET_THEME:
       setTheme(action.theme);
       return { ...state, theme: action.theme };
@@ -260,8 +270,8 @@ export const reducer = (state = initialState, action: TAction): TState => {
       } else return state;
     }
 
-    case TOGGLE_VOLUME: {
-      const volume = action.volume ? action.volume : state.volume === VOLUME[1] ? VOLUME[0] : VOLUME[1];
+    case SET_VOLUME: {
+      const volume = action.volume ? action.volume : state.volume === VOLUME[1][0] ? VOLUME[0][0] : VOLUME[1][0];
       setVolume(volume);
       return { ...state, volume };
     }
@@ -300,6 +310,61 @@ export const reducer = (state = initialState, action: TAction): TState => {
           };
 
       return { ...state, ohlc };
+    }
+
+    case ADD_FAVOURITE: {
+      const { favourite } = action;
+      const favourites = getListFavourites();
+
+      if (!favourites.includes(favourite)) {
+        favourites.push(favourite);
+        setListFavourites(favourites);
+      }
+      return { ...state, listFavourites: favourites };
+    }
+
+    case REMOVE_FAVOURITE: {
+      const { favourite } = action;
+      const favourites = getListFavourites();
+      const index = favourites.indexOf(favourite);
+
+      if (index >= 0) {
+        favourites.splice(index, 1);
+        setListFavourites(favourites);
+      }
+      return { ...state, listFavourites: favourites };
+    }
+
+    case SET_LIST_SORTING: {
+      const [curField, curDirection] = state.listSorting.split('-');
+      const newOrder = [action.order];
+      if (curField === action.order) newOrder.push(curDirection === SORTING[0] ? SORTING[1] : SORTING[0]);
+      else newOrder.push(action.order === 'name' ? SORTING[0] : SORTING[1]);
+
+      const listOrder = newOrder.join('-');
+      setListOrder(listOrder);
+
+      return { ...state, listSorting: listOrder };
+    }
+
+    case SET_LIST_INTERVAL: {
+      const { interval } = action;
+      setListInterval(interval);
+      return { ...state, listInterval: interval };
+    }
+
+    case SET_LIST_DIFF: {
+      const { diff } = action;
+
+      setListDiff(diff);
+      return { ...state, listDiffType: diff };
+    }
+
+    case SET_LIST_SECONDARY: {
+      const { secondary } = action;
+
+      setListSecondary(secondary);
+      return { ...state, listSecondaryMode: secondary };
     }
 
     default:
