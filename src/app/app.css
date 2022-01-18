@@ -5,6 +5,7 @@
   --color-font: rgba(0, 0, 0, 0.87);
   --color-font-sec: rgba(0, 0, 0, 0.54);
   --color-border: #f0f3fa;
+  --color-border-highlight: #ffa500;
   --color-highlight: #d7ecff;
   --color-highlight-text: #1e88e5;
   --color-red: #f44336;
@@ -17,6 +18,7 @@
   --color-font: rgba(255, 255, 255, 0.87);
   --color-font-sec: rgba(255, 255, 255, 0.54);
   --color-border: #2a2e38;
+  --color-border-highlight: #ffa500;
   --color-highlight: #212c38;
   --color-highlight-text: #1e88e5;
   --color-red: #ef5350;
@@ -26,7 +28,7 @@
 
 .App {
   display: grid;
-  grid-template-columns: 1fr 345px;
+  grid-template-columns: 1fr 400px;
   grid-gap: 5px;
   overflow: hidden;
   height: 100%;
