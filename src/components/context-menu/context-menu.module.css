@@ -1,0 +1,126 @@
+.Watchlist {
+  display: grid;
+  grid-template-rows: 39px 1fr;
+  grid-gap: 1px;
+  background-color: var(--color-bg);
+  overflow: hidden;
+  max-height: 100%;
+}
+
+.List {
+  height: 100%;
+  overflow: auto;
+  background-color: var(--color-paper);
+  padding-bottom: var(--sab);
+  box-sizing: border-box;
+}
+
+.List a {
+  color: inherit;
+  text-decoration: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  border-bottom: 1px solid var(--color-border);
+}
+.List a,
+.Header {
+  padding-right: 8px;
+}
+
+.List a > div,
+.Header > div {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 64px;
+  height: 100%;
+}
+
+.List a > div:first-child,
+.Header > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex: 1 0 75px;
+  position: sticky;
+  left: 0;
+  background-color: var(--color-paper);
+  padding-left: 8px;
+}
+
+.Header,
+.Group {
+  width: fit-content;
+  min-width: 100%;
+  box-sizing: border-box;
+}
+.Group + .Group {
+  border-top: 3px double var(--color-border-highlight);
+}
+
+.Curtain {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
+  opacity: 1;
+}
+.Curtain::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: var(--color-paper);
+  opacity: 0.5;
+  transition: opacity 0.25s;
+}
+.CurtainInactive {
+  pointer-events: none;
+  opacity: 0;
+  z-index: -1;
+}
+.CurtainInactive::before {
+  opacity: 0;
+}
+.Context {
+  position: fixed;
+  width: 180px;
+  background-color: var(--color-paper);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+  z-index: 11;
+}
+.Context > div {
+  display: flex;
+  padding: 8px;
+  font-size: 12px;
+  align-items: center;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.Context > div:hover {
+  background-color: var(--color-highlight);
+}
+.Context svg {
+  height: 22px;
+  margin-right: 8px;
+  fill: var(--color-font);
+}
+/*
+@media only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 2dppx) {
+  .List a {
+    border-bottom-width: 0.5px;
+  }
+}
+*/
+
+.List a:last-child {
+  border-bottom: 0;
+}
