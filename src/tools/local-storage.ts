@@ -2,7 +2,9 @@ import { INTERVALS } from 'config';
 
 const LIST_ORDER = 'list-order';
 const LIST_INTERVAL = 'list-interval';
+const LIST_DIFF = 'list-diff';
 const LIST_SEC = 'list-secondary';
+const FAVOURITES = 'favourites';
 const THEME = 'theme';
 const STOCK = 'stock';
 const INTERVAL = 'interval';
@@ -26,6 +28,14 @@ export function setListInterval(interval: string): void {
   localStorage.setItem(LIST_INTERVAL, interval);
 }
 
+export function getListDiff(): string | null {
+  return localStorage.getItem(LIST_DIFF);
+}
+
+export function setListDiff(diff: string): void {
+  localStorage.setItem(LIST_DIFF, diff);
+}
+
 export function getListSecondary(): string | null {
   return localStorage.getItem(LIST_SEC);
 }
@@ -33,6 +43,17 @@ export function getListSecondary(): string | null {
 export function setListSecondary(secondary: string): void {
   localStorage.setItem(LIST_SEC, secondary);
 }
+
+export function setListFavourites(favourites: string[]): void {
+  if (favourites.length) localStorage.setItem(FAVOURITES, favourites.join(','));
+  else localStorage.removeItem(FAVOURITES);
+}
+
+export function getListFavourites(): string[] {
+  const favourites = localStorage.getItem(FAVOURITES);
+  return favourites ? favourites.toUpperCase().split(',') : [];
+}
+
 export function getTheme(): string | null {
   return localStorage.getItem(THEME);
 }
@@ -101,8 +122,8 @@ export function setAdvanced(advanced?: TAdvanced): void {
   else localStorage.setItem(ADVANCED, JSON.stringify(advanced));
 }
 
-export function getVolume(): string {
-  return localStorage.getItem(VOLUME) || 'total_shares';
+export function getVolume(): string | null {
+  return localStorage.getItem(VOLUME);
 }
 
 export function setVolume(volume: string): void {
