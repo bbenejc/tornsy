@@ -38,7 +38,7 @@ export function useQueryParams(): string {
   return redirect;
 }
 
-function verifyStock(stocks: TStockInfo[], options: string[]): string {
+function verifyStock(stocks: TStockList[], options: string[]): string {
   let stock = '';
 
   const findStock = (stock: string) => stocks.find((s) => s.stock.toUpperCase() === stock.toUpperCase());
@@ -55,7 +55,7 @@ function verifyStock(stocks: TStockInfo[], options: string[]): string {
 }
 
 function verifyInterval(option: string): TInterval {
-  if (option.toLowerCase() in INTERVALS) return option.toLowerCase() as TInterval;
+  if (INTERVALS.includes(option.toLowerCase() as TInterval)) return option.toLowerCase() as TInterval;
   return 'm1';
 }
 

@@ -68,7 +68,7 @@ export function useStockData(stock: string, interval: TInterval): [TStockData[],
   return [data, data.length ? loadMore : null];
 }
 
-async function fetchStock(stock: string, interval: TInterval, from = 0, to = 0): Promise<TStockData[] | null> {
+async function fetchStock(stock: string, interval: TInterval, from = 0, to = 0): Promise<TAPIStockData[] | null> {
   if (stock === '') return Promise.resolve(null);
   let url = process.env.REACT_APP_API + '/' + stock;
   const params = [];
