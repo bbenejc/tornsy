@@ -1,9 +1,7 @@
 import { INTERVALS } from 'config';
 
 const LIST_ORDER = 'list-order';
-const LIST_INTERVAL = 'list-interval';
-const LIST_DIFF = 'list-diff';
-const LIST_SEC = 'list-secondary';
+const LIST_COLUMNS = 'list-columns';
 const FAVOURITES = 'favourites';
 const THEME = 'theme';
 const STOCK = 'stock';
@@ -20,28 +18,13 @@ export function setListOrder(order: string): void {
   localStorage.setItem(LIST_ORDER, order);
 }
 
-export function getListInterval(): string | null {
-  return localStorage.getItem(LIST_INTERVAL);
+export function getListColumns(): string[] {
+  const columns = localStorage.getItem(LIST_COLUMNS);
+  return columns ? columns.split(',') : ['price|h1', 'price|h24', 'marketcap', 'marketcap|m30|$'];
 }
 
-export function setListInterval(interval: string): void {
-  localStorage.setItem(LIST_INTERVAL, interval);
-}
-
-export function getListDiff(): string | null {
-  return localStorage.getItem(LIST_DIFF);
-}
-
-export function setListDiff(diff: string): void {
-  localStorage.setItem(LIST_DIFF, diff);
-}
-
-export function getListSecondary(): string | null {
-  return localStorage.getItem(LIST_SEC);
-}
-
-export function setListSecondary(secondary: string): void {
-  localStorage.setItem(LIST_SEC, secondary);
+export function setListColumns(columns: string[]): void {
+  localStorage.setItem(LIST_COLUMNS, columns.join(','));
 }
 
 export function setListFavourites(favourites: string[]): void {
