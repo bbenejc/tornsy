@@ -37,9 +37,7 @@ export function calculateRSI(data: TStockData[], interval: TInterval, length = 1
 
   for (let i = isM1; i < initialLength; i += 1) {
     const curData = data[i];
-    const diff = isM1
-      ? parseFloat(curData[1]) - parseFloat(data[i - 1][1])
-      : parseFloat(curData[4] as string) - parseFloat(curData[1]);
+    const diff = isM1 ? curData[1] - data[i - 1][1] : (curData[4] as number) - curData[1];
 
     if (diff > 0) initialGains.push(diff);
     else initialLosses.push(-diff);
@@ -48,12 +46,12 @@ export function calculateRSI(data: TStockData[], interval: TInterval, length = 1
   const RSI: LineData[] = [];
   let AG = sumArray(initialGains) / length;
   let AL = sumArray(initialLosses) / length;
-  let prevPrice = parseFloat(data[initialLength - 1][1]);
+  let prevPrice = data[initialLength - 1][1];
 
   for (let i = initialLength; i < data.length; i += 1) {
     const curData = data[i];
-    const CP = parseFloat(curData[cIndex] as string);
-    const OP = isM1 ? prevPrice : parseFloat(curData[1]);
+    const CP = curData[cIndex] as number;
+    const OP = isM1 ? prevPrice : curData[1];
     const diff = CP - OP;
     const G = diff > 0 ? diff : 0;
     const L = diff < 0 ? -diff : 0;
@@ -81,8 +79,8 @@ export function calculateStochastics(data: TStockData[], interval: TInterval, kL
 
   for (let i = 0; i < data.length; i += 1) {
     const curData = data[i];
-    const l = parseFloat(curData[lIndex] as string);
-    const h = parseFloat(curData[hIndex] as string);
+    const l = curData[lIndex];
+    const h = curData[hIndex];
     lArr.push(l);
     hArr.push(h);
 
@@ -91,7 +89,7 @@ export function calculateStochastics(data: TStockData[], interval: TInterval, kL
       hArr.shift();
     }
     if (lArr.length === kLength) {
-      const CP = parseFloat(curData[cIndex] as string);
+      const CP = curData[cIndex] as number;
       const L = Math.min(...lArr);
       const H = Math.max(...hArr);
 
@@ -164,11 +162,11 @@ export function calculateADX(data: TStockData[], interval: TInterval, smoothing 
 
   for (let i = 1; i < data.length; i += 1) {
     const time = data[i][0];
-    const CH = parseFloat(data[i][hIndex] as string);
-    const PH = parseFloat(data[i - 1][hIndex] as string);
-    const CL = parseFloat(data[i][lIndex] as string);
-    const PL = parseFloat(data[i - 1][lIndex] as string);
-    const PC = parseFloat(data[i - 1][cIndex] as string);
+    const CH = data[i][hIndex];
+    const PH = data[i - 1][hIndex];
+    const CL = data[i][lIndex];
+    const PL = data[i - 1][lIndex];
+    const PC = data[i - 1][cIndex] as number;
 
     const h = CH - PH;
     const l = PL - CL;
@@ -222,7 +220,7 @@ function parseData_(data: TStockData[], interval: TInterval): LineData[] {
   for (let i = 0; i < data.length; i += 1) {
     parsedData.push({
       time: data[i][0],
-      value: parseFloat(data[i][cIndex] as string),
+      value: data[i][cIndex] as number,
     });
   }
 
