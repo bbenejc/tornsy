@@ -1,6 +1,6 @@
-import React, { ReactElement } from 'react';
+import { ReactElement } from 'react';
 import { useSelector } from 'react-redux';
-import { selectOrderedStocksList } from 'app/store';
+import { selectFavourites, selectOrderedStocksList } from 'app/store';
 import { WatchlistMenu } from './menu';
 import { WatchlistHeader } from './header';
 import { WatchlistItem } from './item';
@@ -8,23 +8,45 @@ import css from './watchlist.module.css';
 
 export function Watchlist(): ReactElement {
   return (
-    <div className={css.Watchlist}>
-      <WatchlistMenu />
-      <div className={css.List}>
-        <WatchlistHeader className={css.Header} />
-        <List />
+    <>
+      <div className={css.Watchlist}>
+        <WatchlistMenu />
+        <div className={css.List}>
+          <WatchlistHeader className={css.Header} />
+          <List />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
 function List(): ReactElement {
   const stocks = useSelector(selectOrderedStocksList);
+  const favourites = useSelector(selectFavourites);
+
+  const favStocks: typeof stocks = [];
+  const otherStocks: typeof stocks = [];
+  stocks.forEach((s) => {
+    if (favourites.includes(s.stock)) favStocks.push(s);
+    else otherStocks.push(s);
+  });
+
   return (
     <>
-      {stocks.map((stock) => {
-        return <WatchlistItem stock={stock} key={stock.stock} />;
-      })}
+      {favStocks.length > 0 && (
+        <div className={css.Group}>
+          {favStocks.map((stock) => {
+            return <WatchlistItem stock={stock} key={stock.stock} />;
+          })}
+        </div>
+      )}
+      {otherStocks.length > 0 && (
+        <div className={css.Group}>
+          {otherStocks.map((stock) => {
+            return <WatchlistItem stock={stock} key={stock.stock} />;
+          })}
+        </div>
+      )}
     </>
   );
 }
