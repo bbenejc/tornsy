@@ -351,7 +351,7 @@ function getLineData(data: TStockData[], interval: TInterval): LineData[] {
     const row = data[i];
     lineData.push({
       time: row[0],
-      value: parseFloat(row[cIndex] as string),
+      value: row[cIndex] as number,
     });
   }
 
@@ -369,10 +369,10 @@ function getOhlcData(data: TStockData[], interval: TInterval): BarData[] {
     const row = data[i];
     ohlcData.push({
       time: row[0],
-      open: parseFloat(row[oIndex]),
-      high: parseFloat(row[hIndex] as string),
-      low: parseFloat(row[lIndex] as string),
-      close: parseFloat(row[cIndex] as string),
+      open: row[oIndex],
+      high: row[hIndex],
+      low: row[lIndex],
+      close: row[cIndex] as number,
     });
   }
 
@@ -389,15 +389,11 @@ export function enableLoadingMode(chart: IChartApi): void {
 }
 
 export function disableLoadingMode(chart: IChartApi, interval: TInterval): void {
-  const scale = chart.timeScale();
-  const range = scale.getVisibleLogicalRange();
-  const bar = range ? Math.round(scale.width() / (range.to - range.from)) : 6;
-
   chart.applyOptions({
     watermark: { visible: false },
     timeScale: {
       timeVisible: !['d1', 'w1', 'n1'].includes(interval),
-      rightOffset: 10 / bar,
+      rightOffset: chart.timeScale().width() > 480 ? 4 : 1,
     },
     handleScroll: true,
     handleScale: true,

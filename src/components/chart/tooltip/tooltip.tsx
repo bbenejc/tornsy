@@ -29,9 +29,10 @@ import {
 import { Placeholder } from 'components';
 import { getTheme } from 'themes';
 import { getStockLogoUrl, findDataIndex, formatNumber } from 'tools';
-import { INTERVALS, INDICATORS_ADVANCED, INDICATORS_MAX, VOLUME } from 'config';
+import { INDICATORS_ADVANCED, INDICATORS_MAX, VOLUME } from 'config';
 import css from './tooltip.module.css';
 import type { IChartApi } from 'lightweight-charts';
+import { getIntervalName } from 'tools/intervals';
 
 // TODO: add backgrounds
 // TODO: mobile visibility on "edit" and "remove" buttons... can click even when hidden
@@ -150,15 +151,15 @@ function Tooltip({ data, series, stock, interval, chart }: TProps): ReactElement
           </div>
         );
         if (dataIndex > 0) {
-          const cur = parseFloat(data[dataIndex][1]);
-          prev = parseFloat(data[dataIndex - 1][1]);
+          const cur = data[dataIndex][1];
+          prev = data[dataIndex - 1][1];
           diff = cur - prev;
 
           if (diff >= 0) infoCss.push(css.Green);
           else infoCss.push(css.Red);
         } else infoCss.push(css.Red);
       } else {
-        prev = dataIndex > 0 ? parseFloat(data[dataIndex - 1][4] || '') : series[0].open;
+        prev = dataIndex > 0 ? (data[dataIndex - 1][4] as number) : series[0].open;
         diff = series[0].close - prev;
         infoCss.push(diff >= 0 ? css.Green : css.Red);
 
@@ -316,11 +317,12 @@ function Tooltip({ data, series, stock, interval, chart }: TProps): ReactElement
       dataIndex < 0
         ? stockInfo.marketcap
           ? stockInfo.marketcap
-          : stockInfo.total_shares * parseFloat(stockInfo.price)
+          : stockInfo.total_shares * stockInfo.price
         : data[dataIndex][data[dataIndex].length - 1],
     ];
-    const volumeMarketcap = volume === VOLUME[1];
-    if (volumeMarketcap) volumeValues.reverse();
+    const curVolume = volume === VOLUME[0][0] ? VOLUME[0] : VOLUME[1];
+    const otherVolume = volume === VOLUME[0][0] ? VOLUME[1] : VOLUME[0];
+    if (curVolume === VOLUME[1]) volumeValues.reverse();
 
     return (
       <>
@@ -329,7 +331,7 @@ function Tooltip({ data, series, stock, interval, chart }: TProps): ReactElement
             <img src={getStockLogoUrl(stock, theme.dark)} alt={stock} />
             <div>
               {stockInfo.name}
-              <span className={css.Interval}>{INTERVALS[interval]}</span>
+              <span className={css.Interval}>{getIntervalName(interval)}</span>
             </div>
           </div>
 
@@ -340,9 +342,9 @@ function Tooltip({ data, series, stock, interval, chart }: TProps): ReactElement
             className={css.Name}
             style={{ color: 'rgb(' + theme.volume + ')' }}
             onClick={toggleVolume}
-            title={volumeMarketcap ? '# Shares' : 'Marketcap'}
+            title={otherVolume[1]}
           >
-            {volumeMarketcap ? 'M. Cap' : '# Shares'}
+            {curVolume[1]}
           </div>
           <div className={css.Value}>
             {formatNumber(volumeValues[0], true)}{' '}
