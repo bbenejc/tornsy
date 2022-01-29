@@ -20,9 +20,7 @@ import {
   ADD_FAVOURITE,
   REMOVE_FAVOURITE,
   SET_LIST_SORTING,
-  SET_LIST_INTERVAL,
-  SET_LIST_DIFF,
-  SET_LIST_SECONDARY,
+  SET_LIST_COLUMNS,
   TState,
   TAction,
 } from './declarations';
@@ -38,17 +36,14 @@ import {
   getVolume,
   setVolume,
   getListFavourites,
-  getListDiff,
-  getListSecondary,
-  setListDiff,
-  setListSecondary,
-  EMPTY_ARRAY,
   setListFavourites,
-  getListInterval,
-  setListInterval,
+  getListColumns,
+  setListColumns,
+  EMPTY_ARRAY,
+  parseFloatsData,
 } from 'tools';
-import { API_LIMIT, INDICATORS_ADVANCED, INDICATORS_MAX, VOLUME, SORTING, DIFF, SECONDARY } from 'config';
-import { getInterval } from 'tools/intervals';
+import { API_LIMIT, INDICATORS_ADVANCED, INDICATORS_MAX, VOLUME, SORTING } from 'config';
+import { calculateInterval } from 'tools/intervals';
 
 const initialState: TState = {
   visibility: document.visibilityState === 'visible',
@@ -63,10 +58,8 @@ const initialState: TState = {
   list: { data: [], lastUpdate: 0 },
   ohlc: {},
   listFavourites: getListFavourites(),
-  listSorting: getListOrder() || 'price-desc',
-  listInterval: getListInterval() || 'm1',
-  listDiffType: getListDiff() || DIFF[0][0],
-  listSecondaryMode: getListSecondary() || SECONDARY[0][0],
+  listSorting: getListOrder() || 'marketcap-desc',
+  listColumns: getListColumns(),
 };
 
 export const reducer = (state = initialState, action: TAction): TState => {
@@ -116,31 +109,26 @@ export const reducer = (state = initialState, action: TAction): TState => {
               const info = list.find((e) => e.stock.toUpperCase() === stock.toUpperCase());
               if (info) {
                 if (interval === 'm1' && timestamp > data.data[num - 1][0]) {
-                  const mcap = info.marketcap || parseFloat(info.price) * info.total_shares;
-                  data.data = [...data.data, [timestamp, info.price, info.total_shares, mcap]];
+                  data.data = [...data.data, [timestamp, info.price, info.total_shares, info.marketcap]];
                 } else if (interval !== 'm1') {
-                  const i = getInterval(timestamp, interval as TInterval);
-                  const mcap = info.marketcap || parseFloat(info.price) * info.total_shares;
+                  const i = calculateInterval(timestamp, interval as TInterval);
 
                   if (i === data.data[num - 1][0]) {
                     const [, o, h, l] = data.data[num - 1];
-                    const hNum = parseFloat(h as string);
-                    const lNum = parseFloat(l as string);
-                    const priceNum = parseFloat(info.price);
 
                     data.data[num - 1] = [
                       i,
                       o,
-                      hNum > priceNum ? h : info.price,
-                      lNum < priceNum ? l : info.price,
+                      h > info.price ? h : info.price,
+                      l < info.price ? l : info.price,
                       info.price,
                       info.total_shares,
-                      mcap,
+                      info.marketcap,
                     ] as TStockData;
                   } else if (i > data.data[num - 1][0]) {
                     data.data = [
                       ...data.data,
-                      [i, info.price, info.price, info.price, info.price, info.total_shares, mcap],
+                      [i, info.price, info.price, info.price, info.price, info.total_shares, info.marketcap],
                     ];
                   }
                 }
@@ -155,9 +143,10 @@ export const reducer = (state = initialState, action: TAction): TState => {
     }
 
     case SET_OHLC: {
-      const { stock, interval, data: newData } = action;
+      const { stock, interval, data } = action;
       const now = Date.now();
       const ohlc = { ...state.ohlc };
+      const newData = parseFloatsData(data);
 
       if (newData.length > 0 && ohlc[stock] && ohlc[stock][interval] && ohlc[stock][interval].loading) {
         const curData = ohlc[stock][interval].data;
@@ -170,13 +159,6 @@ export const reducer = (state = initialState, action: TAction): TState => {
             lastView: now,
           },
         };
-
-        const num = newData[0].length;
-        if (num === 3 || num === 6) {
-          for (let i = 0; i < newData.length; i += 1) {
-            newData[i].push(parseFloat(newData[i][num - 2]) * newData[i][num - 1]);
-          }
-        }
 
         if (curData.length === 0 || newData[0][0] < curData[0][0]) {
           ohlc[stock][interval].data = [...newData, ...curData];
@@ -347,24 +329,10 @@ export const reducer = (state = initialState, action: TAction): TState => {
       return { ...state, listSorting: listOrder };
     }
 
-    case SET_LIST_INTERVAL: {
-      const { interval } = action;
-      setListInterval(interval);
-      return { ...state, listInterval: interval };
-    }
-
-    case SET_LIST_DIFF: {
-      const { diff } = action;
-
-      setListDiff(diff);
-      return { ...state, listDiffType: diff };
-    }
-
-    case SET_LIST_SECONDARY: {
-      const { secondary } = action;
-
-      setListSecondary(secondary);
-      return { ...state, listSecondaryMode: secondary };
+    case SET_LIST_COLUMNS: {
+      const { columns } = action;
+      setListColumns(columns);
+      return { ...state, listColumns: columns };
     }
 
     default:

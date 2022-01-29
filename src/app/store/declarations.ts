@@ -19,9 +19,7 @@ export const STOP_FETCHING = 'STOP_FETCHING';
 export const ADD_FAVOURITE = 'ADD_FAVOURITES';
 export const REMOVE_FAVOURITE = 'REMOVE_FAVOURITES';
 export const SET_LIST_SORTING = 'SET_LIST_SORTING';
-export const SET_LIST_INTERVAL = 'SET_LIST_INTERVAL';
-export const SET_LIST_DIFF = 'SET_LIST_DIFF';
-export const SET_LIST_SECONDARY = 'SET_LIST_SECONDARY';
+export const SET_LIST_COLUMNS = 'SET_LIST_COLUMNS';
 
 export type TState = {
   visibility: boolean; // tab visibility
@@ -34,7 +32,7 @@ export type TState = {
   advanced?: TAdvanced; // advanced indicator
   theme: string; // light vs dark theme
   list: {
-    data: TStockInfo[];
+    data: TStockList[];
     lastUpdate: number;
   };
   ohlc: {
@@ -51,9 +49,7 @@ export type TState = {
   // watchlist params
   listFavourites: string[]; // list of favourite stocks (always on top)
   listSorting: string; // how to sort the watchlist
-  listInterval: string; // current interval for watchlist
-  listDiffType: string; // % or $ (show growths in percent vs nominal)
-  listSecondaryMode: string; // shares or marketcap
+  listColumns: string[]; // which columns to show
 };
 
 export type TAction =
@@ -71,12 +67,12 @@ export type TAction =
   | { type: typeof REMOVE_ADVANCED }
   | { type: typeof UPDATE_ADVANCED; key: string; value: number }
   | { type: typeof SET_THEME; theme: TState['theme'] }
-  | { type: typeof SET_LIST; list: TStockInfo[]; timestamp: number }
+  | { type: typeof SET_LIST; list: TStockList[]; timestamp: number }
   | {
       type: typeof SET_OHLC;
       stock: string;
       interval: TInterval;
-      data: TStockData[];
+      data: TAPIStockData[];
     }
   | {
       type: typeof START_FETCHING | typeof STOP_FETCHING;
@@ -86,6 +82,4 @@ export type TAction =
   | { type: typeof ADD_FAVOURITE; favourite: string }
   | { type: typeof REMOVE_FAVOURITE; favourite: string }
   | { type: typeof SET_LIST_SORTING; order: string }
-  | { type: typeof SET_LIST_INTERVAL; interval: string }
-  | { type: typeof SET_LIST_DIFF; diff: string }
-  | { type: typeof SET_LIST_SECONDARY; secondary: string };
+  | { type: typeof SET_LIST_COLUMNS; columns: string[] };

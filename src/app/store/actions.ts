@@ -20,9 +20,7 @@ import {
   ADD_FAVOURITE,
   REMOVE_FAVOURITE,
   SET_LIST_SORTING,
-  SET_LIST_INTERVAL,
-  SET_LIST_DIFF,
-  SET_LIST_SECONDARY,
+  SET_LIST_COLUMNS,
   TState,
   TAction,
 } from './declarations';
@@ -83,11 +81,11 @@ export function setTheme(theme: TState['theme']): TAction {
   return { type: SET_THEME, theme };
 }
 
-export function setStocksList(list: TStockInfo[], timestamp: number): TAction {
+export function setStocksList(list: TStockList[], timestamp: number): TAction {
   return { type: SET_LIST, list, timestamp };
 }
 
-export function setStockData(stock: string, interval: TInterval, data: TStockData[]): TAction {
+export function setStockData(stock: string, interval: TInterval, data: TAPIStockData[]): TAction {
   return { type: SET_OHLC, stock, interval, data };
 }
 
@@ -111,14 +109,6 @@ export function setListSorting(order: string): TAction {
   return { type: SET_LIST_SORTING, order };
 }
 
-export function setListInterval(interval: string): TAction {
-  return { type: SET_LIST_INTERVAL, interval };
-}
-
-export function setListDiff(diff: string): TAction {
-  return { type: SET_LIST_DIFF, diff };
-}
-
-export function setListSecondary(secondary: string): TAction {
-  return { type: SET_LIST_SECONDARY, secondary };
+export function setListColumns(columns: string[]): TAction {
+  return { type: SET_LIST_COLUMNS, columns };
 }

@@ -17,14 +17,14 @@ type TTheme = {
 
 type TInterval = 'm1' | 'm5' | 'm15' | 'm30' | 'h1' | 'h2' | 'h4' | 'h6' | 'h12' | 'd1' | 'w1' | 'n1' | 'y1';
 
-type TStockList = {
+type TAPIStockList = {
   stock: string;
   index?: boolean;
   name: string;
   price: string;
   total_shares: number;
   marketcap?: number;
-  intervals?: {
+  interval?: {
     [interval: string]: {
       price: string;
       total_shares: number;
@@ -33,19 +33,22 @@ type TStockList = {
   };
 };
 
-type TStockInfo = {
+type TStockList = {
   stock: string;
   name: string;
-  price: string;
-  price_diff: number;
-  price_growth: number;
-  marketcap: number;
-  marketcap_diff: number;
-  marketcap_growth: number;
+  price: number;
   total_shares: number;
+  marketcap: number;
+  interval: {
+    [interval: string]: {
+      price: number;
+      total_shares: number;
+      marketcap: number;
+    };
+  };
 };
 
-type TStockData =
+type TAPIStockData =
   | [timestamp: UTCTimestamp, price: string, total_shares: number, marketcap?: number]
   | [
       timestamp: UTCTimestamp,
@@ -55,6 +58,18 @@ type TStockData =
       close: string,
       total_shares: number,
       marketcap?: number
+    ];
+
+type TStockData =
+  | [timestamp: UTCTimestamp, price: number, total_shares: number, marketcap: number]
+  | [
+      timestamp: UTCTimestamp,
+      open: number,
+      high: number,
+      low: number,
+      close: number,
+      total_shares: number,
+      marketcap: number
     ];
 
 type TIndicator = {

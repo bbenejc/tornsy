@@ -1,5 +1,6 @@
 import { SORTING } from 'config';
 import { createSelector } from 'reselect';
+import { getColumnValue, parseColumn } from 'tools';
 import { TStore } from '.';
 
 // basic selectors
@@ -12,15 +13,23 @@ export const selectVolume = (state: TStore): string => state.volume;
 export const selectIndicators = (state: TStore): TIndicator[] => state.indicators;
 export const selectAdvanced = (state: TStore): TAdvanced | undefined => state.advanced;
 export const selectTheme = (state: TStore): string => state.theme;
-export const selectStocksList = (state: TStore): TStockInfo[] => state.list.data;
+export const selectStocksList = (state: TStore): TStockList[] => state.list.data;
 export const selectStocksUpdated = (state: TStore): number => state.list.lastUpdate;
 export const selectFavourites = (state: TStore): string[] => state.listFavourites;
 export const selectListOrder = (state: TStore): string => state.listSorting;
-export const selectListInterval = (state: TStore): string => state.listInterval;
-export const selectListDiff = (state: TStore): string => state.listDiffType;
-export const selectListSecondary = (state: TStore): string => state.listSecondaryMode;
+export const selectListColumns = (state: TStore): string[] => state.listColumns;
 
 // advanced selectors
+export const selectListIntervals = createSelector(selectListColumns, (columns) => {
+  const setIntervals = new Set<string>();
+  columns.forEach((column) => {
+    const { interval } = parseColumn(column);
+    if (interval !== '') setIntervals.add(interval);
+  });
+
+  return Array.from(setIntervals);
+});
+
 export const selectIsActiveStock =
   (stock: string) =>
   (state: TStore): boolean =>
@@ -34,7 +43,7 @@ export const selectIsFavouriteStock =
 
 export const selectStockInfo =
   (stock: string) =>
-  (state: TStore): TStockInfo | undefined => {
+  (state: TStore): TStockList | undefined => {
     return state.list.data.find((s) => s.stock.toUpperCase() === stock.toUpperCase());
   };
 
@@ -58,19 +67,15 @@ export const selectStockPrice = createSelector(selectStock, selectStocksList, (s
 });
 
 export const selectOrderedStocksList = createSelector(selectStocksList, selectListOrder, (stocks, order) => {
-  let [sort, direction] = order.split('-');
-  if (stocks.length && sort !== 'name' && !Object.keys(stocks[0]).includes(sort)) sort = 'name';
+  const [sort, direction] = order.split('-');
 
-  return [...stocks].sort((a: TStockInfo, b: TStockInfo): number => {
+  return [...stocks].sort((a: TStockList, b: TStockList): number => {
     if (sort === 'name')
       return direction === SORTING[0] ? a.stock.localeCompare(b.stock) : b.stock.localeCompare(a.stock);
-    else if (sort === 'price') {
-      const lft = direction === SORTING[0] ? a : b;
-      const rgt = direction === SORTING[0] ? b : a;
-      return parseFloat(lft.price) - parseFloat(rgt.price);
-    } else {
-      // @ts-ignore
-      return direction === SORTING[0] ? a[sort] - b[sort] : b[sort] - a[sort];
+    else {
+      const aValue = getColumnValue(a, sort)[0];
+      const bValue = getColumnValue(b, sort)[0];
+      return direction === SORTING[0] ? aValue - bValue : bValue - aValue;
     }
   });
 });
