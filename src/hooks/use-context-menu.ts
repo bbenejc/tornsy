@@ -14,7 +14,10 @@ export function useContextMenu(ref: MutableRefObject<HTMLElement | null>, type: 
         dispatch(openContextMenu(position, type, data));
       };
       const clearTimer = () => {
-        if (touchTimer) clearTimeout(touchTimer);
+        if (touchTimer) {
+          clearTimeout(touchTimer);
+          touchTimer = null;
+        }
       };
       const onContext = (e: MouseEvent) => {
         e.preventDefault();
@@ -23,12 +26,13 @@ export function useContextMenu(ref: MutableRefObject<HTMLElement | null>, type: 
       const touchStart = (e: TouchEvent) => {
         if (e.touches.length === 1) {
           touchTimer = setTimeout(() => {
+            clearTimer();
             openContext([e.touches[0].clientX, e.touches[0].clientY]);
           }, 300);
         } else clearTimer();
       };
       const touchEnd = (e: TouchEvent) => {
-        if (e.type !== 'touchmove' && e.cancelable) e.preventDefault();
+        if (e.type !== 'touchmove' && e.cancelable && !touchTimer) e.preventDefault();
         clearTimer();
       };
 
