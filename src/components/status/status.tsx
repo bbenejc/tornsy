@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useRef, useState } from 'react';
+import { ReactElement, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { selectOnline } from 'app/store';
 import css from './status.module.css';
