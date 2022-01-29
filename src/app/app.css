@@ -28,12 +28,16 @@
 
 .App {
   display: grid;
-  grid-template-columns: 1fr 400px;
+  grid-template-columns: 1fr 410px;
   grid-gap: 5px;
   overflow: hidden;
   height: 100%;
+  width: 100vw;
   background-color: var(--color-bg);
   color: var(--color-font);
+}
+.App.Small {
+  grid-template-columns: 1fr;
 }
 
 .Main {
