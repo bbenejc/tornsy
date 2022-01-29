@@ -1,65 +1,3 @@
-.Watchlist {
-  display: grid;
-  grid-template-rows: 39px 1fr;
-  grid-gap: 1px;
-  background-color: var(--color-bg);
-  overflow: hidden;
-  max-height: 100%;
-}
-
-.List {
-  height: 100%;
-  overflow: auto;
-  background-color: var(--color-paper);
-  padding-bottom: var(--sab);
-  box-sizing: border-box;
-}
-
-.List a {
-  color: inherit;
-  text-decoration: none;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  border-bottom: 1px solid var(--color-border);
-}
-.List a,
-.Header {
-  padding-right: 8px;
-}
-
-.List a > div,
-.Header > div {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  width: 64px;
-  height: 100%;
-}
-
-.List a > div:first-child,
-.Header > div:first-child {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  flex: 1 0 75px;
-  position: sticky;
-  left: 0;
-  background-color: var(--color-paper);
-  padding-left: 8px;
-}
-
-.Header,
-.Group {
-  width: fit-content;
-  min-width: 100%;
-  box-sizing: border-box;
-}
-.Group + .Group {
-  border-top: 3px double var(--color-border-highlight);
-}
-
 .Curtain {
   position: fixed;
   top: 0;
@@ -112,15 +50,4 @@
   height: 22px;
   margin-right: 8px;
   fill: var(--color-font);
-}
-/*
-@media only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 2dppx) {
-  .List a {
-    border-bottom-width: 0.5px;
-  }
-}
-*/
-
-.List a:last-child {
-  border-bottom: 0;
 }

@@ -5,7 +5,7 @@ import { Redirect } from 'react-router-dom';
 import { useStocks, useQueryParams } from 'hooks';
 import { selectTheme, setOnline, setVisibility } from 'app/store';
 import { SMALL } from 'config';
-import { Chart, Menu, Watchlist, Status } from 'components';
+import { Chart, Menu, Watchlist, Status, ContextMenu } from 'components';
 import './app.css';
 
 export function App(): ReactElement {
@@ -46,7 +46,7 @@ export function App(): ReactElement {
   const bottom = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sab'));
   const appCss = ['App', theme];
   const isSmall = width < SMALL;
-  if (isSmall) appCss.push('small');
+  if (isSmall) appCss.push('Small');
 
   return (
     <>
@@ -54,9 +54,10 @@ export function App(): ReactElement {
       <div className={appCss.join(' ')} style={{ height }}>
         <div className="Main">
           <Menu width={width} height={height} />
-          {height > 0 && <Chart height={height - 40 - bottom / 2} width={isSmall ? width : width - 350} />}
+          {height > 0 && <Chart height={height - 40 - bottom / 2} width={isSmall ? width : width - 415} />}
         </div>
         {height > 0 && !isSmall && <Watchlist />}
+        <ContextMenu />
         <Status />
       </div>
     </>
