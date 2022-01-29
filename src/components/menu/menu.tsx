@@ -4,6 +4,7 @@ import { selectInterval, selectStock, selectTheme, setTheme } from 'app/store';
 import { Link } from 'react-router-dom';
 import { Watchlist } from 'components';
 import { INTERVALS, SMALL, XSMALL } from 'config';
+import { getIntervalName } from 'tools/intervals';
 import css from './menu.module.css';
 
 function Menu({ width, height }: TProps): ReactElement {
@@ -40,14 +41,15 @@ function Menu({ width, height }: TProps): ReactElement {
   }, [list, isSmall]);
 
   const intervals: ReactElement[] = [];
-  for (const i in INTERVALS) {
+  for (let i = 0; i < INTERVALS.length; i += 1) {
+    const curI = INTERVALS[i];
     intervals.push(
       <Link
-        className={i === interval ? css.Active : ''}
+        className={curI === interval ? css.Active : ''}
         key={i}
-        to={'/' + stock.toLowerCase() + (i !== 'm1' ? '/' + i : '')}
+        to={'/' + stock.toLowerCase() + (curI !== 'm1' ? '/' + curI : '')}
       >
-        {INTERVALS[i as TInterval]}
+        {getIntervalName(curI)}
       </Link>
     );
   }

@@ -1,35 +1,51 @@
-import React, { ReactElement } from 'react';
+import { ReactElement, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { selectInterval, selectIsActiveStock, selectTheme } from 'app/store';
-import { formatNumber, getStockLogoUrl } from 'tools';
+import { useContextMenu } from 'hooks';
+import { selectInterval, selectIsActiveStock, selectListColumns, selectTheme } from 'app/store';
+import { getColumnValue, formatNumber, getStockLogoUrl } from 'tools';
 import css from './item.module.css';
 
 export function WatchlistItem(props: TProps): ReactElement {
-  const { stock, price, price_diff, price_growth, marketcap, total_shares } = props.stock;
-  const interval = useSelector(selectInterval);
+  const { stock, price } = props.stock;
+  const chartInterval = useSelector(selectInterval);
+  const cols = useSelector(selectListColumns);
   const isDarkTheme = useSelector(selectTheme) === 'dark';
   const isActiveStock = useSelector(selectIsActiveStock(stock.toLowerCase()));
+  const itemRef = useRef<HTMLAnchorElement>(null);
+  useContextMenu(itemRef, 'favourites', stock);
 
   const classNames = [css.Item];
   if (isActiveStock) classNames.push(css.Active);
 
-  const priceCss = price_diff > 0 ? css.Green : price_diff < 0 ? css.Red : css.Grey;
-  // <div className={priceCss}>{Math.abs(price_diff).toFixed(2)}</div>
   return (
-    <Link className={classNames.join(' ')} to={'/' + stock.toLowerCase() + (interval !== 'm1' ? '/' + interval : '')}>
+    <Link
+      ref={itemRef}
+      className={classNames.join(' ')}
+      to={'/' + stock.toLowerCase() + (chartInterval !== 'm1' ? '/' + chartInterval : '')}
+    >
       <div>
         <img src={getStockLogoUrl(stock, isDarkTheme)} alt={stock} />
         {stock}
       </div>
-      <div>{formatNumber(parseFloat(price))}</div>
-      <div className={[priceCss, css.Growth].join(' ')}>{Math.abs(price_growth).toFixed(2)}%</div>
-      <div>{formatNumber(marketcap, true)}</div>
-      <div className={[priceCss, css.Growth].join(' ')}>{Math.abs(price_growth).toFixed(2)}%</div>
+      <div>{formatNumber(price)}</div>
+      {cols.map((col) => {
+        const [value, growth] = getColumnValue(props.stock, col);
+
+        if (growth !== '') {
+          return (
+            <div className={value === 0 ? css.Grey : value > 0 ? css.Green : css.Red} key={col}>
+              {growth !== '' && value > 0 ? '+' : value < 0 ? '-' : ''}
+              {formatNumber(Math.abs(value), true)}
+              {growth === '%' ? '%' : ''}
+            </div>
+          );
+        } else return <div key={col}>{formatNumber(value, true)}</div>;
+      })}
     </Link>
   );
 }
 
 type TProps = {
-  stock: TStockInfo;
+  stock: TStockList;
 };

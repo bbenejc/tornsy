@@ -6,19 +6,20 @@
   background-color: var(--color-paper);
   border-bottom: 1px solid var(--color-bg);
   font-size: 11px;
-  padding: 0 8px 0 4px;
   top: 0;
+  height: 32px;
+  z-index: 1;
+}
+
+.Header > div:nth-child(n + 2) span {
+  padding: 6px 0 6px 8px;
 }
 
 .Header span {
-  padding: 10px 0;
   cursor: pointer;
 }
 
-.Header div:first-child span {
-  padding-left: 4px;
-}
-
-.Header span:hover {
+.Header span:hover,
+.Sorted {
   text-decoration: underline;
 }

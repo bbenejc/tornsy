@@ -1,27 +1,33 @@
+.Item {
+  font-size: 14px;
+  height: 38px;
+  outline: none;
+}
+
+.Item:hover,
+.Item:hover > div,
+.Item:focus,
+.Item:focus > div,
+.Active,
+.Active > div {
+  background-color: var(--color-highlight) !important;
+}
+
 .Item img {
-  width: 20px;
-  height: 20px;
+  width: 21px;
+  height: 21px;
   margin-right: 8px;
 }
 
-.Item:hover {
-  background-color: var(--color-highlight);
-}
-
-.Active {
-  background-color: var(--color-highlight);
-}
-
-.Growth {
-  font-size: 12px;
-}
-
 .Red {
+  font-size: 12px;
   color: var(--color-red);
 }
 .Green {
+  font-size: 12px;
   color: var(--color-green);
 }
 .Grey {
+  font-size: 12px;
   color: var(--color-grey);
 }
