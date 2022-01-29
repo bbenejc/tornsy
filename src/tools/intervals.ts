@@ -1,10 +1,12 @@
+import { INTERVAL_NAMES } from 'config';
+
 const SECONDS: { [key: string]: number } = {
   m: 60,
   h: 3600,
   d: 86400,
 };
 
-export function getInterval(time: number, interval: TInterval, offset = 0): number {
+export function calculateInterval(time: number, interval: TInterval, offset = 0): number {
   const type = interval[0];
 
   // only for seconds, minutes, hours and days
@@ -27,7 +29,20 @@ export function getInterval(time: number, interval: TInterval, offset = 0): numb
     if (offset !== 0) d.setUTCMonth(d.getUTCMonth() + offset);
 
     return Math.floor(d.getTime() / 1000);
+  } else if (type === 'y') {
+    const d = new Date(time * 1000);
+    d.setUTCHours(0, 0, 0, 0);
+    d.setUTCFullYear(d.getUTCFullYear() + offset, 0, 1);
+
+    return Math.floor(d.getTime() / 1000);
   }
 
   return time + offset;
+}
+
+export function getIntervalName(interval: string): string {
+  const type = interval[0] as keyof typeof INTERVAL_NAMES;
+  const length = interval.substr(1);
+
+  return length + (INTERVAL_NAMES[type] ? INTERVAL_NAMES[type] : type);
 }
