@@ -70,7 +70,7 @@ export type TAction =
   | { type: typeof REMOVE_ADVANCED }
   | { type: typeof UPDATE_ADVANCED; key: string; value: number }
   | { type: typeof SET_THEME; theme: TState['theme'] }
-  | { type: typeof SET_LIST; list: TStockList[]; timestamp: number }
+  | { type: typeof SET_LIST; list: TStockList[]; intervals: { [interval: string]: number }; timestamp: number }
   | {
       type: typeof SET_OHLC;
       stock: string;

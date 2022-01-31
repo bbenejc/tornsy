@@ -74,8 +74,23 @@ export const reducer = (state = initialState, action: TAction): TState => {
       return { ...state, contextMenu: { position: action.position, which: action.which, data: action.data } };
 
     case SET_LIST: {
-      const { list, timestamp } = action;
+      const { list, intervals, timestamp } = action;
+      const allIntervals: { [interval: string]: number } = {};
       const ohlc = { ...state.ohlc };
+
+      // set expiry timestamps for new intervals
+      for (const interval in intervals) {
+        allIntervals[interval] = calculateInterval(timestamp, interval[0] + '1', 1);
+      }
+
+      // check for expired intervals and remove them
+      const keepIntervals: string[] = [];
+      for (const interval in state.list.intervals) {
+        if (!(interval in intervals) && state.list.intervals[interval] > timestamp) {
+          allIntervals[interval] = state.list.intervals[interval];
+          keepIntervals.push(interval);
+        }
+      }
 
       // update list
       const now = Date.now();
@@ -111,7 +126,7 @@ export const reducer = (state = initialState, action: TAction): TState => {
                 if (interval === 'm1' && timestamp > data.data[num - 1][0]) {
                   data.data = [...data.data, [timestamp, info.price, info.total_shares, info.marketcap]];
                 } else if (interval !== 'm1') {
-                  const i = calculateInterval(timestamp, interval as TInterval);
+                  const i = calculateInterval(timestamp, interval);
 
                   if (i === data.data[num - 1][0]) {
                     const [, o, h, l] = data.data[num - 1];
@@ -139,7 +154,19 @@ export const reducer = (state = initialState, action: TAction): TState => {
         }
       }
 
-      return { ...state, list: { data: list, lastUpdate: now, intervals: {} }, ohlc };
+      // keep previous non-expired intervals
+      if (keepIntervals.length) {
+        for (let i = 0; i < list.length; i += 1) {
+          const old = state.list.data.find((s) => s.stock === list[i].stock);
+          if (old) {
+            keepIntervals.forEach((interval) => {
+              if (old.interval[interval]) list[i].interval[interval] = old.interval[interval];
+            });
+          }
+        }
+      }
+
+      return { ...state, list: { data: list, lastUpdate: now, intervals: allIntervals }, ohlc };
     }
 
     case SET_OHLC: {

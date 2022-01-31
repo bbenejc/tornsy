@@ -14,6 +14,7 @@ export const selectIndicators = (state: TStore): TIndicator[] => state.indicator
 export const selectAdvanced = (state: TStore): TAdvanced | undefined => state.advanced;
 export const selectTheme = (state: TStore): string => state.theme;
 export const selectStocksList = (state: TStore): TStockList[] => state.list.data;
+export const selectStocksIntervals = (state: TStore): { [interval: string]: number } => state.list.intervals;
 export const selectStocksUpdated = (state: TStore): number => state.list.lastUpdate;
 export const selectFavourites = (state: TStore): string[] => state.listFavourites;
 export const selectListOrder = (state: TStore): string => state.listSorting;

@@ -1,8 +1,16 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useSelector, useStore } from 'react-redux';
 import { UPDATE_SECOND } from 'config';
-import { selectListIntervals, selectOnline, selectStocksUpdated, selectVisibility, setStocksList } from 'app/store';
+import {
+  selectListIntervals,
+  selectStocksIntervals,
+  selectOnline,
+  selectStocksUpdated,
+  selectVisibility,
+  setStocksList,
+} from 'app/store';
 import { parseFloatsListIntervals } from 'tools';
+import { Store } from 'redux';
 
 const worker = new Worker('/worker.js');
 
@@ -11,7 +19,6 @@ export function useStocks(): void {
   const visibility = useSelector(selectVisibility);
   const online = useSelector(selectOnline);
   const intervals = useSelector(selectListIntervals);
-  const prevIntervals = useRef(intervals);
 
   useEffect(() => {
     function scheduleStocksUpdate() {
@@ -24,9 +31,8 @@ export function useStocks(): void {
     }
 
     function loadStocks() {
-      prevIntervals.current = intervals;
-      fetchStocks(intervals)
-        .then(({ data, timestamp }) => {
+      fetchStocks(filterIntervals(intervals, store))
+        .then(({ data, intervals, timestamp }) => {
           const stocks: TStockList[] = [];
           data.forEach((stockData) => {
             const price = parseFloat(stockData.price);
@@ -38,7 +44,7 @@ export function useStocks(): void {
             });
           });
 
-          store.dispatch(setStocksList(stocks, timestamp));
+          store.dispatch(setStocksList(stocks, intervals, timestamp));
         })
         .catch(() => {})
         .finally(() => {
@@ -52,7 +58,7 @@ export function useStocks(): void {
     worker.addEventListener('message', onMessage);
 
     const lastUpdate = selectStocksUpdated(store.getState());
-    if (lastUpdate > Date.now() - 60000 && includesAllIntervals(intervals, prevIntervals.current)) {
+    if (lastUpdate > Date.now() - 60000 && filterIntervals(intervals, store).length === 0) {
       scheduleStocksUpdate();
     } else loadStocks();
 
@@ -64,21 +70,29 @@ export function useStocks(): void {
 }
 
 // TODO: retry on fail
-async function fetchStocks(intervals: string[]): Promise<{
+async function fetchStocks(reqIntervals: string[]): Promise<{
   data: TAPIStockList[];
+  intervals: { [interval: string]: number };
   timestamp: number;
 }> {
-  const params = intervals.length ? '?interval=' + intervals.join(',') : '';
+  const params = reqIntervals.length ? '?interval=' + reqIntervals.join(',') : '';
   const res = await fetch(process.env.REACT_APP_API + '/stocks' + params).then((response) => response.json());
   const data = res && res.data ? res.data : [];
   const timestamp = res && res.timestamp ? res.timestamp : 0;
+  const intervals = res && res.intervals ? res.intervals : {};
 
-  return { data, timestamp };
+  return { data, intervals, timestamp };
 }
 
-function includesAllIntervals(current: string[], prev: string[]): boolean {
-  for (let i = 0; i < current.length; i += 1) {
-    if (!prev.includes(current[i])) return false;
+function filterIntervals(intervals: string[], store: Store): string[] {
+  const now = Math.floor(Date.now() / 1000);
+  const loadedIntervals = selectStocksIntervals(store.getState());
+  const requiredIntervals: string[] = [];
+
+  for (let i = 0; i < intervals.length; i += 1) {
+    const interval = intervals[i];
+    if (!loadedIntervals[interval] || loadedIntervals[interval] <= now) requiredIntervals.push(interval);
   }
-  return true;
+
+  return requiredIntervals;
 }

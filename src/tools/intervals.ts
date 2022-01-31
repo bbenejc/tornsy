@@ -6,7 +6,7 @@ const SECONDS: { [key: string]: number } = {
   d: 86400,
 };
 
-export function calculateInterval(time: number, interval: TInterval, offset = 0): number {
+export function calculateInterval(time: number, interval: string, offset = 0): number {
   const type = interval[0];
 
   // only for seconds, minutes, hours and days

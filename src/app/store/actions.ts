@@ -81,8 +81,12 @@ export function setTheme(theme: TState['theme']): TAction {
   return { type: SET_THEME, theme };
 }
 
-export function setStocksList(list: TStockList[], timestamp: number): TAction {
-  return { type: SET_LIST, list, timestamp };
+export function setStocksList(
+  list: TStockList[],
+  intervals: { [interval: string]: number },
+  timestamp: number
+): TAction {
+  return { type: SET_LIST, list, intervals, timestamp };
 }
 
 export function setStockData(stock: string, interval: TInterval, data: TAPIStockData[]): TAction {
