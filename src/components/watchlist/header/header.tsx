@@ -7,7 +7,7 @@ import { getIntervalName } from 'tools/intervals';
 import { COLUMN_NAMES } from 'config';
 import { useContextMenu } from 'hooks';
 
-function Header({ className }: TProps): ReactElement {
+export function WatchlistHeader({ className }: TProps): ReactElement {
   const headers = ['name', 'price', ...useSelector(selectListColumns)];
 
   return (
@@ -18,8 +18,6 @@ function Header({ className }: TProps): ReactElement {
     </div>
   );
 }
-
-export const WatchlistHeader = memo(Header);
 
 function HeaderItem({ index, column }: TItemProps): ReactElement {
   const dispatch = useDispatch();

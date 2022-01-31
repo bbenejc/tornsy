@@ -76,7 +76,7 @@ function Menu({ width, height }: TProps): ReactElement {
               : { top: -1, width: 345, height: Math.min(height - 40, 450), border: '1px solid var(--color-border)' }
           }
         >
-          <Watchlist />
+          <Watchlist small />
         </div>
       )}
     </>

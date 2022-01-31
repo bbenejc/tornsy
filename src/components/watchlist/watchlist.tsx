@@ -1,4 +1,4 @@
-import { ReactElement } from 'react';
+import { memo, ReactElement } from 'react';
 import { useSelector } from 'react-redux';
 import { selectFavourites, selectOrderedStocksList } from 'app/store';
 import { WatchlistMenu } from './menu';
@@ -6,19 +6,19 @@ import { WatchlistHeader } from './header';
 import { WatchlistItem } from './item';
 import css from './watchlist.module.css';
 
-export function Watchlist(): ReactElement {
+function WatchlistComponent({ small = false }: TProps): ReactElement {
   return (
-    <>
-      <div className={css.Watchlist}>
-        <WatchlistMenu />
-        <div className={css.List}>
-          <WatchlistHeader className={css.Header} />
-          <List />
-        </div>
+    <div className={css.Watchlist}>
+      <WatchlistMenu small={small} />
+      <div className={css.List}>
+        <WatchlistHeader className={css.Header} />
+        <List />
       </div>
-    </>
+    </div>
   );
 }
+
+export const Watchlist = memo(WatchlistComponent);
 
 function List(): ReactElement {
   const stocks = useSelector(selectOrderedStocksList);
@@ -50,3 +50,7 @@ function List(): ReactElement {
     </>
   );
 }
+
+type TProps = {
+  small?: boolean;
+};

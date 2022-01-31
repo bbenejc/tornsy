@@ -1,12 +1,18 @@
-import { ReactElement, memo } from 'react';
+import { ReactElement } from 'react';
 import css from './menu.module.css';
 
-function Menu(): ReactElement {
+export function WatchlistMenu({ small }: TProps): ReactElement {
+  const classes = [css.Menu];
+  if (small) classes.push(css.Small);
+
   return (
-    <div className={css.Menu}>
+    <div className={classes.join(' ')}>
       <div className={css.Title}>Watchlist</div>
+      <button className={css.Close}>×</button>
     </div>
   );
 }
 
-export const WatchlistMenu = memo(Menu);
+type TProps = {
+  small: boolean;
+};

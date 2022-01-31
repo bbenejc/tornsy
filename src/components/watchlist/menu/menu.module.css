@@ -1,10 +1,19 @@
 .Menu {
   background-color: var(--color-paper);
   display: grid;
+  grid-template-columns: 1fr 32px;
   align-items: center;
 }
 .Title {
   font-size: 18px;
   font-weight: 600;
   padding-left: 8px;
+}
+.Close {
+  font-size: 22px;
+  height: 100%;
+  display: none;
+}
+.Small .Close {
+  display: block;
 }
