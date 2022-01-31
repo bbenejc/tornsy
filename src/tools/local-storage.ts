@@ -20,7 +20,7 @@ export function setListOrder(order: string): void {
 
 export function getListColumns(): string[] {
   const columns = localStorage.getItem(LIST_COLUMNS);
-  return columns ? columns.split(',') : ['price|h24', 'price|d7', 'marketcap', 'marketcap|d7|$'];
+  return columns ? columns.split(',') : ['price|h24', 'price|d7', 'marketcap', 'marketcap|d1|$'];
 }
 
 export function setListColumns(columns: string[]): void {
