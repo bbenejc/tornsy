@@ -320,9 +320,10 @@ function Tooltip({ data, series, stock, interval, chart }: TProps): ReactElement
           : stockInfo.total_shares * stockInfo.price
         : data[dataIndex][data[dataIndex].length - 1],
     ];
-    const curVolume = volume === VOLUME[0][0] ? VOLUME[0] : VOLUME[1];
-    const otherVolume = volume === VOLUME[0][0] ? VOLUME[1] : VOLUME[0];
-    if (curVolume === VOLUME[1]) volumeValues.reverse();
+    const mcapMain = volume === VOLUME[1][0];
+    const curVolume = VOLUME[mcapMain ? 1 : 0];
+    const otherVolume = VOLUME[mcapMain ? 0 : 1];
+    if (mcapMain) volumeValues.reverse();
 
     return (
       <>
@@ -347,9 +348,10 @@ function Tooltip({ data, series, stock, interval, chart }: TProps): ReactElement
             {curVolume[1]}
           </div>
           <div className={css.Value}>
+            {mcapMain ? '$' : ''}
             {formatNumber(volumeValues[0], true)}{' '}
             <span>
-              ($
+              ({mcapMain ? '' : '$'}
               {formatNumber(volumeValues[1], true)})
             </span>
           </div>
