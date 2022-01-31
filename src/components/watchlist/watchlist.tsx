@@ -1,4 +1,4 @@
-import { memo, ReactElement } from 'react';
+import { memo, ReactElement, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { selectFavourites, selectOrderedStocksList } from 'app/store';
 import { WatchlistMenu } from './menu';
@@ -12,7 +12,7 @@ function WatchlistComponent({ small = false, onClose }: TProps): ReactElement {
       <WatchlistMenu small={small} onClose={onClose} />
       <div className={css.List}>
         <WatchlistHeader className={css.Header} />
-        <List />
+        <List small={small} onClose={onClose} />
       </div>
     </div>
   );
@@ -20,7 +20,7 @@ function WatchlistComponent({ small = false, onClose }: TProps): ReactElement {
 
 export const Watchlist = memo(WatchlistComponent);
 
-function List(): ReactElement {
+function List({ small = false, onClose }: TProps): ReactElement {
   const stocks = useSelector(selectOrderedStocksList);
   const favourites = useSelector(selectFavourites);
 
@@ -31,19 +31,23 @@ function List(): ReactElement {
     else otherStocks.push(s);
   });
 
+  const closeWatchlist = useCallback(() => {
+    if (small && onClose) onClose();
+  }, [small, onClose]);
+
   return (
     <>
       {favStocks.length > 0 && (
         <div className={css.Group}>
           {favStocks.map((stock) => {
-            return <WatchlistItem stock={stock} key={stock.stock} />;
+            return <WatchlistItem stock={stock} key={stock.stock} onClick={closeWatchlist} />;
           })}
         </div>
       )}
       {otherStocks.length > 0 && (
         <div className={css.Group}>
           {otherStocks.map((stock) => {
-            return <WatchlistItem stock={stock} key={stock.stock} />;
+            return <WatchlistItem stock={stock} key={stock.stock} onClick={closeWatchlist} />;
           })}
         </div>
       )}

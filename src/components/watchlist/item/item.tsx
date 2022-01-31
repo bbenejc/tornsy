@@ -24,6 +24,7 @@ export function WatchlistItem(props: TProps): ReactElement {
       ref={itemRef}
       className={classNames.join(' ')}
       to={'/' + stock.toLowerCase() + (chartInterval !== 'm1' ? '/' + chartInterval : '')}
+      onClick={props.onClick}
     >
       <div>
         <img src={getStockLogoUrl(stock, isDarkTheme)} alt={stock} />
@@ -55,4 +56,5 @@ export function WatchlistItem(props: TProps): ReactElement {
 
 type TProps = {
   stock: TStockList;
+  onClick: () => void;
 };
