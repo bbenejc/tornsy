@@ -54,8 +54,8 @@ export function setStock(stock: string): void {
 }
 
 export function getInterval(): TInterval {
-  const interval = localStorage.getItem(INTERVAL);
-  return (interval && interval in INTERVALS ? interval : 'm1') as TInterval;
+  const interval = localStorage.getItem(INTERVAL) as TInterval;
+  return interval && INTERVALS.includes(interval) ? interval : 'm1';
 }
 
 export function setInterval(interval: string): void {
