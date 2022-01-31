@@ -62,6 +62,10 @@ const initialState: TState = {
   listColumns: getListColumns(),
 };
 
+if (!initialState.listColumns.includes(initialState.listSorting.split('-')[0])) {
+  initialState.listSorting = 'marketcap-desc';
+}
+
 export const reducer = (state = initialState, action: TAction): TState => {
   switch (action.type) {
     case SET_ONLINE:
