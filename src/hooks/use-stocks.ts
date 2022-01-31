@@ -11,7 +11,7 @@ export function useStocks(): void {
   const visibility = useSelector(selectVisibility);
   const online = useSelector(selectOnline);
   const intervals = useSelector(selectListIntervals);
-  const prevIntervals = useRef(intervals.join(','));
+  const prevIntervals = useRef(intervals);
 
   useEffect(() => {
     function scheduleStocksUpdate() {
@@ -24,7 +24,7 @@ export function useStocks(): void {
     }
 
     function loadStocks() {
-      prevIntervals.current = intervals.join(',');
+      prevIntervals.current = intervals;
       fetchStocks(intervals)
         .then(({ data, timestamp }) => {
           const stocks: TStockList[] = [];
@@ -52,8 +52,9 @@ export function useStocks(): void {
     worker.addEventListener('message', onMessage);
 
     const lastUpdate = selectStocksUpdated(store.getState());
-    if (lastUpdate > Date.now() - 60000 && intervals.join(',') === prevIntervals.current) scheduleStocksUpdate();
-    else loadStocks();
+    if (lastUpdate > Date.now() - 60000 && includesAllIntervals(intervals, prevIntervals.current)) {
+      scheduleStocksUpdate();
+    } else loadStocks();
 
     return () => {
       worker.removeEventListener('message', onMessage);
@@ -73,4 +74,11 @@ async function fetchStocks(intervals: string[]): Promise<{
   const timestamp = res && res.timestamp ? res.timestamp : 0;
 
   return { data, timestamp };
+}
+
+function includesAllIntervals(current: string[], prev: string[]): boolean {
+  for (let i = 0; i < current.length; i += 1) {
+    if (!prev.includes(current[i])) return false;
+  }
+  return true;
 }
