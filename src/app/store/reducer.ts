@@ -55,7 +55,7 @@ const initialState: TState = {
   indicators: getIndicators(),
   advanced: getAdvanced(),
   theme: getTheme() || 'dark',
-  list: { data: [], lastUpdate: 0 },
+  list: { data: [], lastUpdate: 0, intervals: {} },
   ohlc: {},
   listFavourites: getListFavourites(),
   listSorting: getListOrder() || 'marketcap-desc',
@@ -139,7 +139,7 @@ export const reducer = (state = initialState, action: TAction): TState => {
         }
       }
 
-      return { ...state, list: { data: list, lastUpdate: now }, ohlc };
+      return { ...state, list: { data: list, lastUpdate: now, intervals: {} }, ohlc };
     }
 
     case SET_OHLC: {

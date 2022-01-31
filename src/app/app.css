@@ -28,7 +28,7 @@
 
 .App {
   display: grid;
-  grid-template-columns: 1fr 435px;
+  grid-template-columns: 1fr 425px;
   grid-gap: 5px;
   overflow: hidden;
   height: 100%;

@@ -34,6 +34,9 @@ export type TState = {
   list: {
     data: TStockList[];
     lastUpdate: number;
+    intervals: {
+      [interval: string]: number;
+    };
   };
   ohlc: {
     [stock: string]: {

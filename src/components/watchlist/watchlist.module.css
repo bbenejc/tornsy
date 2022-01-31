@@ -49,6 +49,7 @@
   left: 0;
   background-color: var(--color-paper);
   padding-left: 8px;
+  box-sizing: border-box;
 }
 
 .Header,
