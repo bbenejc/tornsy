@@ -35,6 +35,7 @@
   overflow: hidden;
   z-index: 11;
   font-size: 12px;
+  box-shadow: 0 0 15px 0 var(--color-shadow);
 }
 .List > div {
   display: flex;

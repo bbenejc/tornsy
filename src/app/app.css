@@ -11,6 +11,7 @@
   --color-red: #f44336;
   --color-green: #26a69a;
   --color-grey: #aaa;
+  --color-shadow: rgba(0, 0, 0, 0.5);
 }
 .App.dark {
   --color-bg: #2a2e38;
@@ -24,6 +25,7 @@
   --color-red: #ef5350;
   --color-green: #26a69a;
   --color-grey: #aaa;
+  --color-shadow: rgba(75, 75, 75, 0.25);
 }
 
 .App {
