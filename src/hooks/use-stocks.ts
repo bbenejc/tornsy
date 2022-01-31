@@ -21,12 +21,15 @@ export function useStocks(): void {
   const intervals = useSelector(selectListIntervals);
 
   useEffect(() => {
-    function scheduleStocksUpdate() {
-      const timeNext = new Date();
-      timeNext.setMinutes(timeNext.getMinutes() + (timeNext.getSeconds() >= 3 ? 1 : 0), UPDATE_SECOND, 0);
+    function scheduleStocksUpdate(time = 0) {
+      if (time === 0) {
+        const timeNext = new Date();
+        timeNext.setMinutes(timeNext.getMinutes() + (timeNext.getSeconds() >= 3 ? 1 : 0), UPDATE_SECOND, 0);
+        time = Math.max(0, timeNext.getTime() - Date.now());
+      }
       worker.postMessage({
         set: 'stocks',
-        interval: Math.max(0, timeNext.getTime() - Date.now()),
+        interval: time,
       });
     }
 
@@ -45,10 +48,10 @@ export function useStocks(): void {
           });
 
           store.dispatch(setStocksList(stocks, intervals, timestamp));
-        })
-        .catch(() => {})
-        .finally(() => {
           scheduleStocksUpdate();
+        })
+        .catch(() => {
+          scheduleStocksUpdate(3000);
         });
     }
 
@@ -69,7 +72,6 @@ export function useStocks(): void {
   }, [store, visibility, online, intervals]);
 }
 
-// TODO: retry on fail
 async function fetchStocks(reqIntervals: string[]): Promise<{
   data: TAPIStockList[];
   intervals: { [interval: string]: number };
