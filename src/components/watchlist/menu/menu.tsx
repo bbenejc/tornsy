@@ -1,4 +1,4 @@
-import { ReactElement, useCallback, MouseEvent, memo } from 'react';
+import { ReactElement, memo } from 'react';
 import css from './menu.module.css';
 
 function Menu(): ReactElement {

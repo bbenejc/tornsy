@@ -54,7 +54,7 @@ export function App(): ReactElement {
       <div className={appCss.join(' ')} style={{ height }}>
         <div className="Main">
           <Menu width={width} height={height} />
-          {height > 0 && <Chart height={height - 40 - bottom / 2} width={isSmall ? width : width - 415} />}
+          {height > 0 && <Chart height={height - 40 - bottom / 2} width={isSmall ? width : width - 440} />}
         </div>
         {height > 0 && !isSmall && <Watchlist />}
         <ContextMenu />
