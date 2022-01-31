@@ -76,7 +76,7 @@ function Menu({ width, height }: TProps): ReactElement {
           style={
             width < XSMALL || height < XSMALL
               ? mobileListStyle
-              : { top: -1, width: 345, height: Math.min(height - 40, 450), border: '1px solid var(--color-border)' }
+              : { top: -1, width: 360, height: Math.min(height - 40, 450), border: '1px solid var(--color-border)' }
           }
           ref={listRef}
         >
