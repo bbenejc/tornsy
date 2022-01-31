@@ -6,10 +6,10 @@ import { WatchlistHeader } from './header';
 import { WatchlistItem } from './item';
 import css from './watchlist.module.css';
 
-function WatchlistComponent({ small = false }: TProps): ReactElement {
+function WatchlistComponent({ small = false, onClose }: TProps): ReactElement {
   return (
     <div className={css.Watchlist}>
-      <WatchlistMenu small={small} />
+      <WatchlistMenu small={small} onClose={onClose} />
       <div className={css.List}>
         <WatchlistHeader className={css.Header} />
         <List />
@@ -53,4 +53,5 @@ function List(): ReactElement {
 
 type TProps = {
   small?: boolean;
+  onClose?: () => void;
 };

@@ -1,4 +1,4 @@
-import { memo, ReactElement, useCallback, useEffect, useState } from 'react';
+import { memo, ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectInterval, selectStock, selectTheme, setTheme } from 'app/store';
 import { Link } from 'react-router-dom';
@@ -12,6 +12,7 @@ function Menu({ width, height }: TProps): ReactElement {
   const stock = useSelector(selectStock);
   const interval = useSelector(selectInterval);
   const [list, setList] = useState(false);
+  const listRef = useRef<any>(null);
   const theme = useSelector(selectTheme);
   const toggleTheme = useCallback(() => {
     dispatch(setTheme(theme === 'light' ? 'dark' : 'light'));
@@ -25,7 +26,9 @@ function Menu({ width, height }: TProps): ReactElement {
 
   useEffect(() => {
     if (list) {
-      const closeList = () => setList(false);
+      const closeList = (e: MouseEvent) => {
+        if (listRef.current && !listRef.current.contains(e.target)) setList(false);
+      };
       const escKey = (e: KeyboardEvent) => {
         if (e.key === 'Escape') setList(false);
       };
@@ -75,8 +78,9 @@ function Menu({ width, height }: TProps): ReactElement {
               ? mobileListStyle
               : { top: -1, width: 345, height: Math.min(height - 40, 450), border: '1px solid var(--color-border)' }
           }
+          ref={listRef}
         >
-          <Watchlist small />
+          <Watchlist small onClose={toggleList} />
         </div>
       )}
     </>
