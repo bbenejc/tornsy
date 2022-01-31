@@ -42,7 +42,7 @@ export function parseColumn(column: string): TParsedColumn {
 
 export function makeColumnString({ field, interval, type }: TParsedColumn): string {
   const parts: string[] = [field];
-  if (interval != '') {
+  if (interval !== '') {
     parts.push(interval);
     if (type !== '%') parts.push(type);
   }

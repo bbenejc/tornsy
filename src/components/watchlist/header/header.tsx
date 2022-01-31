@@ -1,4 +1,4 @@
-import { ReactElement, MouseEvent, memo, useRef } from 'react';
+import { ReactElement, MouseEvent, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectListColumns, selectListOrder, setListSorting } from 'app/store';
 import css from './header.module.css';
