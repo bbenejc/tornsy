@@ -28,26 +28,55 @@
 }
 .Context {
   position: fixed;
-  width: 180px;
+  width: 220px;
   background-color: var(--color-paper);
   border: 1px solid var(--color-border);
   border-radius: 8px;
   overflow: hidden;
   z-index: 11;
+  font-size: 12px;
 }
-.Context > div {
+.List > div {
   display: flex;
   padding: 8px;
-  font-size: 12px;
   align-items: center;
   cursor: pointer;
   white-space: nowrap;
 }
-.Context > div:hover {
+.List > div:hover,
+.Context button:hover {
   background-color: var(--color-highlight);
 }
-.Context svg {
-  height: 22px;
+.List > div:not(:last-child) {
+  border-bottom: 1px solid var(--color-border);
+}
+.List svg {
+  height: 20px;
   margin-right: 8px;
   fill: var(--color-font);
+}
+.Setting {
+  display: flex;
+  padding-left: 8px;
+  border-bottom: 1px solid var(--color-border);
+  align-items: center;
+}
+.Setting > div:first-child {
+  color: var(--color-font-sec);
+  flex: 1;
+}
+.Setting button {
+  padding: 8px 16px;
+}
+.Intervals {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+}
+.Intervals > button {
+  padding: 8px 0;
+  cursor: pointer;
+  text-align: center;
+}
+.Active {
+  color: var(--color-highlight-text);
 }

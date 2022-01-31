@@ -23,3 +23,12 @@ body > svg {
 * {
   user-select: none;
 }
+
+button {
+  border: none;
+  outline: none;
+  background-color: transparent;
+  cursor: pointer;
+  color: inherit;
+  font-size: inherit;
+}

@@ -185,13 +185,9 @@
   color: var(--color-font-sec);
 }
 .Settings button {
-  border: none;
-  outline: none;
-  background-color: transparent;
   color: var(--color-font-sec);
   padding: 8px;
   border-radius: 4px;
-  cursor: pointer;
 }
 .Settings button:hover {
   background-color: var(--color-highlight);
