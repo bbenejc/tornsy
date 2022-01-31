@@ -13,7 +13,7 @@ export function WatchlistHeader({ className }: TProps): ReactElement {
   return (
     <div className={[className, css.Header].join(' ')}>
       {headers.map((h, i) => (
-        <HeaderItem key={h} index={i} column={h} />
+        <HeaderItem key={`${i}-${h}`} index={i} column={h} />
       ))}
     </div>
   );
@@ -31,8 +31,12 @@ function HeaderItem({ index, column }: TItemProps): ReactElement {
   useContextMenu(itemRef, 'header', index - 2);
 
   return (
-    <div ref={index > 1 ? itemRef : null}>
-      <span onClick={changeOrder(column)} className={column === sortColumn ? css.Sorted : ''}>
+    <div>
+      <span
+        ref={index > 1 ? itemRef : null}
+        onClick={changeOrder(column)}
+        className={column === sortColumn ? css.Sorted : ''}
+      >
         {parsedHeader.interval === '' ? COLUMN_NAMES[parsedHeader.field] : getIntervalName(parsedHeader.interval)}
       </span>
     </div>

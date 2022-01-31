@@ -92,16 +92,16 @@ export function parseFloatsData(input: TAPIStockData[]): TStockData[] {
   return output;
 }
 
-export function getColumnValue(data: TStockList, column: string): [number, string] {
+export function getColumnValue(data: TStockList, column: string): [number | null, string] {
   const { field, interval, type } = parseColumn(column);
-  let value = data[field];
+  let value: number | null = data[field];
   const isPercentage = type !== '$';
 
   if (interval) {
     if (data.interval[interval]) {
       const prevValue = data.interval[interval][field];
       value = isPercentage ? (value / prevValue - 1) * 100 : value - prevValue;
-    } else value = 0;
+    } else value = null;
   }
 
   return [value, type];

@@ -5,6 +5,7 @@ import { useContextMenu } from 'hooks';
 import { selectInterval, selectIsActiveStock, selectListColumns, selectTheme } from 'app/store';
 import { getColumnValue, formatNumber, getStockLogoUrl } from 'tools';
 import css from './item.module.css';
+import { Placeholder } from 'components/placeholder';
 
 export function WatchlistItem(props: TProps): ReactElement {
   const { stock, price } = props.stock;
@@ -29,18 +30,24 @@ export function WatchlistItem(props: TProps): ReactElement {
         {stock}
       </div>
       <div>{formatNumber(price)}</div>
-      {cols.map((col) => {
+      {cols.map((col, i) => {
         const [value, growth] = getColumnValue(props.stock, col);
-
-        if (growth !== '') {
+        const key = `${i}-${col}`;
+        if (value === null)
           return (
-            <div className={value === 0 ? css.Grey : value > 0 ? css.Green : css.Red} key={col}>
+            <div key={key}>
+              <Placeholder />
+            </div>
+          );
+        else if (growth !== '') {
+          return (
+            <div className={value === 0 ? css.Grey : value > 0 ? css.Green : css.Red} key={key}>
               {growth !== '' && value > 0 ? '+' : value < 0 ? '-' : ''}
               {formatNumber(Math.abs(value), true)}
               {growth === '%' ? '%' : ''}
             </div>
           );
-        } else return <div key={col}>{formatNumber(value, true)}</div>;
+        } else return <div key={key}>{formatNumber(value, true)}</div>;
       })}
     </Link>
   );

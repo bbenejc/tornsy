@@ -75,6 +75,7 @@ export const selectOrderedStocksList = createSelector(selectStocksList, selectLi
     else {
       const aValue = getColumnValue(a, sort)[0];
       const bValue = getColumnValue(b, sort)[0];
+      if (aValue === null || bValue === null) return 0;
       return direction === SORTING[0] ? aValue - bValue : bValue - aValue;
     }
   });
