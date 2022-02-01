@@ -38,6 +38,7 @@ function Chart({ height, width }: TProps): ReactElement {
   const volume = useSelector(selectVolume);
   const [hover, setHover] = useState<TTooltip[]>();
   const [lastData, setLastData] = useState<TTooltip[]>();
+  const usedTouch = useRef(false);
   const hoverPrev = useRef<string>();
 
   const theme = getTheme(useSelector(selectTheme));
@@ -56,6 +57,26 @@ function Chart({ height, width }: TProps): ReactElement {
     isLoading.current = true;
     chartKey.current = curKey;
   }
+
+  useEffect(() => {
+    const div = divRef.current;
+    const onTouch = () => {
+      usedTouch.current = true;
+    };
+    const onMouse = () => {
+      usedTouch.current = false;
+    };
+
+    if (div) {
+      div.addEventListener('touchend', onTouch);
+      div.addEventListener('mousedown', onMouse);
+
+      return () => {
+        div.removeEventListener('touchend', onTouch);
+        div.removeEventListener('mousedown', onMouse);
+      };
+    }
+  }, []);
 
   // initialize or resize chart
   useEffect(() => {
@@ -125,17 +146,14 @@ function Chart({ height, width }: TProps): ReactElement {
     const tooltip: TTooltip[] = [];
     if (chart.current) {
       if (data.length) {
-        if (isLoading.current) {
-          // fix for a kinetic bug (to stop kinetic scroll when new stock / interval is loaded)
+        // fix for a kinetic bug (to stop kinetic scroll when new stock / interval is loaded)
+        if (isLoading.current && usedTouch.current) {
           try {
             const ref =
               divRef.current?.childNodes[5].childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[1];
             if (ref) {
               ref.dispatchEvent(new TouchEvent('touchstart'));
               ref.dispatchEvent(new TouchEvent('touchend', { bubbles: true }));
-              ref.dispatchEvent(new Event('mousedown'));
-              ref.dispatchEvent(new Event('mouseleave'));
-              ref.dispatchEvent(new Event('mouseup', { bubbles: true }));
             }
           } catch {}
         }
