@@ -276,13 +276,16 @@ function Tooltip({ data, series, stock, interval, chart }: TProps): ReactElement
             {Value}
           </div>
         );
+        if (type === 'rsi') break;
       }
 
       if (type === 'macd') advancedSeries.push(advancedSeries.shift());
       const nameInfo: number[] = [];
-      params.forEach(({ key, value }) => {
+      for (let i = 0; i < params.length; i += 1) {
+        const { key, value } = params[i];
         nameInfo.push(key in advanced ? advanced[key as keyof TAdvanced] : value);
-      });
+        if (type === 'rsi') break;
+      }
 
       advancedExtra.push(
         <div className={css.Indicator} key={advanced.type}>
@@ -487,8 +490,13 @@ const AdvancedSettingsC = React.forwardRef(
         const field = e.currentTarget.getAttribute('data-field');
         let length = parseInt(e.currentTarget.value);
         if (field && !isNaN(length)) {
-          if (length > 250) length = 250;
-          else if (length < 2) length = 2;
+          if (field === 'high' || field === 'low') {
+            if (length > 100) length = 100;
+            else if (length < 1) length = 1;
+          } else {
+            if (length > 250) length = 250;
+            else if (length < 2) length = 2;
+          }
           dispatch(updateAdvanced(field, length));
         }
       },

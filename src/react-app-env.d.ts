@@ -80,7 +80,7 @@ type TIndicator = {
 
 type TAdvanced =
   | undefined
-  | { type: 'rsi'; length: number }
+  | { type: 'rsi'; length: number; high?: number; low?: number }
   | { type: 'stoch'; k: number; d: number }
   | { type: 'macd'; slow: number; fast: number; smoothing: number }
   | { type: 'adx'; length: number };

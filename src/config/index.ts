@@ -46,7 +46,14 @@ export const VOLUME = [
 ];
 
 export const INDICATORS_ADVANCED = [
-  { type: 'rsi', params: [{ key: 'length', value: 14, title: 'Length' }] },
+  {
+    type: 'rsi',
+    params: [
+      { key: 'length', value: 14, title: 'Length' },
+      { key: 'high', value: 70, title: 'High' },
+      { key: 'low', value: 30, title: 'Low' },
+    ],
+  },
   {
     type: 'stoch',
     params: [

@@ -286,7 +286,7 @@ export function createAdvancedSeries(
     const priceLines: number[] = [];
     switch (advanced.type) {
       case 'rsi':
-        priceLines.push(70, 30);
+        priceLines.push(advanced.high || 70, advanced.low || 30);
         const rsiData = calculateRSI(data, interval, advanced.length);
         if (rsiData.length) advancedData.push(rsiData);
         break;
