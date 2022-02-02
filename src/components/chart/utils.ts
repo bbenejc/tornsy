@@ -17,6 +17,7 @@ import {
   calculateMACD,
   calculateRSI,
   calculateSMA,
+  calculateVWAP,
   calculateStochastics,
   formatNumber,
 } from 'tools';
@@ -233,6 +234,8 @@ export function createIndicatorSeries(
       const seriesData =
         indicators[i].type === 'ema'
           ? calculateEMA(data, interval, indicators[i].length)
+          : indicators[i].type === 'vwap'
+          ? calculateVWAP(data, interval, indicators[i].length)
           : calculateSMA(data, interval, indicators[i].length);
 
       const num = seriesData.length;

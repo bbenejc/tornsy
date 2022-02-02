@@ -26,6 +26,40 @@ export function calculateEMA(stockData: TStockData[], interval: TInterval, lengt
   return calcEMA_(data, length, smoothing);
 }
 
+function getAveragePrice(data: TStockData, interval: TInterval): number {
+  if (interval === 'm1') return data[1];
+  else return (data[2] + data[3] + (data[4] as number)) / 3;
+}
+
+export function calculateVWAP(stockData: TStockData[], interval: TInterval, maxLength = 24): LineData[] {
+  const vwapData: LineData[] = [];
+  const volumeIndex = interval === 'm1' ? 2 : 5;
+
+  const prices = [];
+  const volumes = [];
+
+  for (let i = 1; i < stockData.length; i += 1) {
+    const price = getAveragePrice(stockData[i], interval);
+    const volume = Math.abs((stockData[i][volumeIndex] as number) - (stockData[i - 1][volumeIndex] as number));
+    prices.push(price * volume);
+    volumes.push(volume);
+
+    if (prices.length > maxLength) {
+      prices.shift();
+      volumes.shift();
+    }
+
+    const p = sumArray(prices);
+    const v = sumArray(volumes);
+    vwapData.push({
+      time: stockData[i][0],
+      value: p * v === 0 ? price : p / v,
+    });
+  }
+
+  return vwapData;
+}
+
 export function calculateRSI(data: TStockData[], interval: TInterval, length = 14): LineData[] {
   const isM1 = interval === 'm1' ? 1 : 0;
   const cIndex = isM1 ? 1 : 4;

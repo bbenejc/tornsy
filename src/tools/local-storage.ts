@@ -72,7 +72,7 @@ export function getIndicators(): TIndicator[] {
         const indicator = lsIndicators[i];
         if (
           typeof indicator === 'object' &&
-          ['sma', 'ema'].includes(indicator.type) &&
+          ['sma', 'ema', 'vwap'].includes(indicator.type) &&
           typeof indicator.length === 'number'
         ) {
           indicators.push(indicator);

@@ -426,6 +426,9 @@ const IndicatorSettingsC = React.forwardRef(
             <button onClick={changeType} value="ema" className={type === 'ema' ? css.Active : ''}>
               EMA
             </button>
+            <button onClick={changeType} value="vwap" className={type === 'vwap' ? css.Active : ''}>
+              VWAP
+            </button>
           </div>
         </div>
         <div>
