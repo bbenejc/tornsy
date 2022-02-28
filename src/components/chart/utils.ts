@@ -339,6 +339,7 @@ export function createAdvancedSeries(
           lineStyle: LineStyle.Dotted,
           lineWidth: 1,
           axisLabelVisible: true,
+          lineVisible: true,
           title: '',
         })
       );
