@@ -152,7 +152,12 @@ function Chart({ height, width }: TProps): ReactElement {
             const ref =
               divRef.current?.childNodes[5].childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[1];
             if (ref) {
-              ref.dispatchEvent(new TouchEvent('touchstart'));
+              ref.dispatchEvent(
+                new TouchEvent('touchstart', {
+                  bubbles: true,
+                  changedTouches: [new Touch({ identifier: 0, target: ref })],
+                })
+              );
               ref.dispatchEvent(new TouchEvent('touchend', { bubbles: true }));
             }
           } catch {}
