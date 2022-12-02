@@ -2,7 +2,8 @@ Allow from All
 RewriteEngine On
 Options -Indexes
 
-AddType text/cache-manifest .manifest
+AddType text/cache-manifest .webmanifest
+AddType image/x-icon .ico
 
 # Redirect HTTP -> HTTPS
 RewriteCond %{HTTPS} off 
@@ -25,3 +26,5 @@ ExpiresByType text/html M0
 ExpiresByType image/svg+xml "access plus 1 month"
 ExpiresByType text/css "access plus 1 year"
 ExpiresByType application/javascript "access plus 1 year"
+ExpiresByType text/cache-manifest "access plus 1 year"
+ExpiresByType image/x-icon "access plus 1 year"
