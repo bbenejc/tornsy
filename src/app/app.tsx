@@ -5,7 +5,7 @@ import { Redirect } from 'react-router-dom';
 import { useStocks, useQueryParams } from 'hooks';
 import { selectTheme, setOnline, setVisibility } from 'app/store';
 import { SMALL } from 'config';
-import { Chart, Menu, Watchlist, Status, ContextMenu } from 'components';
+import { Chart, Menu, Watchlist, Status, Logo, ContextMenu } from 'components';
 import './app.css';
 
 export function App(): ReactElement {
@@ -58,6 +58,7 @@ export function App(): ReactElement {
         </div>
         {height > 0 && !isSmall && <Watchlist />}
         <ContextMenu />
+        <Logo />
         <Status />
       </div>
     </>

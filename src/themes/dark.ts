@@ -1,5 +1,6 @@
-const darkTheme = {
+const darkTheme: TTheme = {
   dark: true,
+  logo: 'tornsy_dark.svg',
   paper: '#161a24',
   grid: '#242732',
   axis: '#31363e',

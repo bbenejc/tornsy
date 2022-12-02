@@ -2,6 +2,7 @@
 
 type TTheme = {
   dark: boolean;
+  logo: string;
   paper: string;
   grid: string;
   axis: string;

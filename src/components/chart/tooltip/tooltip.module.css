@@ -134,7 +134,7 @@
   line-height: 20px;
 }
 .AdvancedIndicator.None {
-  bottom: 30px;
+  bottom: 60px;
 }
 .AdvancedIndicator .Name {
   color: var(--color-font);

@@ -1,5 +1,6 @@
-const lightTheme = {
+const lightTheme: TTheme = {
   dark: false,
+  logo: 'tornsy_light.svg',
   paper: '#fff',
   grid: '#f2f3f3',
   axis: '#e1e1e3',
