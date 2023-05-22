@@ -13,6 +13,9 @@ import { parseFloatsListIntervals } from 'tools';
 import { Store } from 'redux';
 
 const worker = new Worker('/worker.js');
+window.addEventListener('beforeunload', function () {
+  worker.terminate();
+});
 
 export function useStocks(): void {
   const store = useStore();
