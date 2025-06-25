@@ -27,7 +27,7 @@ export function useStocks(): void {
     function scheduleStocksUpdate(time = 0) {
       if (time === 0) {
         const timeNext = new Date();
-        timeNext.setMinutes(timeNext.getMinutes() + (timeNext.getSeconds() >= 3 ? 1 : 0), UPDATE_SECOND, 0);
+        timeNext.setMinutes(timeNext.getMinutes() + (timeNext.getSeconds() >= UPDATE_SECOND ? 1 : 0), UPDATE_SECOND, 0);
         time = Math.max(0, timeNext.getTime() - Date.now());
       }
       worker.postMessage({

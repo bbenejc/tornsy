@@ -1,5 +1,5 @@
 export const API_LIMIT = 1000;
-export const UPDATE_SECOND = 5;
+export const UPDATE_SECOND = 15;
 export const INDICATORS_MAX = 4;
 export const SMALL = 1200;
 export const XSMALL = 640;
